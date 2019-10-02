@@ -1,0 +1,592 @@
+#+TITLE: Emacs Config
+#+AUTHOR: Matthew Cooper Healy
+
+* Package Management
+** Package Repositories
+#+BEGIN_SRC emacs-lisp
+(require 'package)
+(setq package-archives
+      '(("MELPA Stable" . "https://stable.melpa.org/packages/")
+        ("GNU ELPA"     . "https://elpa.gnu.org/packages/")
+	    ("MELPA"        . "https://melpa.org/packages/"))
+      package-archive-priorities
+      '(("GNU ELPA"     . 10)
+	    ("MELPA"        . 0)))
+(package-initialize)
+
+(add-to-list 'load-path "~/.emacs.d/modules/") ; add local files
+#+END_SRC
+
+** use-package
+#+BEGIN_SRC emacs-lisp
+  (unless (package-installed-p 'use-package)
+    (package-refresh-contents)
+      (package-install 'use-package))
+
+  (eval-when-compile
+    (require 'use-package))
+#+END_SRC
+
+* Quality of Life Improvements
+** Trailing Whitespace
+#+BEGIN_SRC emacs-lisp
+(add-hook 'prog-mode-hook (lambda () (setq show-trailing-whitespace t)))
+(add-hook 'before-save-hook 'delete-trailing-whitespace)
+#+END_SRC
+
+** Line Numbers
+#+BEGIN_SRC emacs-lisp
+(if (version<= "26.0.50" emacs-version)
+  (global-display-line-numbers-mode)
+  (progn
+    (global-linum-mode t)
+    (setq linum-format "%4d \u2502 ")))
+#+END_SRC
+
+** Look
+*** Frame Size
+#+BEGIN_SRC emacs-lisp
+(when window-system
+  (set-frame-size (selected-frame) 220 52))
+#+END_SRC
+
+*** Theme
+#+BEGIN_SRC emacs-lisp
+    (use-package doom-themes
+      :ensure t
+      :config
+      (setq doom-themes-enable-bold t
+            doom-themes-enable-italic t)
+      (load-theme 'doom-one-light t)
+      (doom-themes-visual-bell-config))
+
+    (defvar *dark-mode* nil)
+
+    (defun toggle-light-dark ()
+    "Toggle between light and dark color themes"
+      (interactive)
+      (if *dark-mode*
+        (progn
+          (load-theme 'doom-one-light)
+          (setq *dark-mode* nil))
+        (progn
+          (load-theme 'doom-one)
+          (setq *dark-mode* t)))
+      (set-fonts))
+
+    (global-set-key (kbd "<f6>") 'toggle-light-dark)
+#+END_SRC
+
+*** Org-Mode
+#+BEGIN_SRC emacs-lisp
+(use-package org-bullets
+  :ensure t
+  :config
+  (add-hook 'org-mode-hook (lambda () (org-bullets-mode 1)))
+  (add-hook 'org-mode-hook 'org-indent-mode))
+#+END_SRC
+
+*** Modeline
+#+BEGIN_SRC emacs-lisp
+(use-package doom-modeline
+  :ensure t
+  :hook (after-init . doom-modeline-mode))
+#+END_SRC
+
+*** Remove Default Trash
+#+BEGIN_SRC emacs-lisp
+(menu-bar-mode -1)
+(scroll-bar-mode -1)
+(tool-bar-mode -1)
+(setq inhibit-startup-screen t)
+#+END_SRC
+
+*** Cursor
+#+BEGIN_SRC emacs-lisp
+(setq-default cursor-type 'bar)
+#+END_SRC
+
+*** Truncate, Don't Wrap
+#+BEGIN_SRC emacs-lisp
+(set-default 'truncate-lines t)
+(define-fringe-bitmap 'right-arrow
+  [#b00000000
+   #b00011000
+   #b00111100
+   #b01111110
+   #b01111110
+   #b00111100
+   #b00011000
+   #b00000000])
+(define-fringe-bitmap 'left-arrow
+  [#b00000000
+   #b00011000
+   #b00111100
+   #b01111110
+   #b01111110
+   #b00111100
+   #b00011000
+   #b00000000])
+#+END_SRC
+
+*** Focus Line
+#+BEGIN_SRC emacs-lisp
+(global-hl-line-mode 1)
+#+END_SRC
+
+*** Dashboard
+#+BEGIN_SRC emacs-lisp
+    (defun no-linum ()
+      (display-line-numbers-mode -1))
+    (use-package dashboard
+      :ensure t
+      :config
+      (setq initial-buffer-choice (lambda () (get-buffer "*dashboard*"))) ; for emacs daemon
+      (setq dashboard-items '((projects . 5)
+                              (recents . 5)
+                              (agenda . 5)))
+      (setq dashboard-set-heading-icons t)
+      (dashboard-modify-heading-icons '((recents . "file-text")))
+      (setq dashboard-set-navigator t)
+      (setq dashboard-set-file-icons t)
+      (setq dashboard-startup-banner "~/.emacs.d/img/axiom.png") ; set to path to image file to customize
+      (dashboard-setup-startup-hook)
+      (setq dashboard-center-content t)
+      (add-hook 'dashboard-mode-hook 'no-linum)) ; turn off line numbers for dashboard
+#+END_SRC
+
+*** Rainbow Delimiters
+#+BEGIN_SRC emacs-lisp
+(use-package rainbow-delimiters
+  :ensure t
+  :init
+  (progn
+    (add-hook 'prog-mode-hook 'rainbow-delimiters-mode)))
+#+END_SRC
+
+** Fonts
+*** Installing
+#+BEGIN_SRC emacs-lisp
+  (defun install-plex ()
+    (message "Installing IBM Plex -- You might want to grab a cup of something...")
+    (call-process "/bin/bash" nil nil nil "-c" "wget 'https://github.com/IBM/type/archive/master.zip' -O ~/.local/share/fonts/plex.zip")
+    (call-process "/bin/bash" nil nil nil "-c" "unzip ~/.local/share/fonts/plex.zip -d ~/.local/share/fonts")
+    (call-process "/bin/bash" nil nil nil "-c" "rm ~/.local/share/fonts/plex.zip")
+    (message "Installed IBM Plex"))
+
+  (defun install-fira-symbol ()
+    (message "Installing FiraCode Symbol")
+    (copy-file "~/.emacs.d/fonts/FiraCode-Regular-Symbol.otf" "~/.local/share/fonts/FiraCode-Regular-Symbol.otf")
+    (message "Installed FiraCode Symbol"))
+
+  (defun install-all-the-icons ()
+    (message "Installing all-the-icons")
+    (copy-directory "~/.emacs.d/fonts/all-the-icons" "~/.local/share/fonts/all-the-icons")
+    (message "Installed all-the-icons"))
+
+
+  (defun cache-fonts ()
+    (message "Running fc-cache -f")
+    (call-process "/bin/bash" nil nil nil "-c" "fc-cache -f")
+    (message "Fonts installed"))
+
+  (unless (and (member "IBM Plex Mono" (font-family-list))
+               (member "Fira Code Symbol" (font-family-list))
+               (member "all-the-icons" (font-family-list)))
+    (progn
+      (unless (file-directory-p "~/.local/share/fonts")
+        (make-directory "~/.local/share/fonts" :parents))
+      (install-plex)
+      (install-fira-symbol)
+      (install-all-the-icons)
+      (cache-fonts)))
+#+END_SRC
+
+*** Defaults
+#+BEGIN_SRC emacs-lisp
+    (defun set-fonts ()
+      (interactive)
+      (add-to-list 'default-frame-alist '(font . "IBM Plex Mono-10"))
+      (set-face-attribute 'default t :font "IBM Plex Mono-10")
+      (set-face-attribute 'mode-line nil :weight 'bold :font "IBM Plex Mono")
+      (custom-set-faces
+       '(font-lock-comment-face ((t (:foreground "#5B6268" :slant italic :family "IBM Plex Mono")))))
+      (set-frame-font "IBM Plex Mono-10"))
+    (set-fonts)
+#+END_SRC
+
+*** Icons
+#+BEGIN_SRC emacs-lisp
+(use-package all-the-icons
+  :ensure t) ; recommend installing icons manually, this rarely works
+#+END_SRC
+
+*** Ligatures
+#+BEGIN_SRC emacs-lisp
+  (use-package pretty-mode
+    :ensure t
+    :config
+    (add-hook 'fira-code-mode-hook 'pretty-mode)
+    (pretty-deactivate-groups
+      '(:equality :ordering :ordering-double :ordering-triple :arrows :arrows-twoheaded :punctuation :logic :sets :function))
+    (pretty-activate-groups
+      '(:sub-and-superscripts :greek :arithmetic-nary)))
+
+
+  (defun fira-code-mode--make-alist (list)
+    "Generate prettify-symbols alist from LIST."
+    (let ((idx -1))
+      (mapcar
+       (lambda (s)
+         (setq idx (1+ idx))
+         (let* ((code (+ #Xe100 idx))
+            (width (string-width s))
+            (prefix ())
+            (suffix '(?\s (Br . Br)))
+            (n 1))
+       (while (< n width)
+         (setq prefix (append prefix '(?\s (Br . Bl))))
+         (setq n (1+ n)))
+       (cons s (append prefix suffix (list (decode-char 'ucs code))))))
+       list)))
+
+  (defconst fira-code-mode--ligatures
+    '("www" "**" "***" "**/" "*>" "*/" "\\\\" "\\\\\\"
+      "{-" "[]" "::" ":::" ":=" "!!" "!=" "!==" "-}"
+      "--" "---" "-->" "->" "->>" "-<" "-<<" "-~"
+      "#{" "#[" "##" "###" "####" "#(" "#?" "#_" "#_("
+      ".-" ".=" ".." "..<" "..." "?=" "??" ";;" "/*"
+      "/**" "/=" "/==" "/>" "//" "///" "&&" "||" "||="
+      "|=" "|>" "^=" "$>" "++" "+++" "+>" "=:=" "=="
+      "===" "==>" "=>" "=>>" "<=" "=<<" "=/=" ">-" ">="
+      ">=>" ">>" ">>-" ">>=" ">>>" "<*" "<*>" "<|" "<|>"
+      "<$" "<$>" "<!--" "<-" "<--" "<->" "<+" "<+>" "<="
+      "<==" "<=>" "<=<" "<>" "<<" "<<-" "<<=" "<<<" "<~"
+      "<~~" "</" "</>" "~@" "~-" "~=" "~>" "~~" "~~>" "%%"))
+
+  (defconst fira-code-mode--custom-mathy-symbols '(("def" .      ?ƒ)
+                                                   ("not " .     ?¬)
+                                                   ("in" .       ?∈)
+                                                   ("IN" .       ?∈)
+                                                   ("not in" .   ?∉)
+                                                   ("return" .   ?⇑)
+                                                   ("yield" .    ?⟻)
+                                                   ("for" .      ?∀)
+                                                   ("is not" .   ?≢)
+                                                   ("IS NOT" .   ?≢)
+                                                   ("is" .       ?≡)
+                                                   ("IS" .       ?≡)
+                                                   ;; Mypy (don't render as well, so left in hex)
+                                                   ("Dict" .     #x1d507)
+                                                   ("List" .     #x2112)
+                                                   ("Tuple" .    #x2a02)
+                                                   ("Set" .      #x2126)
+                                                   ("Iterable" . #x1d50a)
+                                                   ("Any" .      #x2754)
+                                                   ("Union" .    #x22c3)
+                                                   ;; Null
+                                                   ("null" .     ?∅)
+                                                   ("NULL" .     ?∅)
+                                                   ("nil" .      ?∅)
+                                                   ("None" .     ?∅)))
+
+  (defvar fira-code-mode--old-prettify-alist)
+
+  (defun fira-code-mode--enable ()
+    "Enable Fira Code ligatures in current buffer."
+    (setq-local fira-code-mode--old-prettify-alist prettify-symbols-alist)
+    (setq-local prettify-symbols-alist (append fira-code-mode--custom-mathy-symbols fira-code-mode--old-prettify-alist))
+    (setq-local prettify-symbols-alist (append (fira-code-mode--make-alist fira-code-mode--ligatures) prettify-symbols-alist))
+    (prettify-symbols-mode t))
+
+  (defun fira-code-mode--disable ()
+    "Disable Fira Code ligatures in current buffer."
+    (setq-local prettify-symbols-alist fira-code-mode--old-prettify-alist)
+    (prettify-symbols-mode -1))
+
+  (define-minor-mode fira-code-mode
+    "Fira Code ligatures minor mode"
+    :lighter " Fira Code"
+    (setq-local prettify-symbols-unprettify-at-point 'right-edge)
+    (if fira-code-mode
+        (fira-code-mode--enable)
+      (fira-code-mode--disable)))
+
+  (defun fira-code-mode--setup ()
+    "Setup Fira Code Symbols"
+    (set-fontset-font t '(#Xe100 . #Xe16f) "Fira Code Symbol"))
+
+  (provide 'fira-code-mode)
+  (add-hook 'prog-mode-hook 'fira-code-mode)
+
+  (global-set-key (kbd "<f7>") 'fira-code-mode)
+#+END_SRC
+
+** SQL Highlighting
+#+BEGIN_SRC emacs-lisp
+(use-package mmm-mode
+  :ensure t
+  :custom
+  (mmm-global-mode 'maybe)
+  :config
+  (set-face-background 'mmm-default-submode-face nil)
+  (mmm-add-classes
+   '((python-sql
+      :submode sql-mode
+      :face mmm-code-submode-face
+      :front "\\(dedent\\|SQL\\)(\"\"\""
+      :back "\"\"\".*)")))
+  (mmm-add-mode-ext-class 'python-mode nil 'python-sql))
+
+#+END_SRC
+
+** Eshell
+#+BEGIN_SRC emacs-lisp
+  (use-package eshell
+    :ensure t
+    :commands (eshell eshell-command)
+    :config
+    (setenv "PAGER" "cat") ; prevent `less`|`more` from breaking everything
+    (add-hook 'eshell-hook (lambda () (linum-mode 0))))
+
+  (use-package eshell-prompt-extras
+    :ensure t
+    :init
+    (progn
+      (setq eshell-highlight-prompt nil
+	    epe-git-dirty-char ""
+	    epe-path-style 'single	; don't have a mess of a path
+	    eshell-prompt-function 'epe-theme-lambda)))
+#+END_SRC
+
+** Quick Reload
+#+BEGIN_SRC emacs-lisp
+(defun revert-buffer-no-confirm ()
+  "Revert the current buffer without asking permission"
+  (interactive)
+  (revert-buffer :ignore-auto :noconfirm))
+
+(global-set-key (kbd "<f5>") 'revert-buffer-no-confirm)
+#+END_SRC
+
+* Project-Management
+** Projectile
+#+BEGIN_SRC emacs-lisp
+(use-package projectile
+  :ensure t
+  :custom
+  (projectile-indexing-method 'alien)
+  (projectile-enable-caching t)
+  (projectile-completion-system 'ivy)
+  :bind-keymap
+  ("C-c p" . projectile-command-map)
+  :config
+  (projectile-global-mode))
+#+END_SRC
+
+* Auto-Completion
+** Company
+#+BEGIN_SRC emacs-lisp
+  (use-package company
+    :ensure t
+    :config
+    (add-hook 'after-init-hook 'global-company-mode)
+    (define-key company-active-map (kbd "C-n") #'company-select-next)
+    (define-key company-active-map (kbd "C-p") #'company-select-previous))
+
+  (use-package company-quickhelp
+    :ensure t
+    :config
+    (add-hook 'after-init-hook 'company-quickhelp-mode)
+    (define-key company-active-map (kbd "C-c h") #'company-quickhelp-manual-begin))
+#+END_SRC
+
+* Searching and Fuzzy-Finding
+** Ivy
+#+BEGIN_SRC emacs-lisp
+(use-package ivy
+  :ensure t
+  :diminish (ivy-mode . "")
+  :bind
+  (:map ivy-mode-map
+   ("C-'" . ivy-avy))
+
+  :custom
+  (ivy-use-virtual-buffers t)           ; add ‘recentf-mode’ and bookmarks to ‘ivy-switch-buffer'.
+  (ivy-height 10)                       ; number of result lines to display
+  (ivy-count-format "")                 ; does not count candidates
+  (ivy-initial-inputs-alist nil)        ; no regexp by default
+  (ivy-re-builders-alist                ; configure regexp engine.
+    '((t . ivy--regex-ignore-order)))	; allow input not in order
+
+  :config
+  (ivy-mode 1))
+#+END_SRC
+
+** Counsel
+#+BEGIN_SRC emacs-lisp
+(use-package counsel
+  :ensure t
+  :bind
+  ("M-x" . counsel-M-x)
+  ("C-h f" . counsel-describe-function)
+  ("C-h v" . counsel-describe-variable)
+  ("C-c k" . counsel-ag)
+  ("C-h a" . counsel-apropos))
+#+END_SRC
+
+** Swiper
+#+BEGIN_SRC emacs-lisp
+  (use-package swiper
+    :ensure t
+    :config
+    (global-set-key (kbd "C-s") 'swiper))	; replace standard search functionality
+#+END_SRC
+
+* Git/Github
+#+BEGIN_SRC emacs-lisp
+  (use-package magit
+    :ensure t
+    :config
+    (global-set-key (kbd "C-c b") 'magit-blame)) ; Add shortcut for blame
+
+  (use-package magithub
+    :after magit
+    :ensure t
+    :config
+    (magithub-feature-autoinject t)
+    (setq magithub-clone-default-directory "~/octokitty"))
+#+END_SRC
+
+* Tab to Complete
+#+BEGIN_SRC emacs-lisp
+(setq tab-always-indent 'complete)
+#+END_SRC
+
+* LSP Features
+** Eglot
+#+BEGIN_SRC emacs-lisp
+  (use-package eglot
+    :ensure t
+    :config
+    (add-hook 'python-mode-hook 'eglot-ensure)
+    (add-hook 'haskell-mode-hook 'eglot-ensure)
+    (add-hook 'ruby-mode-hook 'eglot-ensure)
+    (add-hook 'elixir-mode-hook 'eglot-ensure)
+    (add-hook 'c-mode-hook 'eglot-ensure))
+#+END_SRC
+
+* Language Specific IDE-Like Features
+** Pure Triad
+*** Lisp
+#+BEGIN_SRC emacs-lisp
+  (use-package slime
+    :ensure t
+    :config
+    (setq inferior-lisp-program "/opt/sbcl/bin/sbcl")
+    (setq slime-contribs '(slime-fancy)))
+
+  (use-package lispy
+    :ensure t)
+
+  (use-package cider
+    :ensure t
+    :after lispy parinfer
+    :config
+    (add-hook 'cider-mode-hook 'eldoc-mode)
+    (setq cider-repl-pop-to-buffer-on-connect t)
+
+    ;; Switch automatically to errors for CIDER
+    (setq cider-show-error-buffer t)
+    (setq cider-auto-select-error-buffer t)
+    (setq cider-repl-history-file "~/.emacs.d/cider-history")
+    (setq cider-repl-wrap-history t) ; wrap history when navigating
+
+    ;; use paredit in repl
+    (add-hook 'cider-repl-mode-hook 'paredit-mode)
+
+    ;; Use clojure mode for other extensions
+    (add-to-list 'auto-mode-alist '("\\.edn$" . clojure-mode))
+    (add-to-list 'auto-mode-alist '("\\.boot$" . clojure-mode))
+    (add-to-list 'auto-mode-alist '("\\.cljs.*$" . clojure-mode))
+    (add-to-list 'auto-mode-alist '("lein-env" . enh-ruby-mode)))
+
+#+END_SRC
+
+*** Haskell
+#+BEGIN_SRC emacs-lisp
+  (use-package haskell-mode
+    :ensure t)
+#+END_SRC
+
+*** Smalltalk
+#+BEGIN_SRC emacs-lisp
+  (unless (file-directory-p "~/.emacs.d/modules/shampoo-emacs") ; install shampoo-emacs
+    (call-process "/bin/bash" nil nil nil "-c" (concat "wget -c https://dmitrymatveev.co.uk/shampoo/files/shampoo-emacs-0.0.1.tgz -O ~/.emacs.d/modules/shampoo-emacs.tgz "
+                                                  "&& tar -xzvf ~/.emacs.d/modules/shampoo-emacs.tgz -C ~/.emacs.d/modules/"
+                                                  "&& rm ~/.emacs.d/modules/shampoo-emacs.tgz")))
+  (add-to-list 'load-path "~/.emacs.d/modules/shampoo-emacs")
+  (require 'shampoo)
+#+END_SRC
+
+** Productivity Triad
+*** Python
+**** Auto-PEP8 On Save
+#+BEGIN_SRC emacs-lisp
+  (use-package py-autopep8
+    :ensure t
+    :config
+    (add-hook 'python-mode-hook 'py-autopep8-enable-on-save))
+#+END_SRC
+
+**** PEP8-compliant comments
+#+BEGIN_SRC emacs-lisp
+  (add-hook 'python-mode-hook
+    (lambda ()
+      (setq comment-start " # ")))
+#+END_SRC
+
+*** Ruby
+#+BEGIN_SRC emacs-lisp
+  (use-package robe
+    :ensure t
+    :after company
+    :config
+    (add-hook 'ruby-mode-hook 'robe-mode)
+    (push 'company-robe company-backends))
+
+  (use-package enh-ruby-mode
+    :ensure t
+    :config
+    (add-hook 'enh-ruby-mode-hook 'robe-mode)
+    (add-to-list 'auto-mode-alist '("\\(?:\\.rb\\|ru\\|rake\\|thor\\|jbuilder\\|gemspec\\|podspec\\|/\\(?:Gem\\|Rake\\|Cap\\|Thor\\|Vagrant\\|Guard\\|Pod\\)file\\)\\'" . enh-ruby-mode)))
+#+END_SRC
+
+*** Elixir
+#+BEGIN_SRC emacs-lisp
+  (use-package alchemist
+    :ensure t)
+
+  (use-package elixir-mode
+    :ensure t
+    :config
+    (add-hook 'elixir-mode-hook (lambda () (add-hook 'before-save-hook 'elixir-format nil t))))
+#+END_SRC
+
+** Other
+*** Julia
+#+BEGIN_SRC emacs-lisp
+  (use-package julia-mode
+    :ensure t)
+
+  (use-package julia-repl
+    :ensure t
+    :config
+    (add-hook 'julia-mode-hook 'julia-repl-mode))
+#+END_SRC
+
+*** Crystal
+#+BEGIN_SRC emacs-lisp
+  (use-package crystal-mode
+    :ensure t)
+#+END_SRC
