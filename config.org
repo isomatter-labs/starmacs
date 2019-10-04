@@ -52,29 +52,31 @@
 
 *** Theme
 #+BEGIN_SRC emacs-lisp
-    (use-package doom-themes
-      :ensure t
-      :config
-      (setq doom-themes-enable-bold t
-            doom-themes-enable-italic t)
-      (load-theme 'doom-one-light t)
-      (doom-themes-visual-bell-config))
+  (use-package doom-themes
+    :ensure t
+    :config
+    (setq doom-themes-enable-bold t
+          doom-themes-enable-italic t)
+    (load-theme 'doom-one t)
+    (doom-themes-visual-bell-config)
+    (doom-themes-org-config)
+    (doom-themes-treemacs-config))
 
-    (defvar *dark-mode* nil)
+  (defvar *dark-mode* t)
 
-    (defun toggle-light-dark ()
-    "Toggle between light and dark color themes"
-      (interactive)
-      (if *dark-mode*
-        (progn
-          (load-theme 'doom-one-light)
-          (setq *dark-mode* nil))
-        (progn
-          (load-theme 'doom-one)
-          (setq *dark-mode* t)))
-      (set-fonts))
+  (defun toggle-light-dark ()
+  "Toggle between light and dark color themes"
+    (interactive)
+    (if *dark-mode*
+      (progn
+        (load-theme 'doom-one-light t)
+        (setq *dark-mode* nil))
+      (progn
+        (load-theme 'doom-one t)
+        (setq *dark-mode* t)))
+    (set-fonts))
 
-    (global-set-key (kbd "<f6>") 'toggle-light-dark)
+  (global-set-key (kbd "<f6>") 'toggle-light-dark)
 #+END_SRC
 
 *** Org-Mode
@@ -382,6 +384,51 @@
   ("C-c p" . projectile-command-map)
   :config
   (projectile-global-mode))
+#+END_SRC
+
+** Treemacs
+#+BEGIN_SRC emacs-lisp
+
+  (use-package treemacs
+    :ensure t
+    :defer t
+    :init
+    (with-eval-after-load 'winum
+      (define-key winum-keymap (kbd "M-0") #'treemacs-select-window))
+    :config
+    (progn
+      (setq treemacs-collapse-dirs (if treemacs-python-executable 3 0)
+            treemacs-position 'left
+            treemacs-display-in-side-window t
+            treemacs-show-cursor nil
+            treemacs-indentation 2
+            treemacs-indentation-string " "
+            treemacs-width 35)
+      (treemacs-follow-mode t)
+      (treemacs-filewatch-mode t)
+      (treemacs-fringe-indicator-mode t))
+    :bind
+      (:map global-map
+            ("M-0"       . treemacs-select-window)
+            ("C-x t 1"   . treemacs-delete-other-windows)
+            ("C-x t t"   . treemacs)
+            ("<f8>"      . treemacs)	; Add hotkey
+            ("C-x t B"   . treemacs-bookmark)
+            ("C-x t C-t" . treemacs-find-file)
+            ("C-x t M-t" . treemacs-find-tag)))
+
+  (use-package treemacs-projectile
+    :after treemacs projectile
+    :ensure t)
+
+  (use-package treemacs-icons-dired
+    :after treemacs dired
+    :ensure t
+    :config (treemacs-icons-dired-mode))
+
+  (use-package treemacs-magit
+    :after treemacs magit
+    :ensure t)
 #+END_SRC
 
 * Auto-Completion
