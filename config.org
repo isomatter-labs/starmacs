@@ -44,12 +44,6 @@
 #+END_SRC
 
 ** Look
-*** Frame Size
-#+BEGIN_SRC emacs-lisp
-(when window-system
-  (set-frame-size (selected-frame) 220 52))
-#+END_SRC
-
 *** Theme
 #+BEGIN_SRC emacs-lisp
   (use-package doom-themes
