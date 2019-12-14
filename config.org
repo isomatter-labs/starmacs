@@ -41,7 +41,7 @@
     (setq evil-want-C-u-scroll t)
 
     :config
-    (evil-mode)
+    (evil-mode))
 #+END_SRC
 
 * Quality of Life Improvements
