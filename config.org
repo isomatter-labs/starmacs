@@ -497,8 +497,7 @@
 #+END_SRC
 
 * Language Specific IDE-Like Features
-** Pure Triad
-*** Lisp
+** Lisp
 #+BEGIN_SRC emacs-lisp
   (use-package slime
     :ensure t
@@ -533,14 +532,13 @@
 
 #+END_SRC
 
-*** Haskell
+** Haskell
 #+BEGIN_SRC emacs-lisp
   (use-package haskell-mode
     :ensure t)
 #+END_SRC
 
-** Productivity Triad
-*** Python
+** Python
 **** Auto-PEP8 On Save
 #+BEGIN_SRC emacs-lisp
   (use-package py-autopep8
@@ -556,7 +554,7 @@
       (setq comment-start " # ")))
 #+END_SRC
 
-*** Ruby
+** Ruby
 #+BEGIN_SRC emacs-lisp
   (use-package robe
     :ensure t
@@ -572,7 +570,7 @@
     (add-to-list 'auto-mode-alist '("\\(?:\\.rb\\|ru\\|rake\\|thor\\|jbuilder\\|gemspec\\|podspec\\|/\\(?:Gem\\|Rake\\|Cap\\|Thor\\|Vagrant\\|Guard\\|Pod\\)file\\)\\'" . enh-ruby-mode)))
 #+END_SRC
 
-*** Elixir
+** Elixir
 #+BEGIN_SRC emacs-lisp
   (use-package alchemist
     :ensure t)
@@ -581,22 +579,4 @@
     :ensure t
     :config
     (add-hook 'elixir-mode-hook (lambda () (add-hook 'before-save-hook 'elixir-format nil t))))
-#+END_SRC
-
-** Other
-*** Julia
-#+BEGIN_SRC emacs-lisp
-  (use-package julia-mode
-    :ensure t)
-
-  (use-package julia-repl
-    :ensure t
-    :config
-    (add-hook 'julia-mode-hook 'julia-repl-mode))
-#+END_SRC
-
-*** Crystal
-#+BEGIN_SRC emacs-lisp
-  (use-package crystal-mode
-    :ensure t)
 #+END_SRC
