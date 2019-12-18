@@ -27,23 +27,6 @@
     (require 'use-package))
 #+END_SRC
 
-* Evil Mode
-#+BEGIN_SRC emacs-lisp
-  (use-package evil
-    :ensure t
-
-    :init
-    (setq evil-search-module 'evil-search)
-    (setq evil-ex-complete-emacs-commands nil)
-    (setq evil-vsplit-window-right t)
-    (setq evil-split-window-below t)
-    (setq evil-shift-round nil)
-    (setq evil-want-C-u-scroll t)
-
-    :config
-    (evil-mode))
-#+END_SRC
-
 * Quality of Life Improvements
 ** Trailing Whitespace
 #+BEGIN_SRC emacs-lisp
@@ -63,31 +46,10 @@
 ** Look
 *** Theme
 #+BEGIN_SRC emacs-lisp
-  (use-package doom-themes
+  (use-package nord-theme
     :ensure t
     :config
-    (setq doom-themes-enable-bold t
-          doom-themes-enable-italic t)
-    (load-theme 'doom-one t)
-    (doom-themes-visual-bell-config)
-    (doom-themes-org-config)
-    (doom-themes-treemacs-config))
-
-  (defvar *dark-mode* t)
-
-  (defun toggle-light-dark ()
-  "Toggle between light and dark color themes"
-    (interactive)
-    (if *dark-mode*
-      (progn
-        (load-theme 'doom-one-light t)
-        (setq *dark-mode* nil))
-      (progn
-        (load-theme 'doom-one t)
-        (setq *dark-mode* t)))
-    (set-fonts))
-
-  (global-set-key (kbd "<f6>") 'toggle-light-dark)
+    (load-theme 'nord t))
 #+END_SRC
 
 *** Org-Mode
