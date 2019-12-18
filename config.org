@@ -539,16 +539,6 @@
     :ensure t)
 #+END_SRC
 
-*** Smalltalk
-#+BEGIN_SRC emacs-lisp
-  (unless (file-directory-p "~/.emacs.d/modules/shampoo-emacs") ; install shampoo-emacs
-    (call-process "/bin/bash" nil nil nil "-c" (concat "wget -c https://dmitrymatveev.co.uk/shampoo/files/shampoo-emacs-0.0.1.tgz -O ~/.emacs.d/modules/shampoo-emacs.tgz "
-                                                  "&& tar -xzvf ~/.emacs.d/modules/shampoo-emacs.tgz -C ~/.emacs.d/modules/"
-                                                  "&& rm ~/.emacs.d/modules/shampoo-emacs.tgz")))
-  (add-to-list 'load-path "~/.emacs.d/modules/shampoo-emacs")
-  (require 'shampoo)
-#+END_SRC
-
 ** Productivity Triad
 *** Python
 **** Auto-PEP8 On Save
