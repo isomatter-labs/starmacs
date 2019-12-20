@@ -494,7 +494,7 @@
 #+END_SRC
 
 ** Python
-**** Auto-PEP8 On Save
+*** Auto-PEP8 On Save
 #+BEGIN_SRC emacs-lisp
   (use-package py-autopep8
     :ensure t
@@ -502,36 +502,9 @@
     (add-hook 'python-mode-hook 'py-autopep8-enable-on-save))
 #+END_SRC
 
-**** PEP8-compliant comments
+*** PEP8-compliant comments
 #+BEGIN_SRC emacs-lisp
   (add-hook 'python-mode-hook
     (lambda ()
       (setq comment-start " # ")))
-#+END_SRC
-
-** Ruby
-#+BEGIN_SRC emacs-lisp
-  (use-package robe
-    :ensure t
-    :after company
-    :config
-    (add-hook 'ruby-mode-hook 'robe-mode)
-    (push 'company-robe company-backends))
-
-  (use-package enh-ruby-mode
-    :ensure t
-    :config
-    (add-hook 'enh-ruby-mode-hook 'robe-mode)
-    (add-to-list 'auto-mode-alist '("\\(?:\\.rb\\|ru\\|rake\\|thor\\|jbuilder\\|gemspec\\|podspec\\|/\\(?:Gem\\|Rake\\|Cap\\|Thor\\|Vagrant\\|Guard\\|Pod\\)file\\)\\'" . enh-ruby-mode)))
-#+END_SRC
-
-** Elixir
-#+BEGIN_SRC emacs-lisp
-  (use-package alchemist
-    :ensure t)
-
-  (use-package elixir-mode
-    :ensure t
-    :config
-    (add-hook 'elixir-mode-hook (lambda () (add-hook 'before-save-hook 'elixir-format nil t))))
 #+END_SRC
