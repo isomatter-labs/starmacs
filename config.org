@@ -446,8 +446,6 @@
     :config
     (add-hook 'python-mode-hook 'eglot-ensure)
     (add-hook 'haskell-mode-hook 'eglot-ensure)
-    (add-hook 'ruby-mode-hook 'eglot-ensure)
-    (add-hook 'elixir-mode-hook 'eglot-ensure)
     (add-hook 'c-mode-hook 'eglot-ensure))
 #+END_SRC
 
