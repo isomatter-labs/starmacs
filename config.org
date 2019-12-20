@@ -292,7 +292,7 @@
     (set-fontset-font t '(#Xe100 . #Xe16f) "Fira Code Symbol"))
 
   (provide 'fira-code-mode)
-  (add-hook 'prog-mode-hook 'fira-code-mode)
+  ;(add-hook 'prog-mode-hook 'fira-code-mode)
 
   (global-set-key (kbd "<f7>") 'fira-code-mode)
 #+END_SRC
@@ -357,51 +357,6 @@
   ("C-c p" . projectile-command-map)
   :config
   (projectile-global-mode))
-#+END_SRC
-
-** Treemacs
-#+BEGIN_SRC emacs-lisp
-
-  (use-package treemacs
-    :ensure t
-    :defer t
-    :init
-    (with-eval-after-load 'winum
-      (define-key winum-keymap (kbd "M-0") #'treemacs-select-window))
-    :config
-    (progn
-      (setq treemacs-collapse-dirs (if treemacs-python-executable 3 0)
-            treemacs-position 'left
-            treemacs-display-in-side-window t
-            treemacs-show-cursor nil
-            treemacs-indentation 2
-            treemacs-indentation-string " "
-            treemacs-width 35)
-      (treemacs-follow-mode t)
-      (treemacs-filewatch-mode t)
-      (treemacs-fringe-indicator-mode t))
-    :bind
-      (:map global-map
-            ("M-0"       . treemacs-select-window)
-            ("C-x t 1"   . treemacs-delete-other-windows)
-            ("C-x t t"   . treemacs)
-            ("<f8>"      . treemacs)	; Add hotkey
-            ("C-x t B"   . treemacs-bookmark)
-            ("C-x t C-t" . treemacs-find-file)
-            ("C-x t M-t" . treemacs-find-tag)))
-
-  (use-package treemacs-projectile
-    :after treemacs projectile
-    :ensure t)
-
-  (use-package treemacs-icons-dired
-    :after treemacs dired
-    :ensure t
-    :config (treemacs-icons-dired-mode))
-
-  (use-package treemacs-magit
-    :after treemacs magit
-    :ensure t)
 #+END_SRC
 
 * Auto-Completion
