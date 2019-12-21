@@ -12,7 +12,6 @@
       package-archive-priorities
       '(("GNU ELPA"     . 10)
 	    ("MELPA"        . 0)))
-(package-initialize)
 
 (add-to-list 'load-path "~/.emacs.d/modules/") ; add local files
 #+END_SRC
