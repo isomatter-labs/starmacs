@@ -351,6 +351,14 @@
   (projectile-global-mode))
 #+END_SRC
 
+** Dumb-Jump
+#+BEGIN_SRC emacs-lisp
+(use-package dumb-jump
+  :ensure t
+  :config
+  (add-hook 'prog-mode-hook 'dumb-jump-mode))
+#+END_SRC
+
 * Auto-Completion
 ** Company
 #+BEGIN_SRC emacs-lisp
