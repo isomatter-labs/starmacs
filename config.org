@@ -13,7 +13,7 @@
       '(("GNU ELPA"     . 10)
 	    ("MELPA"        . 0)))
 
-(add-to-list 'load-path "~/.emacs.d/modules/") ; add local files
+(add-to-list 'load-path "~/.emacs.d/modules") ; add local files
 #+END_SRC
 
 ** use-package
@@ -126,7 +126,8 @@
       (setq dashboard-startup-banner "~/.emacs.d/img/axiom.png") ; set to path to image file to customize
       (dashboard-setup-startup-hook)
       (setq dashboard-center-content t)
-      (add-hook 'dashboard-mode-hook 'no-linum)) ; turn off line numbers for dashboard
+      (add-hook 'dashboard-mode-hook 'no-linum) ; turn off line numbers for dashboard
+      (add-hook 'dashboard-mode-hook 'olivetti-mode))
 #+END_SRC
 
 *** Rainbow Delimiters
@@ -314,25 +315,6 @@
 
 #+END_SRC
 
-** Eshell
-#+BEGIN_SRC emacs-lisp
-  (use-package eshell
-    :ensure t
-    :commands (eshell eshell-command)
-    :config
-    (setenv "PAGER" "cat") ; prevent `less`|`more` from breaking everything
-    (add-hook 'eshell-hook (lambda () (linum-mode 0))))
-
-  (use-package eshell-prompt-extras
-    :ensure t
-    :init
-    (progn
-      (setq eshell-highlight-prompt nil
-	    epe-git-dirty-char ""
-	    epe-path-style 'single	; don't have a mess of a path
-	    eshell-prompt-function 'epe-theme-lambda)))
-#+END_SRC
-
 ** Quick Reload
 #+BEGIN_SRC emacs-lisp
 (defun revert-buffer-no-confirm ()
@@ -343,12 +325,13 @@
 (global-set-key (kbd "<f5>") 'revert-buffer-no-confirm)
 #+END_SRC
 
-** Zen Mode
+** Zen Mode (Olivetti)
 #+BEGIN_SRC emacs-lisp
-(use-package zen-mode
+(use-package olivetti
   :ensure t
   :config
-  (global-set-key (kbd "C-M-z") 'zen-mode))
+  (setq olivetti-body-width 120)
+  (global-set-key (kbd "C-M-z") 'olivetti-mode))
 #+END_SRC
 
 * Project-Management
