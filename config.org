@@ -330,7 +330,8 @@
 (use-package olivetti
   :ensure t
   :config
-  (setq olivetti-body-width 120)
+  (setq-default olivetti-body-width 120)
+  (add-hook 'prog-mode-hook 'olivetti-mode)
   (global-set-key (kbd "C-M-z") 'olivetti-mode))
 #+END_SRC
 
