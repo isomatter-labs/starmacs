@@ -343,6 +343,14 @@
 (global-set-key (kbd "<f5>") 'revert-buffer-no-confirm)
 #+END_SRC
 
+** Zen Mode
+#+BEGIN_SRC emacs-lisp
+(use-package zen-mode
+  :ensure t
+  :config
+  (global-set-key (kbd "C-M-z") 'zen-mode))
+#+END_SRC
+
 * Project-Management
 ** Projectile
 #+BEGIN_SRC emacs-lisp
