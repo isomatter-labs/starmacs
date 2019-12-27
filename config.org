@@ -45,10 +45,14 @@
 ** Look
 *** Theme
 #+BEGIN_SRC emacs-lisp
-  (use-package nord-theme
+  (use-package doom-themes
     :ensure t
     :config
-    (load-theme 'nord t))
+    (setq doom-themes-enable-bold t
+          doom-themes-enable-italic t)
+    (doom-themes-visual-bell-config)
+    (doom-themes-org-config)
+    (load-theme 'doom-nord t))
 #+END_SRC
 
 *** Org-Mode
@@ -56,7 +60,6 @@
 (use-package org-bullets
   :ensure t
   :config
-  (add-hook 'org-mode-hook (lambda () (org-bullets-mode 1)))
   (add-hook 'org-mode-hook 'org-indent-mode))
 #+END_SRC
 
@@ -330,9 +333,10 @@
 (use-package olivetti
   :ensure t
   :config
-  (setq-default olivetti-body-width 120)
-  (add-hook 'prog-mode-hook 'olivetti-mode)
+  (setq-default olivetti-body-width 150)
   (add-hook 'org-mode-hook 'olivetti-mode)
+
+  (global-set-key (kbd "<f12>") 'olivetti-mode)
   (global-set-key (kbd "C-M-z") 'olivetti-mode))
 #+END_SRC
 
