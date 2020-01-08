@@ -52,7 +52,7 @@
           doom-themes-enable-italic t)
     (doom-themes-visual-bell-config)
     (doom-themes-org-config)
-    (load-theme 'doom-nord t))
+    (load-theme 'doom-one t))
 #+END_SRC
 
 *** Org-Mode
@@ -146,11 +146,13 @@
 *** Installing
 #+BEGIN_SRC emacs-lisp
   (defun install-plex ()
-    (message "Installing IBM Plex -- You might want to grab a cup of something...")
-    (call-process "/bin/bash" nil nil nil "-c" "wget 'https://github.com/IBM/type/archive/master.zip' -O ~/.local/share/fonts/plex.zip")
-    (call-process "/bin/bash" nil nil nil "-c" "unzip ~/.local/share/fonts/plex.zip -d ~/.local/share/fonts")
-    (call-process "/bin/bash" nil nil nil "-c" "rm ~/.local/share/fonts/plex.zip")
-    (message "Installed IBM Plex"))
+    (if (eq window-system 'x)
+      (progn
+        (message "Installing IBM Plex -- You might want to grab a cup of something...")
+        (call-process "/bin/bash" nil nil nil "-c" "wget 'https://github.com/IBM/type/archive/master.zip' -O ~/.local/share/fonts/plex.zip")
+        (call-process "/bin/bash" nil nil nil "-c" "unzip ~/.local/share/fonts/plex.zip -d ~/.local/share/fonts")
+        (call-process "/bin/bash" nil nil nil "-c" "rm ~/.local/share/fonts/plex.zip")
+        (message "Installed IBM Plex"))))
 
   (defun install-fira-symbol ()
     (message "Installing FiraCode Symbol")
@@ -168,9 +170,10 @@
     (call-process "/bin/bash" nil nil nil "-c" "fc-cache -f")
     (message "Fonts installed"))
 
-  (unless (and (member "IBM Plex Mono" (font-family-list))
-               (member "Fira Code Symbol" (font-family-list))
-               (member "all-the-icons" (font-family-list)))
+  (unless (or (not (eq window-system 'x))
+              (and (member "IBM Plex Mono" (font-family-list))
+                   (member "Fira Code Symbol" (font-family-list))
+                   (member "all-the-icons" (font-family-list))))
     (progn
       (unless (file-directory-p "~/.local/share/fonts")
         (make-directory "~/.local/share/fonts" :parents))
