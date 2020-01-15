@@ -27,6 +27,11 @@
 #+END_SRC
 
 * Quality of Life Improvements
+** Mouse in Terminal
+#+BEGIN_SRC emacs-lisp
+(xterm-mouse-mode 1)
+#+END_SRC
+
 ** Trailing Whitespace
 #+BEGIN_SRC emacs-lisp
 (add-hook 'prog-mode-hook (lambda () (setq show-trailing-whitespace t)))
@@ -49,10 +54,11 @@
     :ensure t
     :config
     (setq doom-themes-enable-bold t
-          doom-themes-enable-italic t)
+	  doom-themes-enable-italic t)
     (doom-themes-visual-bell-config)
     (doom-themes-org-config)
-    (load-theme 'doom-one t))
+    (if (eq window-system 'x)
+        (load-theme 'doom-one t)))		; Only load in GUI to reduce issues with comment-coloring
 #+END_SRC
 
 *** Org-Mode
@@ -108,7 +114,8 @@
 
 *** Focus Line
 #+BEGIN_SRC emacs-lisp
-(global-hl-line-mode 1)
+(if (eq window-system 'x)
+    (global-hl-line-mode 1))
 #+END_SRC
 
 *** Dashboard
@@ -147,12 +154,12 @@
 #+BEGIN_SRC emacs-lisp
   (defun install-plex ()
     (if (eq window-system 'x)
-      (progn
-        (message "Installing IBM Plex -- You might want to grab a cup of something...")
-        (call-process "/bin/bash" nil nil nil "-c" "wget 'https://github.com/IBM/type/archive/master.zip' -O ~/.local/share/fonts/plex.zip")
-        (call-process "/bin/bash" nil nil nil "-c" "unzip ~/.local/share/fonts/plex.zip -d ~/.local/share/fonts")
-        (call-process "/bin/bash" nil nil nil "-c" "rm ~/.local/share/fonts/plex.zip")
-        (message "Installed IBM Plex"))))
+        (progn
+          (message "Installing IBM Plex -- You might want to grab a cup of something...")
+          (call-process "/bin/bash" nil nil nil "-c" "wget 'https://github.com/IBM/type/archive/master.zip' -O ~/.local/share/fonts/plex.zip")
+          (call-process "/bin/bash" nil nil nil "-c" "unzip ~/.local/share/fonts/plex.zip -d ~/.local/share/fonts")
+          (call-process "/bin/bash" nil nil nil "-c" "rm ~/.local/share/fonts/plex.zip")
+          (message "Installed IBM Plex"))))
 
   (defun install-fira-symbol ()
     (message "Installing FiraCode Symbol")
