@@ -322,8 +322,8 @@
    '((python-sql
       :submode sql-mode
       :face mmm-code-submode-face
-      :front "\\(dedent\\|SQL\\)(\"\"\""
-      :back "\"\"\".*)")))
+      :front "\\(dedent\\|SQL\\)(\\(\"\"\"\\|'''\\)"
+      :back "\\(\"\"\"\\|'''\\).*)")))
   (mmm-add-mode-ext-class 'python-mode nil 'python-sql))
 
 #+END_SRC
