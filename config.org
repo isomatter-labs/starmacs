@@ -312,6 +312,7 @@
 
 ** SQL Highlighting
 #+BEGIN_SRC emacs-lisp
+(add-to-list 'auto-mode-alist '("\\.sqli\\'" . sql-mode))
 (use-package mmm-mode
   :ensure t
   :custom
