@@ -445,7 +445,7 @@
     :ensure t
     :config
     (magithub-feature-autoinject t)
-    (setq magithub-clone-default-directory "~/octokitty"))
+    (setq magithub-clone-default-directory "~/octokitty/"))
 #+END_SRC
 
 * Tab to Complete
