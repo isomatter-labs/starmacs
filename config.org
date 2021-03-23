@@ -36,10 +36,11 @@
 #+BEGIN_SRC emacs-lisp
 (add-hook 'prog-mode-hook (lambda () (setq show-trailing-whitespace t)))
 (add-hook 'before-save-hook 'delete-trailing-whitespace)
+;; whitespace-space-regexp will only work with selective highlighting, not with space-mark
 ;(setq whitespace-space-regexp "\\( \\{2,\\}\\)")
 (setq whitespace-style (quote (face tabs newline tab-mark newline-mark)))
 (custom-set-faces
-  '(whitespace-tab((t (:foreground "#525252"))))
+  '(whitespace-tab((t (:foreground "#E06C75")))) ; make tabs _very_ noticable
   '(whitespace-space((t (:foreground "#525252"))))
   '(whitespace-newline((t (:foreground "#525252")))))
 (setq whitespace-display-mappings
@@ -48,6 +49,7 @@
     (tab-mark 9 [187 9] [92 9])))
 (global-whitespace-mode 1)
 
+(setq-default indent-tabs-mode nil) ; never indent with tabs
 #+END_SRC
 
 ** Line Numbers
@@ -57,6 +59,13 @@
   (progn
     (global-linum-mode t)
     (setq linum-format "%4d \u2502 ")))
+#+END_SRC
+
+** Column Ruler
+I like to display a column ruler at common styleguide limits
+(famously, 80 characters, but also often 100 and 120 characters).
+#+BEGIN_SRC emacs-lisp
+(add-hook 'prog-mode-hook #'display-fill-column-indicator-mode)
 #+END_SRC
 
 ** Look
@@ -269,27 +278,24 @@
       "<~~" "</" "</>" "~@" "~-" "~=" "~>" "~~" "~~>" "%%"))
 
   (defconst fira-code-mode--custom-mathy-symbols '(("def" .      ?ƒ)
+                                                   ("define".    ?ƒ)
                                                    ("not " .     ?¬)
                                                    ("in" .       ?∈)
                                                    ("IN" .       ?∈)
+                                                   ("FROM".      ?∈)
                                                    ("not in" .   ?∉)
                                                    ("return" .   ?⇑)
                                                    ("yield" .    ?⟻)
-                                                   ("for" .      ?∀)
                                                    ("is not" .   ?≢)
                                                    ("IS NOT" .   ?≢)
                                                    ("is" .       ?≡)
                                                    ("IS" .       ?≡)
-                                                   ;; Mypy (don't render as well, so left in hex)
-                                                   ("Dict" .     #x1d507)
-                                                   ("List" .     #x2112)
-                                                   ("Tuple" .    #x2a02)
-                                                   ("Set" .      #x2126)
-                                                   ("Iterable" . #x1d50a)
-                                                   ("Any" .      #x2754)
-                                                   ("Union" .    #x22c3)
+                                                   ("eq" .       ?≡)
+                                                   ("lambda" .   ?λ)
+                                                   ("SELECT" .   ?∃)
                                                    ;; Null
                                                    ("null" .     ?∅)
+                                                   ("nullptr".   ?∅)
                                                    ("NULL" .     ?∅)
                                                    ("nil" .      ?∅)
                                                    ("None" .     ?∅)))
@@ -339,9 +345,9 @@
    '((python-sql
       :submode sql-mode
       :face mmm-code-submode-face
-      :front "\\(dedent\\|SQL\\)(\\(\"\"\"\\|'''\\)"
-      :back "\\(\"\"\"\\|'''\\).*)")))
-  (mmm-add-mode-ext-class 'python-mode nil 'python-sql))
+      :front "\\(--SQL\\)"
+      :back "\\(--SQL\\).*)")))
+  (mmm-add-mode-ext-class 'python-mode nil 'python-sql)) ; TODO: add hooks for other used languages
 
 #+END_SRC
 
@@ -460,14 +466,17 @@
     :config
     (add-hook 'python-mode-hook 'eglot-ensure)
     (add-hook 'haskell-mode-hook 'eglot-ensure)
-    (add-hook 'c-mode-hook 'eglot-ensure))
+    (add-hook 'c-mode-hook 'eglot-ensure)
+    (add-hook 'c++-mode-hook 'eglot-ensure))
 #+END_SRC
 
 * Language Specific IDE-Like Features
 ** Scheme
 #+BEGIN_SRC emacs-lisp
 (use-package geiser
-  :ensure t)
+  :ensure t
+  :config
+  (add-hook 'scheme-mode-hook 'fira-code-mode))
 #+END_SRC
 
 ** Common Lisp
@@ -487,7 +496,9 @@
 ** Haskell
 #+BEGIN_SRC emacs-lisp
   (use-package haskell-mode
-    :ensure t)
+    :ensure t
+    :config
+    (add-hook 'haskell-mode 'fira-code-mode))
 #+END_SRC
 
 ** Python
@@ -504,6 +515,11 @@
   (add-hook 'python-mode-hook
     (lambda ()
       (setq comment-start " # ")))
+#+END_SRC
+
+*** Use Ligatures
+#+BEGIN_SRC emacs-lisp
+(add-hook 'python-mode-hook 'fira-code-mode)
 #+END_SRC
 
 ** C++
@@ -587,4 +603,20 @@
 
 ;(add-hook 'c++-mode-hook 'clang-format-on-save)
 ;(add-hook 'c-mode-hook 'clang-format-on-save)
+#+END_SRC
+
+*** General QoL
+The styleguides I use ask for a 100-char column limit
+#+BEGIN_SRC emacs-lisp
+(add-hook 'c++-mode-hook (lambda () (setq fill-column 100)))
+#+END_SRC
+
+They also require a 4-space indent.
+#+BEGIN_SRC emacs-lisp
+(add-hook 'c++-mode-hook (lambda () (setq tab-width 4)))
+#+END_SRC
+
+I also really like ligatures
+#+BEGIN_SRC emacs-lisp
+(add-hook 'c++mode-hook 'fira-code-mode)
 #+END_SRC
