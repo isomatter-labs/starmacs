@@ -16,5 +16,8 @@
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
- '(font-lock-comment-face ((t (:foreground "#5B6268" :slant italic :family "IBM Plex Mono")))))
+ '(font-lock-comment-face ((t (:foreground "#5B6268" :slant italic :family "IBM Plex Mono"))))
+ '(whitespace-newline ((t (:foreground "#525252"))))
+ '(whitespace-space ((t (:foreground "#525252"))))
+ '(whitespace-tab ((t (:foreground "#525252")))))
 (put 'downcase-region 'disabled nil)

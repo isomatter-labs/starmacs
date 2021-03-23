@@ -32,19 +32,21 @@
 (xterm-mouse-mode 1)
 #+END_SRC
 
-** Trailing Whitespace
+** Whitespace
 #+BEGIN_SRC emacs-lisp
-  (add-hook 'prog-mode-hook (lambda () (setq show-trailing-whitespace t)))
-  (add-hook 'before-save-hook 'delete-trailing-whitespace)
-  (setq whitespace-style (quote (face tabs newline spaces space-mark tab-mark newline-mark)))
-  (custom-set-faces
-    '(whitespace-tab((t (:foreground "#525252"))))
-    '(whitespace-space((t (:foreground "#525252"))))
-    '(whitespace-newline((t (:foreground "#525252")))))
-  (setq whitespace-display-mappings
-    '((space-mark 32 [183] [46])
-      (newline-mark 10 [172 10])
-      (tab-mark 9 [187 9] [92 9])))
+(add-hook 'prog-mode-hook (lambda () (setq show-trailing-whitespace t)))
+(add-hook 'before-save-hook 'delete-trailing-whitespace)
+;(setq whitespace-space-regexp "\\( \\{2,\\}\\)")
+(setq whitespace-style (quote (face tabs newline tab-mark newline-mark)))
+(custom-set-faces
+  '(whitespace-tab((t (:foreground "#525252"))))
+  '(whitespace-space((t (:foreground "#525252"))))
+  '(whitespace-newline((t (:foreground "#525252")))))
+(setq whitespace-display-mappings
+  '((space-mark 32 [183] [46])
+    (newline-mark 10 [172 10])
+    (tab-mark 9 [187 9] [92 9])))
+(global-whitespace-mode 1)
 
 #+END_SRC
 
@@ -473,11 +475,13 @@
   (use-package slime
     :ensure t
     :config
-    (setq inferior-lisp-program "/opt/sbcl/bin/sbcl")
+    (setq inferior-lisp-program "sbcl") ; remember to add sbcl to your path!
     (setq slime-contribs '(slime-fancy)))
 
   (use-package lispy
-    :ensure t)
+    :ensure t
+    :config
+    (add-hook 'emacs-lisp-mode-hook (lambda () (lispy-mode 1))))
 #+END_SRC
 
 ** Haskell
@@ -501,6 +505,7 @@
     (lambda ()
       (setq comment-start " # ")))
 #+END_SRC
+
 ** C++
 *** Flycheck
 #+BEGIN_SRC emacs-lisp
