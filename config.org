@@ -158,7 +158,7 @@ I like to display a column ruler at common styleguide limits
       (dashboard-modify-heading-icons '((recents . "file-text")))
       (setq dashboard-set-navigator t)
       (setq dashboard-set-file-icons t)
-      (setq dashboard-startup-banner "~/.emacs.d/img/iso-white.png") ; set to path to image file to customize
+      (setq dashboard-startup-banner "~/.emacs.d/img/axiom.png") ; set to path to image file to customize
       (dashboard-setup-startup-hook)
       (setq dashboard-center-content t)
       (add-hook 'dashboard-mode-hook 'no-linum) ; turn off line numbers for dashboard
