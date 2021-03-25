@@ -177,19 +177,18 @@ I like to display a column ruler at common styleguide limits
 ** Fonts
 *** Installing
 #+BEGIN_SRC emacs-lisp
-  (defun install-plex ()
+  (defun install-cascadia-code ()
     (if (eq window-system 'x)
         (progn
-          (message "Installing IBM Plex -- You might want to grab a cup of something...")
-          (call-process "/bin/bash" nil nil nil "-c" "wget 'https://github.com/IBM/type/archive/master.zip' -O ~/.local/share/fonts/plex.zip")
-          (call-process "/bin/bash" nil nil nil "-c" "unzip ~/.local/share/fonts/plex.zip -d ~/.local/share/fonts")
-          (call-process "/bin/bash" nil nil nil "-c" "rm ~/.local/share/fonts/plex.zip")
-          (message "Installed IBM Plex"))))
-
-  (defun install-fira-symbol ()
-    (message "Installing FiraCode Symbol")
-    (copy-file "~/.emacs.d/fonts/FiraCode-Regular-Symbol.otf" "~/.local/share/fonts/FiraCode-Regular-Symbol.otf")
-    (message "Installed FiraCode Symbol"))
+          (message "Installing Cascadia Code -- You might want to grab a cup of something...")
+          (call-process "/bin/bash" nil nil nil "-c" "wget 'https://github.com/microsoft/cascadia-code/releases/download/v2102.25/CascadiaCode-2102.25.zip' -O ~/.emacs.d/fonts/cascadia-code.zip")
+          (if
+            (string-equal system-type "windows-nt")
+            (progn
+              (call-process "/bin/bash" nil nil nil "-c" "unzip ~/.emacs.d/fonts/cascadia-code.zip -d ~/.local/share/fonts")
+              (call-process "/bin/bash" nil nil nil "-c" "rm ~/.emacs.d/fonts/cascadia-code.zip")
+              (message "Installed Cascadia Code"))
+            (message "You should install Cascadia Code yourself(cmd scripting is hard). It's in ~/.emacs.d/fonts")))))
 
   (defun install-all-the-icons ()
     (message "Installing all-the-icons")
@@ -203,8 +202,7 @@ I like to display a column ruler at common styleguide limits
     (message "Fonts installed"))
 
   (unless (or (not (eq window-system 'x))
-              (and (member "IBM Plex Mono" (font-family-list))
-                   (member "Fira Code Symbol" (font-family-list))
+              (and (member "Cascadia Code" (font-family-list))
                    (member "all-the-icons" (font-family-list))))
     (progn
       (unless (file-directory-p "~/.local/share/fonts")
@@ -219,12 +217,12 @@ I like to display a column ruler at common styleguide limits
 #+BEGIN_SRC emacs-lisp
     (defun set-fonts ()
       (interactive)
-      (add-to-list 'default-frame-alist '(font . "IBM Plex Mono-10"))
-      (set-face-attribute 'default t :font "IBM Plex Mono-10")
-      (set-face-attribute 'mode-line nil :weight 'bold :font "IBM Plex Mono")
+      (add-to-list 'default-frame-alist '(font . "Cascadia Code-10"))
+      (set-face-attribute 'default t :font "Cascadia Code-10")
+      (set-face-attribute 'mode-line nil :weight 'bold :font "Cascadia Code")
       (custom-set-faces
-       '(font-lock-comment-face ((t (:foreground "#5B6268" :slant italic :family "IBM Plex Mono")))))
-      (set-frame-font "IBM Plex Mono-10"))
+       '(font-lock-comment-face ((t (:foreground "#5B6268" :slant italic :family "Cascadia Code")))))
+      (set-frame-font "Cascadia Code-10"))
     (set-fonts)
 #+END_SRC
 
@@ -245,91 +243,32 @@ I like to display a column ruler at common styleguide limits
     (pretty-activate-groups
       '(:sub-and-superscripts :greek :arithmetic-nary)))
 
+(use-package ligature
+  :load-path "~/.emacs.d/mickeynp-ligature"
+  :config
+  ;; Enable the "www" ligature in every possible major mode
+  (ligature-set-ligatures 't '("www"))
+  ;; Enable traditional ligature support in eww-mode, if the
+  ;; `variable-pitch' face supports it
+  (ligature-set-ligatures 'eww-mode '("ff" "fi" "ffi"))
+  ;; Enable all Cascadia Code ligatures in programming modes
+  (ligature-set-ligatures 'prog-mode '("|||>" "<|||" "<==>" "<!--" "####" "~~>" "***" "||=" "||>"
+                                       ":::" "::=" "=:=" "===" "==>" "=!=" "=>>" "=<<" "=/=" "!=="
+                                       "!!." ">=>" ">>=" ">>>" ">>-" ">->" "->>" "-->" "---" "-<<"
+                                       "<~~" "<~>" "<*>" "<||" "<|>" "<$>" "<==" "<=>" "<=<" "<->"
+                                       "<--" "<-<" "<<=" "<<-" "<<<" "<+>" "</>" "###" "#_(" "..<"
+                                       "..." "+++" "/==" "///" "_|_" "www" "&&" "^=" "~~" "~@" "~="
+                                       "~>" "~-" "**" "*>" "*/" "||" "|}" "|]" "|=" "|>" "|-" "{|"
+                                       "[|" "]#" "::" ":=" ":>" ":<" "$>" "==" "=>" "!=" "!!" ">:"
+                                       ">=" ">>" ">-" "-~" "-|" "->" "--" "-<" "<~" "<*" "<|" "<:"
+                                       "<$" "<=" "<>" "<-" "<<" "<+" "</" "#{" "#[" "#:" "#=" "#!"
+                                       "##" "#(" "#?" "#_" "%%" ".=" ".-" ".." ".?" "+>" "++" "?:"
+                                       "?=" "?." "??" ";;" "/*" "/=" "/>" "//" "__" "~~" "(*" "*)"
+                                       "\\\\" "://"))
+  ;; Enables ligature checks globally in all buffers. You can also do it
+  ;; per mode with `ligature-mode'.
+  (global-ligature-mode t))
 
-  (defun fira-code-mode--make-alist (list)
-    "Generate prettify-symbols alist from LIST."
-    (let ((idx -1))
-      (mapcar
-       (lambda (s)
-         (setq idx (1+ idx))
-         (let* ((code (+ #Xe100 idx))
-            (width (string-width s))
-            (prefix ())
-            (suffix '(?\s (Br . Br)))
-            (n 1))
-       (while (< n width)
-         (setq prefix (append prefix '(?\s (Br . Bl))))
-         (setq n (1+ n)))
-       (cons s (append prefix suffix (list (decode-char 'ucs code))))))
-       list)))
-
-  (defconst fira-code-mode--ligatures
-    '("www" "**" "***" "**/" "*>" "*/" "\\\\" "\\\\\\"
-      "{-" "[]" "::" ":::" ":=" "!!" "!=" "!==" "-}"
-      "--" "---" "-->" "->" "->>" "-<" "-<<" "-~"
-      "#{" "#[" "##" "###" "####" "#(" "#?" "#_" "#_("
-      ".-" ".=" ".." "..<" "..." "?=" "??" ";;" "/*"
-      "/**" "/=" "/==" "/>" "//" "///" "&&" "||" "||="
-      "|=" "|>" "^=" "$>" "++" "+++" "+>" "=:=" "=="
-      "===" "==>" "=>" "=>>" "<=" "=<<" "=/=" ">-" ">="
-      ">=>" ">>" ">>-" ">>=" ">>>" "<*" "<*>" "<|" "<|>"
-      "<$" "<$>" "<!--" "<-" "<--" "<->" "<+" "<+>" "<="
-      "<==" "<=>" "<=<" "<>" "<<" "<<-" "<<=" "<<<" "<~"
-      "<~~" "</" "</>" "~@" "~-" "~=" "~>" "~~" "~~>" "%%"))
-
-  (defconst fira-code-mode--custom-mathy-symbols '(("def" .      ?ƒ)
-                                                   ("define".    ?ƒ)
-                                                   ("not " .     ?¬)
-                                                   ("in" .       ?∈)
-                                                   ("IN" .       ?∈)
-                                                   ("FROM".      ?∈)
-                                                   ("not in" .   ?∉)
-                                                   ("return" .   ?⇑)
-                                                   ("yield" .    ?⟻)
-                                                   ("is not" .   ?≢)
-                                                   ("IS NOT" .   ?≢)
-                                                   ("is" .       ?≡)
-                                                   ("IS" .       ?≡)
-                                                   ("eq" .       ?≡)
-                                                   ("lambda" .   ?λ)
-                                                   ("SELECT" .   ?∃)
-                                                   ;; Null
-                                                   ("null" .     ?∅)
-                                                   ("nullptr".   ?∅)
-                                                   ("NULL" .     ?∅)
-                                                   ("nil" .      ?∅)
-                                                   ("None" .     ?∅)))
-
-  (defvar fira-code-mode--old-prettify-alist)
-
-  (defun fira-code-mode--enable ()
-    "Enable Fira Code ligatures in current buffer."
-    (setq-local fira-code-mode--old-prettify-alist prettify-symbols-alist)
-    (setq-local prettify-symbols-alist (append fira-code-mode--custom-mathy-symbols fira-code-mode--old-prettify-alist))
-    (setq-local prettify-symbols-alist (append (fira-code-mode--make-alist fira-code-mode--ligatures) prettify-symbols-alist))
-    (prettify-symbols-mode t))
-
-  (defun fira-code-mode--disable ()
-    "Disable Fira Code ligatures in current buffer."
-    (setq-local prettify-symbols-alist fira-code-mode--old-prettify-alist)
-    (prettify-symbols-mode -1))
-
-  (define-minor-mode fira-code-mode
-    "Fira Code ligatures minor mode"
-    :lighter " Fira Code"
-    (setq-local prettify-symbols-unprettify-at-point 'right-edge)
-    (if fira-code-mode
-        (fira-code-mode--enable)
-      (fira-code-mode--disable)))
-
-  (defun fira-code-mode--setup ()
-    "Setup Fira Code Symbols"
-    (set-fontset-font t '(#Xe100 . #Xe16f) "Fira Code Symbol"))
-
-  (provide 'fira-code-mode)
-  ;(add-hook 'prog-mode-hook 'fira-code-mode)
-
-  (global-set-key (kbd "<f7>") 'fira-code-mode)
 #+END_SRC
 
 ** SQL Highlighting
