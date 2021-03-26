@@ -184,11 +184,12 @@ I like to display a column ruler at common styleguide limits
           (call-process "/bin/bash" nil nil nil "-c" "wget 'https://github.com/microsoft/cascadia-code/releases/download/v2102.25/CascadiaCode-2102.25.zip' -O ~/.emacs.d/fonts/cascadia-code.zip")
           (if
             (string-equal system-type "windows-nt")
+            (message "You should install Cascadia Code yourself(cmd scripting is hard). It's in ~/.emacs.d/fonts")))))
             (progn
               (call-process "/bin/bash" nil nil nil "-c" "unzip ~/.emacs.d/fonts/cascadia-code.zip -d ~/.local/share/fonts")
               (call-process "/bin/bash" nil nil nil "-c" "rm ~/.emacs.d/fonts/cascadia-code.zip")
               (message "Installed Cascadia Code"))
-            (message "You should install Cascadia Code yourself(cmd scripting is hard). It's in ~/.emacs.d/fonts")))))
+
 
   (defun install-all-the-icons ()
     (message "Installing all-the-icons")
@@ -207,8 +208,7 @@ I like to display a column ruler at common styleguide limits
     (progn
       (unless (file-directory-p "~/.local/share/fonts")
         (make-directory "~/.local/share/fonts" :parents))
-      (install-plex)
-      (install-fira-symbol)
+      (install-cascadia-code)
       (install-all-the-icons)
       (cache-fonts)))
 #+END_SRC
