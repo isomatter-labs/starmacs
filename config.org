@@ -389,7 +389,8 @@ I like to display a column ruler at common styleguide limits
     :ensure t
     :config
     (magithub-feature-autoinject t)
-    (setq magithub-clone-default-directory "~/octokitty/"))
+    (setq magithub-clone-default-directory "~/octokitty/")
+    (setq auth-sources '("~/.authinfo")))
 #+END_SRC
 
 * Tab to Complete
