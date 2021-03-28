@@ -78,7 +78,7 @@ I like to display a column ruler at common styleguide limits
       doom-themes-enable-italic t)
     (doom-themes-visual-bell-config)
     (doom-themes-org-config)
-    ;(if (eq window-system 'x)
+    (if (window-system)
         (load-theme 'doom-one t));) ; Only load in GUI to reduce issues with comment-coloring
 #+END_SRC
 
@@ -139,7 +139,7 @@ I like to display a column ruler at common styleguide limits
 
 *** Focus Line
 #+BEGIN_SRC emacs-lisp
-(if (eq window-system 'x)
+(if (window-system)
     (global-hl-line-mode 1))
 #+END_SRC
 
