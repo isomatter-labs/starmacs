@@ -4,16 +4,16 @@
 * Package Management
 ** Package Repositories
 #+BEGIN_SRC emacs-lisp
-(require 'package)
-(setq package-archives
-      '(("MELPA Stable" . "https://stable.melpa.org/packages/")
-        ("GNU ELPA"     . "https://elpa.gnu.org/packages/")
-	    ("MELPA"        . "https://melpa.org/packages/"))
-      package-archive-priorities
-      '(("GNU ELPA"     . 10)
-	    ("MELPA"        . 0)))
+  (require 'package)
+  (setq package-archives
+        '(("MELPA Stable" . "https://stable.melpa.org/packages/")
+          ("GNU ELPA"     . "https://elpa.gnu.org/packages/")
+          ("MELPA"        . "https://melpa.org/packages/"))
+        package-archive-priorities
+        '(("GNU ELPA"     . 10)
+          ("MELPA"        . 0)))
 
-(add-to-list 'load-path "~/.emacs.d/modules") ; add local files
+  (add-to-list 'load-path "~/.emacs.d/modules") ; add local files
 #+END_SRC
 
 ** use-package
@@ -65,7 +65,7 @@
 I like to display a column ruler at common styleguide limits
 (famously, 80 characters, but also often 100 and 120 characters).
 #+BEGIN_SRC emacs-lisp
-(add-hook 'prog-mode-hook #'display-fill-column-indicator-mode)
+  (add-hook 'prog-mode-hook #'display-fill-column-indicator-mode)
 #+END_SRC
 
 ** Look
@@ -79,99 +79,97 @@ I like to display a column ruler at common styleguide limits
     (doom-themes-visual-bell-config)
     (doom-themes-org-config)
     (if (window-system)
-        (load-theme 'doom-one t));) ; Only load in GUI to reduce issues with comment-coloring
+        (load-theme 'doom-one t))) ; Only load in GUI to reduce issues with comment-coloring
 #+END_SRC
 
 *** Org-Mode
 #+BEGIN_SRC emacs-lisp
-(use-package org-bullets
-  :ensure t
-  :config
-  (add-hook 'org-mode-hook 'org-indent-mode))
-(require 'color)
-(set-face-attribute 'org-block nil :background (face-attribute 'default :background))
-(set-face-attribute 'org-block-begin-line nil :background (face-attribute 'default :background))
-(set-face-attribute 'org-block-end-line nil :background (face-attribute 'default :background))
+  (use-package org-bullets
+    :ensure t
+    :config
+    (add-hook 'org-mode-hook 'org-indent-mode))
+
+  (require 'color)
 #+END_SRC
 
 *** Modeline
 #+BEGIN_SRC emacs-lisp
-(use-package doom-modeline
-  :ensure t
-  :hook (after-init . doom-modeline-mode))
+  (use-package doom-modeline
+    :ensure t
+    :hook (after-init . doom-modeline-mode))
 #+END_SRC
 
 *** Remove Default Trash
 #+BEGIN_SRC emacs-lisp
-(menu-bar-mode -1)
-(scroll-bar-mode -1)
-(tool-bar-mode -1)
-(setq inhibit-startup-screen t)
+  (menu-bar-mode -1)
+  (scroll-bar-mode -1)
+  (tool-bar-mode -1)
+  (setq inhibit-startup-screen t)
 #+END_SRC
 
 *** Cursor
 #+BEGIN_SRC emacs-lisp
-(setq-default cursor-type 'bar)
+  (setq-default cursor-type 'bar)
 #+END_SRC
 
 *** Truncate, Don't Wrap
 #+BEGIN_SRC emacs-lisp
-(set-default 'truncate-lines t)
-(define-fringe-bitmap 'right-arrow
-  [#b00000000
-   #b00011000
-   #b00111100
-   #b01111110
-   #b01111110
-   #b00111100
-   #b00011000
-   #b00000000])
-(define-fringe-bitmap 'left-arrow
-  [#b00000000
-   #b00011000
-   #b00111100
-   #b01111110
-   #b01111110
-   #b00111100
-   #b00011000
-   #b00000000])
+  (set-default 'truncate-lines t)
+  (define-fringe-bitmap 'right-arrow
+    [#b00000000
+     #b00011000
+     #b00111100
+     #b01111110
+     #b01111110
+     #b00111100
+     #b00011000
+     #b00000000])
+  (define-fringe-bitmap 'left-arrow
+    [#b00000000
+     #b00011000
+     #b00111100
+     #b01111110
+     #b01111110
+     #b00111100
+     #b00011000
+     #b00000000])
 #+END_SRC
 
 *** Focus Line
 #+BEGIN_SRC emacs-lisp
-(if (window-system)
-    (global-hl-line-mode 1))
+  (if (window-system)
+      (global-hl-line-mode 1))
 #+END_SRC
 
 *** Dashboard
 #+BEGIN_SRC emacs-lisp
-    (defun no-linum ()
-      (display-line-numbers-mode -1))
-    (use-package dashboard
-      :ensure t
-      :config
-      (setq initial-buffer-choice (lambda () (get-buffer "*dashboard*"))) ; for emacs daemon
-      (setq dashboard-items '((projects . 5)
-                              (recents . 5)
-                              (agenda . 5)))
-      (setq dashboard-set-heading-icons t)
-      (dashboard-modify-heading-icons '((recents . "file-text")))
-      (setq dashboard-set-navigator t)
-      (setq dashboard-set-file-icons t)
-      (setq dashboard-startup-banner "~/.emacs.d/img/axiom.png") ; set to path to image file to customize
-      (dashboard-setup-startup-hook)
-      (setq dashboard-center-content t)
-      (add-hook 'dashboard-mode-hook 'no-linum) ; turn off line numbers for dashboard
-      (add-hook 'dashboard-mode-hook 'olivetti-mode))
+  (defun no-linum ()
+    (display-line-numbers-mode -1))
+  (use-package dashboard
+    :ensure t
+    :config
+    (setq initial-buffer-choice (lambda () (get-buffer "*dashboard*"))) ; for emacs daemon
+    (setq dashboard-items '((projects . 5)
+                            (recents . 5)
+                            (agenda . 5)))
+    (setq dashboard-set-heading-icons t)
+    (dashboard-modify-heading-icons '((recents . "file-text")))
+    (setq dashboard-set-navigator t)
+    (setq dashboard-set-file-icons t)
+    (setq dashboard-startup-banner "~/.emacs.d/img/axiom.png") ; set to path to image file to customize
+    (dashboard-setup-startup-hook)
+    (setq dashboard-center-content t)
+    (add-hook 'dashboard-mode-hook 'no-linum) ; turn off line numbers for dashboard
+    (add-hook 'dashboard-mode-hook 'olivetti-mode))
 #+END_SRC
 
 *** Rainbow Delimiters
 #+BEGIN_SRC emacs-lisp
-(use-package rainbow-delimiters
-  :ensure t
-  :init
-  (progn
-    (add-hook 'prog-mode-hook 'rainbow-delimiters-mode)))
+  (use-package rainbow-delimiters
+    :ensure t
+    :init
+    (progn
+      (add-hook 'prog-mode-hook 'rainbow-delimiters-mode)))
 #+END_SRC
 
 ** Fonts
@@ -228,8 +226,8 @@ I like to display a column ruler at common styleguide limits
 
 *** Icons
 #+BEGIN_SRC emacs-lisp
-(use-package all-the-icons
-  :ensure t) ; recommend installing icons manually, this rarely works
+  (use-package all-the-icons
+    :ensure t) ; recommend installing icons manually, this rarely works
 #+END_SRC
 
 *** Ligatures
@@ -243,130 +241,122 @@ I like to display a column ruler at common styleguide limits
     (pretty-activate-groups
       '(:sub-and-superscripts :greek :arithmetic-nary)))
 
-(use-package ligature
-  :load-path "~/.emacs.d/mickeynp-ligature"
-  :config
-  ;; Enable the "www" ligature in every possible major mode
-  (ligature-set-ligatures 't '("www"))
-  ;; Enable traditional ligature support in eww-mode, if the
-  ;; `variable-pitch' face supports it
-  (ligature-set-ligatures 'eww-mode '("ff" "fi" "ffi"))
-  ;; Enable all Cascadia Code ligatures in programming modes
-  (ligature-set-ligatures 'prog-mode '("|||>" "<|||" "<==>" "<!--" "####" "~~>" "***" "||=" "||>"
-                                       ":::" "::=" "=:=" "===" "==>" "=!=" "=>>" "=<<" "=/=" "!=="
-                                       "!!." ">=>" ">>=" ">>>" ">>-" ">->" "->>" "-->" "---" "-<<"
-                                       "<~~" "<~>" "<*>" "<||" "<|>" "<$>" "<==" "<=>" "<=<" "<->"
-                                       "<--" "<-<" "<<=" "<<-" "<<<" "<+>" "</>" "###" "#_(" "..<"
-                                       "..." "+++" "/==" "///" "_|_" "www" "&&" "^=" "~~" "~@" "~="
-                                       "~>" "~-" "**" "*>" "*/" "||" "|}" "|]" "|=" "|>" "|-" "{|"
-                                       "[|" "]#" "::" ":=" ":>" ":<" "$>" "==" "=>" "!=" "!!" ">:"
-                                       ">=" ">>" ">-" "-~" "-|" "->" "--" "-<" "<~" "<*" "<|" "<:"
-                                       "<$" "<=" "<>" "<-" "<<" "<+" "</" "#{" "#[" "#:" "#=" "#!"
-                                       "##" "#(" "#?" "#_" "%%" ".=" ".-" ".." ".?" "+>" "++" "?:"
-                                       "?=" "?." "??" ";;" "/*" "/=" "/>" "//" "__" "~~" "(*" "*)"
-                                       "\\\\" "://"))
-  ;; Enables ligature checks globally in all buffers. You can also do it
-  ;; per mode with `ligature-mode'.
-  (global-ligature-mode t))
+  (use-package ligature
+    :load-path "~/.emacs.d/mickeynp-ligature"
+    :config
+    ;; Enable the "www" ligature in every possible major mode
+    (ligature-set-ligatures 't '("www"))
+    ;; Enable traditional ligature support in eww-mode, if the
+    ;; `variable-pitch' face supports it
+    (ligature-set-ligatures 'eww-mode '("ff" "fi" "ffi"))
+    ;; Enable all Cascadia Code ligatures in programming modes
+    (ligature-set-ligatures 'prog-mode '("|||>" "<|||" "<==>" "<!--" "####" "~~>" "***" "||=" "||>"
+                                         ":::" "::=" "=:=" "===" "==>" "=!=" "=>>" "=<<" "=/=" "!=="
+                                         "!!." ">=>" ">>=" ">>>" ">>-" ">->" "->>" "-->" "---" "-<<"
+                                         "<~~" "<~>" "<*>" "<||" "<|>" "<$>" "<==" "<=>" "<=<" "<->"
+                                         "<--" "<-<" "<<=" "<<-" "<<<" "<+>" "</>" "###" "#_(" "..<"
+                                         "..." "+++" "/==" "///" "_|_" "www" "&&" "^=" "~~" "~@" "~="
+                                         "~>" "~-" "**" "*>" "*/" "||" "|}" "|]" "|=" "|>" "|-" "{|"
+                                         "[|" "]#" "::" ":=" ":>" ":<" "$>" "==" "=>" "!=" "!!" ">:"
+                                         ">=" ">>" ">-" "-~" "-|" "->" "--" "-<" "<~" "<*" "<|" "<:"
+                                         "<$" "<=" "<>" "<-" "<<" "<+" "</" "#{" "#[" "#:" "#=" "#!"
+                                         "##" "#(" "#?" "#_" "%%" ".=" ".-" ".." ".?" "+>" "++" "?:"
+                                         "?=" "?." "??" ";;" "/*" "/=" "/>" "//" "__" "~~" "(*" "*)"
+                                         "\\\\" "://"))
+    ;; Enables ligature checks globally in all buffers. You can also do it
+    ;; per mode with `ligature-mode'.
+    (global-ligature-mode t))
 
 #+END_SRC
 
 ** SQL Highlighting
 #+BEGIN_SRC emacs-lisp
-(add-to-list 'auto-mode-alist '("\\.sqli\\'" . sql-mode))
-(use-package mmm-mode
-  :ensure t
-  :custom
-  (mmm-global-mode 'maybe)
-  :config
-  (set-face-background 'mmm-default-submode-face nil)
-  (mmm-add-classes
-   '((python-sql
-      :submode sql-mode
-      :face mmm-code-submode-face
-      :front "\\(--SQL\\)"
-      :back "\\(--SQL\\).*)")))
-  (mmm-add-mode-ext-class 'python-mode nil 'python-sql)) ; TODO: add hooks for other used languages
+  (add-to-list 'auto-mode-alist '("\\.sqli\\'" . sql-mode))
+  (use-package mmm-mode
+    :ensure t
+    :custom
+    (mmm-global-mode 'maybe)
+    :config
+    (set-face-background 'mmm-default-submode-face nil)
+    (mmm-add-classes
+      '((python-sql
+        :submode sql-mode
+        :face mmm-code-submode-face
+        :front "\\(--SQL\\)"
+        :back "\\(--SQL\\).*)")))
+    (mmm-add-mode-ext-class 'python-mode nil 'python-sql)) ; TODO: add hooks for other used languages
 
 #+END_SRC
 
 ** Quick Reload
 #+BEGIN_SRC emacs-lisp
-(defun revert-buffer-no-confirm ()
-  "Revert the current buffer without asking permission"
-  (interactive)
-  (revert-buffer :ignore-auto :noconfirm))
+  (defun revert-buffer-no-confirm ()
+    "Revert the current buffer without asking permission"
+    (interactive)
+    (revert-buffer :ignore-auto :noconfirm))
 
-(global-set-key (kbd "<f5>") 'revert-buffer-no-confirm)
+  (global-set-key (kbd "<f5>") 'revert-buffer-no-confirm)
 #+END_SRC
 
 ** Zen Mode (Olivetti)
 #+BEGIN_SRC emacs-lisp
-(use-package olivetti
-  :ensure t
-  :config
-  (setq-default olivetti-body-width 120)
-  (add-hook 'org-mode-hook 'olivetti-mode)
+  (use-package olivetti
+    :ensure t
+    :config
+    (setq-default olivetti-body-width 120)
+    (add-hook 'org-mode-hook 'olivetti-mode)
 
-  (global-set-key (kbd "<f12>") 'olivetti-mode)
-  (global-set-key (kbd "C-M-z") 'olivetti-mode))
+    (global-set-key (kbd "<f12>") 'olivetti-mode)
+    (global-set-key (kbd "C-M-z") 'olivetti-mode))
 #+END_SRC
 
 * Project-Management
 ** Projectile
 #+BEGIN_SRC emacs-lisp
-(use-package projectile
-  :ensure t
-  :custom
-  (projectile-indexing-method 'alien)
-  (projectile-enable-caching t)
-  (projectile-completion-system 'ivy)
-  :bind-keymap
-  ("C-c p" . projectile-command-map)
-  :config
-  (projectile-global-mode))
-#+END_SRC
-
-** Dumb-Jump
-#+BEGIN_SRC emacs-lisp
-(use-package dumb-jump
-  :ensure t
-  :config
-  (add-hook 'prog-mode-hook 'dumb-jump-mode))
+  (use-package projectile
+    :ensure t
+    :custom
+    (projectile-indexing-method 'alien)
+    (projectile-enable-caching t)
+    (projectile-completion-system 'ivy)
+    :bind-keymap
+    ("C-c p" . projectile-command-map)
+    :config
+    (projectile-global-mode))
 #+END_SRC
 
 * Searching and Fuzzy-Finding
 ** Ivy
 #+BEGIN_SRC emacs-lisp
-(use-package ivy
-  :ensure t
-  :diminish (ivy-mode . "")
-  :bind
-  (:map ivy-mode-map
-   ("C-'" . ivy-avy))
+  (use-package ivy
+    :ensure t
+    :diminish (ivy-mode . "")
+    :bind
+    (:map ivy-mode-map
+      ("C-'" . ivy-avy))
 
-  :custom
-  (ivy-use-virtual-buffers t)           ; add ‘recentf-mode’ and bookmarks to ‘ivy-switch-buffer'.
-  (ivy-height 10)                       ; number of result lines to display
-  (ivy-count-format "")                 ; does not count candidates
-  (ivy-initial-inputs-alist nil)        ; no regexp by default
-  (ivy-re-builders-alist                ; configure regexp engine.
-    '((t . ivy--regex-ignore-order)))	; allow input not in order
+    :custom
+    (ivy-use-virtual-buffers t)           ; add ‘recentf-mode’ and bookmarks to ‘ivy-switch-buffer'.
+    (ivy-height 10)                       ; number of result lines to display
+    (ivy-count-format "")                 ; does not count candidates
+    (ivy-initial-inputs-alist nil)        ; no regexp by default
+    (ivy-re-builders-alist                ; configure regexp engine.
+      '((t . ivy--regex-ignore-order)))	; allow input not in order
 
-  :config
-  (ivy-mode 1))
+    :config
+    (ivy-mode 1))
 #+END_SRC
 
 ** Counsel
 #+BEGIN_SRC emacs-lisp
-(use-package counsel
-  :ensure t
-  :bind
-  ("M-x" . counsel-M-x)
-  ("C-h f" . counsel-describe-function)
-  ("C-h v" . counsel-describe-variable)
-  ("C-c k" . counsel-ag)
-  ("C-h a" . counsel-apropos))
+  (use-package counsel
+    :ensure t
+    :bind
+    ("M-x" . counsel-M-x)
+    ("C-h f" . counsel-describe-function)
+    ("C-h v" . counsel-describe-variable)
+    ("C-c k" . counsel-ag)
+    ("C-h a" . counsel-apropos))
 #+END_SRC
 
 ** Swiper
@@ -413,10 +403,10 @@ I like to display a column ruler at common styleguide limits
 * Language Specific IDE-Like Features
 ** Scheme
 #+BEGIN_SRC emacs-lisp
-(use-package geiser
-  :ensure t
-  :config
-  (add-hook 'scheme-mode-hook 'fira-code-mode))
+  (use-package geiser
+    :ensure t
+    :config
+    (add-hook 'scheme-mode-hook 'fira-code-mode))
 #+END_SRC
 
 ** Common Lisp
@@ -459,31 +449,30 @@ I like to display a column ruler at common styleguide limits
 
 *** Use Ligatures
 #+BEGIN_SRC emacs-lisp
-(add-hook 'python-mode-hook 'fira-code-mode)
+  (add-hook 'python-mode-hook 'fira-code-mode)
 #+END_SRC
 
 ** C++
 *** Flycheck
 #+BEGIN_SRC emacs-lisp
-(use-package flycheck
-  :ensure t
-  :config
-  (progn
-    (global-flycheck-mode)))
+  (use-package flycheck
+    :ensure t
+    :config
+    (progn
+      (global-flycheck-mode)))
 
-(defun flycheck-rtags-setup ()
-  "Configure flycheck-rtags."
-  (flycheck-select-checker 'rtags)
-  (setq-local flycheck-highlighting-mode nil)
-  (setq-local flycheck-check-syntax-automatically nil))
+  (defun flycheck-rtags-setup ()
+    "Configure flycheck-rtags."
+    (flycheck-select-checker 'rtags)
+    (setq-local flycheck-highlighting-mode nil)
+    (setq-local flycheck-check-syntax-automatically nil))
 
-(use-package flycheck-rtags
-  :ensure t
-  :config
-  (progn
-    (add-hook 'c++-mode-hook 'flycheck-rtags-setup)
-    (add-hook 'c-mode-hook 'flycheck-rtags-setup)))
-
+  (use-package flycheck-rtags
+    :ensure t
+    :config
+    (progn
+      (add-hook 'c++-mode-hook 'flycheck-rtags-setup)
+      (add-hook 'c-mode-hook 'flycheck-rtags-setup)))
 
 #+END_SRC
 
@@ -538,8 +527,8 @@ I like to display a column ruler at common styleguide limits
 
 *** Format on Save
 #+BEGIN_SRC emacs-lisp
-(defun clang-format-on-save ()
-  (add-hook 'before-save-hook #'clang-format-buffer nil 'local))
+  (defun clang-format-on-save ()
+    (add-hook 'before-save-hook #'clang-format-buffer nil 'local))
 
 ;(add-hook 'c++-mode-hook 'clang-format-on-save)
 ;(add-hook 'c-mode-hook 'clang-format-on-save)
@@ -548,15 +537,15 @@ I like to display a column ruler at common styleguide limits
 *** General QoL
 The styleguides I use ask for a 100-char column limit
 #+BEGIN_SRC emacs-lisp
-(add-hook 'c++-mode-hook (lambda () (setq fill-column 100)))
+  (add-hook 'c++-mode-hook (lambda () (setq fill-column 100)))
 #+END_SRC
 
 They also require a 4-space indent.
 #+BEGIN_SRC emacs-lisp
-(add-hook 'c++-mode-hook (lambda () (setq tab-width 4)))
+  (add-hook 'c++-mode-hook (lambda () (setq tab-width 4)))
 #+END_SRC
 
 I also really like ligatures
 #+BEGIN_SRC emacs-lisp
-(add-hook 'c++mode-hook 'fira-code-mode)
+  (add-hook 'c++mode-hook 'fira-code-mode)
 #+END_SRC
