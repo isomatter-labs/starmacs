@@ -92,18 +92,19 @@ I like to display a column ruler at common styleguide limits
 
 *** Org-Mode
 #+BEGIN_SRC emacs-lisp
-    (require 'color)
+      (require 'color)
 
-    (use-package org
-      :ensure t
-      :commands (org-capture org-agenda)
-      :config
-      (add-hook 'org-mode-hook 'org-indent-mode))
+      (use-package org
+        :ensure t
+        :commands (org-capture org-agenda)
+        :config
+        (add-hook 'org-mode-hook 'org-indent-mode)
+        (add-hook 'org-mode-hook 'no-linum))
 
-    (use-package org-bullets
-      :ensure t
-      :config
-      (add-hook 'org-mode-hook (lambda () (org-bullets-mode 1))))
+      (use-package org-bullets
+        :ensure t
+        :config
+        (add-hook 'org-mode-hook (lambda () (org-bullets-mode 1))))
 #+END_SRC
 
 *** Modeline
@@ -159,9 +160,11 @@ I like to display a column ruler at common styleguide limits
 #+BEGIN_SRC emacs-lisp
   (defun no-linum ()
     (display-line-numbers-mode -1))
+
   (use-package dashboard
     :ensure t
     :config
+    (setq dashboard-banner-logo-title "Welcome to the Isomorph Research Laboratories AXIOM Editing environment.")
     (setq initial-buffer-choice (lambda () (get-buffer "*dashboard*"))) ; for emacs daemon
     (setq dashboard-items '((projects . 5)
                             (recents . 5)
@@ -171,6 +174,7 @@ I like to display a column ruler at common styleguide limits
     (setq dashboard-set-navigator t)
     (setq dashboard-set-file-icons t)
     (setq dashboard-startup-banner "~/.emacs.d/img/axiom.png") ; set to path to image file to customize
+    (setq dashboard-set-footer nil)
     (dashboard-setup-startup-hook)
     (setq dashboard-center-content t)
     (add-hook 'dashboard-mode-hook 'no-linum) ; turn off line numbers for dashboard
