@@ -24,6 +24,14 @@
 
   (eval-when-compile
     (require 'use-package))
+
+  (use-package auto-package-update
+    :ensure t
+    :config
+    (setq auto-package-update-delete-old-versions t)
+    (setq auto-package-update-hide-results t)
+    (setq auto-package-update-interval 30)
+    (auto-package-update-maybe))
 #+END_SRC
 
 * Quality of Life Improvements
@@ -84,12 +92,18 @@ I like to display a column ruler at common styleguide limits
 
 *** Org-Mode
 #+BEGIN_SRC emacs-lisp
-  (use-package org-bullets
-    :ensure t
-    :config
-    (add-hook 'org-mode-hook 'org-indent-mode))
+    (require 'color)
 
-  (require 'color)
+    (use-package org
+      :ensure t
+      :commands (org-capture org-agenda)
+      :config
+      (add-hook 'org-mode-hook 'org-indent-mode))
+
+    (use-package org-bullets
+      :ensure t
+      :config
+      (add-hook 'org-mode-hook (lambda () (org-bullets-mode 1))))
 #+END_SRC
 
 *** Modeline
@@ -175,18 +189,14 @@ I like to display a column ruler at common styleguide limits
 ** Fonts
 *** Installing
 #+BEGIN_SRC emacs-lisp
-  (defun install-cascadia-code ()
-    (if (eq window-system 'x)
-        (progn
-          (message "Installing Cascadia Code -- You might want to grab a cup of something...")
-          (call-process "/bin/bash" nil nil nil "-c" "wget 'https://github.com/microsoft/cascadia-code/releases/download/v2102.25/CascadiaCode-2102.25.zip' -O ~/.emacs.d/fonts/cascadia-code.zip")
-          (if
-            (string-equal system-type "windows-nt")
-            (message "You should install Cascadia Code yourself(cmd scripting is hard). It's in ~/.emacs.d/fonts")))))
-            (progn
-              (call-process "/bin/bash" nil nil nil "-c" "unzip ~/.emacs.d/fonts/cascadia-code.zip -d ~/.local/share/fonts")
-              (call-process "/bin/bash" nil nil nil "-c" "rm ~/.emacs.d/fonts/cascadia-code.zip")
-              (message "Installed Cascadia Code"))
+  (defun install-iosevka ()
+    (when (and (window-system) ( not (string-equal system-type "windows-nt")))
+      (progn
+        (message "Installing Iosevka -- You might want to grab a cup of something...")
+        (call-process "/bin/bash" nil nil nil "-c" "wget 'https://github.com/be5invis/Iosevka/releases/download/v5.1.1/ttf-iosevka-5.1.1.zip' -O ~/.emacs.d/fonts/iosevka.zip")
+        (call-process "/bin/bash" nil nil nil "-c" "unzip ~/.emacs.d/fonts/iosevka.zip -d ~/.local/share/fonts")
+        (call-process "/bin/bash" nil nil nil "-c" "rm ~/.emacs.d/fonts/iosekva.zip")
+        (message "Installed Iosevka"))))
 
 
   (defun install-all-the-icons ()
@@ -196,32 +206,36 @@ I like to display a column ruler at common styleguide limits
 
 
   (defun cache-fonts ()
-    (message "Running fc-cache -f")
-    (call-process "/bin/bash" nil nil nil "-c" "fc-cache -f")
-    (message "Fonts installed"))
+    (unless
+        (string-equal system-type "windows-nt")
+      (progn
+        (message "Running fc-cache -f")
+        (call-process "/bin/bash" nil nil nil "-c" "fc-cache -f")
+        (message "Fonts installed"))))
 
-  (unless (or (not (eq window-system 'x))
-              (and (member "Cascadia Code" (font-family-list))
-                   (member "all-the-icons" (font-family-list))))
+  (unless (window-system)
     (progn
       (unless (file-directory-p "~/.local/share/fonts")
         (make-directory "~/.local/share/fonts" :parents))
-      (install-cascadia-code)
-      (install-all-the-icons)
+      (unless (member "Iosevka" (font-family-list))
+        (install-iosevka))
+      (unless (member "all-the-icons" (font-family-list))
+        (install-all-the-icons))
       (cache-fonts)))
 #+END_SRC
 
 *** Defaults
 #+BEGIN_SRC emacs-lisp
-    (defun set-fonts ()
-      (interactive)
-      (add-to-list 'default-frame-alist '(font . "Cascadia Code-10"))
-      (set-face-attribute 'default t :font "Cascadia Code-10")
-      (set-face-attribute 'mode-line nil :weight 'bold :font "Cascadia Code")
-      (custom-set-faces
-       '(font-lock-comment-face ((t (:foreground "#5B6268" :slant italic :family "Cascadia Code")))))
-      (set-frame-font "Cascadia Code-10"))
-    (set-fonts)
+  (defun set-fonts ()
+    (interactive)
+    (add-to-list 'default-frame-alist '(font . "Iosevka"))
+    (set-face-attribute 'default t :font "Iosevka")
+    (set-face-attribute 'mode-line nil :weight 'extra-bold :font "Iosevka")
+    (custom-set-faces
+      '(font-lock-comment-face ((t (:foreground "#5B6268" :weight light :slant italic :family "Iosevka")))))
+    (set-frame-font "Iosevka"))
+
+  (set-fonts)
 #+END_SRC
 
 *** Icons
@@ -232,15 +246,6 @@ I like to display a column ruler at common styleguide limits
 
 *** Ligatures
 #+BEGIN_SRC emacs-lisp
-  (use-package pretty-mode
-    :ensure t
-    :config
-    (add-hook 'fira-code-mode-hook 'pretty-mode)
-    (pretty-deactivate-groups
-      '(:equality :ordering :ordering-double :ordering-triple :arrows :arrows-twoheaded :punctuation :logic :sets :function))
-    (pretty-activate-groups
-      '(:sub-and-superscripts :greek :arithmetic-nary)))
-
   (use-package ligature
     :load-path "~/.emacs.d/mickeynp-ligature"
     :config
@@ -249,7 +254,7 @@ I like to display a column ruler at common styleguide limits
     ;; Enable traditional ligature support in eww-mode, if the
     ;; `variable-pitch' face supports it
     (ligature-set-ligatures 'eww-mode '("ff" "fi" "ffi"))
-    ;; Enable all Cascadia Code ligatures in programming modes
+    ;; Enable all Iosevka ligatures in programming modes
     (ligature-set-ligatures 'prog-mode '("|||>" "<|||" "<==>" "<!--" "####" "~~>" "***" "||=" "||>"
                                          ":::" "::=" "=:=" "===" "==>" "=!=" "=>>" "=<<" "=/=" "!=="
                                          "!!." ">=>" ">>=" ">>>" ">>-" ">->" "->>" "-->" "---" "-<<"
@@ -334,38 +339,36 @@ I like to display a column ruler at common styleguide limits
     :bind
     (:map ivy-mode-map
       ("C-'" . ivy-avy))
-
     :custom
     (ivy-use-virtual-buffers t)           ; add ‘recentf-mode’ and bookmarks to ‘ivy-switch-buffer'.
     (ivy-height 10)                       ; number of result lines to display
     (ivy-count-format "")                 ; does not count candidates
     (ivy-initial-inputs-alist nil)        ; no regexp by default
     (ivy-re-builders-alist                ; configure regexp engine.
-      '((t . ivy--regex-ignore-order)))	; allow input not in order
-
+      '((t . ivy--regex-ignore-order)))   ; allow input not in order
     :config
-    (ivy-mode 1))
-#+END_SRC
+    (ivy-mode))
 
-** Counsel
-#+BEGIN_SRC emacs-lisp
   (use-package counsel
     :ensure t
+    :after ivy
     :bind
     ("M-x" . counsel-M-x)
     ("C-h f" . counsel-describe-function)
     ("C-h v" . counsel-describe-variable)
     ("C-c k" . counsel-ag)
-    ("C-h a" . counsel-apropos))
-#+END_SRC
+    ("C-h a" . counsel-apropos)
+    ("C-x C-f" . counsel-find-file)
+    ("C-x b" . ivy-switch-buffer))
 
-** Swiper
-#+BEGIN_SRC emacs-lisp
   (use-package swiper
     :ensure t
-    :config
-    (global-set-key (kbd "C-s") 'swiper))	; replace standard search functionality
+    :after ivy
+    :bind
+    ("C-s" . swiper)
+    ("C-r" . swiper)) ; replace standard search functionality
 #+END_SRC
+
 
 * Git/Github
 #+BEGIN_SRC emacs-lisp
@@ -445,11 +448,6 @@ I like to display a column ruler at common styleguide limits
   (add-hook 'python-mode-hook
     (lambda ()
       (setq comment-start " # ")))
-#+END_SRC
-
-*** Use Ligatures
-#+BEGIN_SRC emacs-lisp
-  (add-hook 'python-mode-hook 'fira-code-mode)
 #+END_SRC
 
 ** C++
@@ -543,9 +541,4 @@ The styleguides I use ask for a 100-char column limit
 They also require a 4-space indent.
 #+BEGIN_SRC emacs-lisp
   (add-hook 'c++-mode-hook (lambda () (setq tab-width 4)))
-#+END_SRC
-
-I also really like ligatures
-#+BEGIN_SRC emacs-lisp
-  (add-hook 'c++mode-hook 'fira-code-mode)
 #+END_SRC
