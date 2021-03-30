@@ -249,32 +249,28 @@ I like to display a column ruler at common styleguide limits
 #+END_SRC
 
 *** Ligatures
+This can only be used if this build of emacs includes commit ~fe903c5ab7354b97f80ecf1b01ca3ff1027be446~, which
+did not make it into emacs 27.1. If emacs is build from =master= or =native-comp=, the issue should be fixed.
+
 #+BEGIN_SRC emacs-lisp
-  ;; (use-package ligature
-  ;;   :load-path "~/.emacs.d/mickeynp-ligature"
-  ;;   :config
-  ;;   ;; Enable the "www" ligature in every possible major mode
-  ;;   (ligature-set-ligatures 't '("www"))
-  ;;   ;; Enable traditional ligature support in eww-mode, if the
-  ;;   ;; `variable-pitch' face supports it
-  ;;   (ligature-set-ligatures 'eww-mode '("ff" "fi" "ffi"))
-  ;;   ;; Enable all Iosevka ligatures in programming modes
-  ;;   (ligature-set-ligatures 'prog-mode '("|||>" "<|||" "<==>" "<!--" "####" "~~>" "***" "||=" "||>"
-  ;;                                        ":::" "::=" "=:=" "===" "==>" "=!=" "=>>" "=<<" "=/=" "!=="
-  ;;                                        "!!." ">=>" ">>=" ">>>" ">>-" ">->" "->>" "-->" "---" "-<<"
-  ;;                                        "<~~" "<~>" "<*>" "<||" "<|>" "<$>" "<==" "<=>" "<=<" "<->"
-  ;;                                        "<--" "<-<" "<<=" "<<-" "<<<" "<+>" "</>" "###" "#_(" "..<"
-  ;;                                        "..." "+++" "/==" "///" "_|_" "www" "&&" "^=" "~~" "~@" "~="
-  ;;                                        "~>" "~-" "**" "*>" "*/" "||" "|}" "|]" "|=" "|>" "|-" "{|"
-  ;;                                        "[|" "]#" "::" ":=" ":>" ":<" "$>" "==" "=>" "!=" "!!" ">:"
-  ;;                                        ">=" ">>" ">-" "-~" "-|" "->" "--" "-<" "<~" "<*" "<|" "<:"
-  ;;                                        "<$" "<=" "<>" "<-" "<<" "<+" "</" "#{" "#[" "#:" "#=" "#!"
-  ;;                                        "##" "#(" "#?" "#_" "%%" ".=" ".-" ".." ".?" "+>" "++" "?:"
-  ;;                                        "?=" "?." "??" ";;" "/*" "/=" "/>" "//" "__" "~~" "(*" "*)"
-  ;;                                        "\\\\" "://"))
-  ;;   ;; Enables ligature checks globally in all buffers. You can also do it
-  ;;   ;; per mode with `ligature-mode'.
-  ;;   (global-ligature-mode t))
+      (use-package ligature
+        :load-path "~/.emacs.d/mickeynp-ligature"
+        :config
+        ;; Enable traditional ligature support in eww-mode, if the
+        ;; `variable-pitch' face supports it
+        (ligature-set-ligatures 'eww-mode '("ff" "fi" "ffi"))
+        ;; Enable all Iosevka ligatures in programming modes
+        (ligature-set-ligatures 'prog-mode '("<--" "<---" "<<-" "<-" "->" "->>" "-->" "--->"
+                                             "<->" "<-->" "<--->" "<---->" "<!--" "<!---"
+                                             "<==" "<===" "<=" "=>" "==>" "===>" ">="
+                                             "<=>" "<==>" "<===>" "<====>"
+                                             "<~~" "<~" "~>" "~~>" "::" ":::" "==" "!="
+                                             "===" "!==" ":=" ":-" ":+" "<*" "<*>" "*>"
+                                             "<|" "<|>" "|>" "+:" "-:" "=:" "<***>" "++" "+++"))
+        ;; Enables ligature checks globally in all buffers. You can also do it
+        ;; per mode with `ligature-mode'.
+        ;(global-ligature-mode t) ; uncomment if fix commit in place
+        )
 
 #+END_SRC
 
