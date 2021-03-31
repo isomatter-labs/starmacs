@@ -250,7 +250,10 @@ I like to display a column ruler at common styleguide limits
     (interactive)
     (add-to-list 'default-frame-alist '(font . "Iosevka"))
     (set-face-attribute 'default t :font "Iosevka")
-    (set-face-attribute 'mode-line nil :weight 'extra-bold :font "Iosevka")
+    (set-face-attribute 'mode-line nil
+                        :weight 'extra-bold ;should be _very_ bold
+                        :font "Iosevka"     ;same font
+                        :height 1.05)       ;should be a little larger than regular text
     (custom-set-faces
       '(font-lock-comment-face ((t (:foreground "#5B6268" :weight light :slant italic :family "Iosevka")))))
     (set-frame-font "Iosevka"))
