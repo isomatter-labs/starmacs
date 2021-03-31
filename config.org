@@ -35,6 +35,21 @@
 #+END_SRC
 
 * Quality of Life Improvements
+** Replace Selection
+When text is highlighted, typing should delete the highlighted text and insert what is typed.
+#+BEGIN_SRC emacs-lisp
+  (delete-selection-mode 1)
+#+END_SRC
+
+** Usage Guides
+=discover.el= mostly just helps with =dired= mode, but it's worth including for new users.
+#+BEGIN_SRC emacs-lisp
+  (use-package discover
+    :ensure t
+    :config
+    (global-discover-mode 1))
+#+END_SRC
+
 ** Mouse in Terminal
 #+BEGIN_SRC emacs-lisp
 (xterm-mouse-mode 1)
@@ -124,7 +139,7 @@ I like to display a column ruler at common styleguide limits
 
 *** Cursor
 #+BEGIN_SRC emacs-lisp
-  (setq-default cursor-type 'bar)
+  (setq-default cursor-type '(bar . 1))
 #+END_SRC
 
 *** Truncate, Don't Wrap
@@ -158,27 +173,28 @@ I like to display a column ruler at common styleguide limits
 
 *** Dashboard
 #+BEGIN_SRC emacs-lisp
-  (defun no-linum ()
-    (display-line-numbers-mode -1))
+    (defun no-linum ()
+      (display-line-numbers-mode -1))
 
-  (use-package dashboard
-    :ensure t
-    :config
-    (setq dashboard-banner-logo-title "Welcome to the Isomorph Research Laboratories AXIOM Editing environment.")
-    (setq initial-buffer-choice (lambda () (get-buffer "*dashboard*"))) ; for emacs daemon
-    (setq dashboard-items '((projects . 5)
-                            (recents . 5)
-                            (agenda . 5)))
-    (setq dashboard-set-heading-icons t)
-    (dashboard-modify-heading-icons '((recents . "file-text")))
-    (setq dashboard-set-navigator t)
-    (setq dashboard-set-file-icons t)
-    (setq dashboard-startup-banner "~/.emacs.d/img/axiom.png") ; set to path to image file to customize
-    (setq dashboard-set-footer nil)
-    (dashboard-setup-startup-hook)
-    (setq dashboard-center-content t)
-    (add-hook 'dashboard-mode-hook 'no-linum) ; turn off line numbers for dashboard
-    (add-hook 'dashboard-mode-hook 'olivetti-mode))
+    (use-package dashboard
+      :ensure t
+      :config
+      (setq dashboard-banner-logo-title "Welcome to the Isomorph Research Laboratories AXIOM Editing environment.")
+      (setq initial-buffer-choice (lambda () (get-buffer "*dashboard*"))) ; for emacs daemon
+      (setq dashboard-items '((projects . 5)
+                              (recents . 5)
+                              (agenda . 5)))
+      (setq dashboard-set-heading-icons t)
+      (dashboard-modify-heading-icons '((recents . "file-text")))
+      (setq dashboard-set-navigator t)
+      (setq dashboard-set-file-icons t)
+      (setq dashboard-startup-banner "~/.emacs.d/img/axiom.png") ; set to path to image file to customize
+      (setq dashboard-set-footer nil)
+      (dashboard-setup-startup-hook)
+      (setq dashboard-center-content t)
+      (add-hook 'dashboard-mode-hook 'no-linum) ; turn off line numbers for dashboard
+      (add-hook 'dashboard-mode-hook 'olivetti-mode)
+      (add-hook 'prog-mode-hook (lambda () (if (one-window-p) (olivetti-mode)))))
 #+END_SRC
 
 *** Rainbow Delimiters
@@ -386,6 +402,13 @@ did not make it into emacs 27.1. If emacs is build from =master= or =native-comp
     (setq auth-sources '("~/.authinfo")))
 #+END_SRC
 
+#+BEGIN_SRC emacs-lisp
+      (use-package diff-hl
+        :ensure t
+        :config
+        (global-diff-hl-mode))
+#+END_SRC
+
 * Tab to Complete
 #+BEGIN_SRC emacs-lisp
 (setq tab-always-indent 'complete)
@@ -468,5 +491,19 @@ The styleguides I use ask for a 100-char column limit
 
 They also require a 4-space indent.
 #+BEGIN_SRC emacs-lisp
-  (add-hook 'c++-mode-hook (lambda () (setq tab-width 4)))
+  (defun my-c-mode-common-hook ()
+    ;; my customizations for all of c-mode, c++-mode, objc-mode, java-mode
+    (c-set-offset 'substatement-open 0)
+    ;; other customizations can go here
+
+    (setq c++-tab-always-indent t)
+    (setq c-basic-offset 4)                  ;; Default is 2
+    (setq c-indent-level 4)                  ;; Default is 2
+
+    (setq tab-stop-list '(4 8 12 16 20 24 28 32 36 40 44 48 52 56 60))
+    (setq tab-width 4)
+    (setq indent-tabs-mode nil)  ; use spaces only if nil
+    )
+
+  (add-hook 'c-mode-common-hook 'my-c-mode-common-hook)
 #+END_SRC
