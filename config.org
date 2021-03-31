@@ -52,36 +52,36 @@ When text is highlighted, typing should delete the highlighted text and insert w
 
 ** Mouse in Terminal
 #+BEGIN_SRC emacs-lisp
-(xterm-mouse-mode 1)
+  (xterm-mouse-mode 1)
 #+END_SRC
 
 ** Whitespace
 #+BEGIN_SRC emacs-lisp
-(add-hook 'prog-mode-hook (lambda () (setq show-trailing-whitespace t)))
-(add-hook 'before-save-hook 'delete-trailing-whitespace)
-;; whitespace-space-regexp will only work with selective highlighting, not with space-mark
-;(setq whitespace-space-regexp "\\( \\{2,\\}\\)")
-(setq whitespace-style (quote (face tabs newline tab-mark newline-mark)))
-(custom-set-faces
-  '(whitespace-tab((t (:foreground "#E06C75")))) ; make tabs _very_ noticable
-  '(whitespace-space((t (:foreground "#525252"))))
-  '(whitespace-newline((t (:foreground "#525252")))))
-(setq whitespace-display-mappings
-  '((space-mark 32 [183] [46])
-    (newline-mark 10 [172 10])
-    (tab-mark 9 [187 9] [92 9])))
-(global-whitespace-mode 1)
+  (add-hook 'prog-mode-hook (lambda () (setq show-trailing-whitespace t)))
+  (add-hook 'before-save-hook 'delete-trailing-whitespace)
+  ;; whitespace-space-regexp will only work with selective highlighting, not with space-mark
+                                          ;(setq whitespace-space-regexp "\\( \\{2,\\}\\)")
+  (setq whitespace-style (quote (face tabs newline tab-mark newline-mark)))
+  (custom-set-faces
+   '(whitespace-tab((t (:foreground "#E06C75")))) ; make tabs _very_ noticable
+   '(whitespace-space((t (:foreground "#525252"))))
+   '(whitespace-newline((t (:foreground "#525252")))))
+  (setq whitespace-display-mappings
+        '((space-mark 32 [183] [46])
+          (newline-mark 10 [172 10])
+          (tab-mark 9 [187 9] [92 9])))
+  (global-whitespace-mode 1)
 
-(setq-default indent-tabs-mode nil) ; never indent with tabs
+  (setq-default indent-tabs-mode nil) ; never indent with tabs
 #+END_SRC
 
 ** Line Numbers
 #+BEGIN_SRC emacs-lisp
-(if (version<= "26.0.50" emacs-version)
-  (global-display-line-numbers-mode)
-  (progn
-    (global-linum-mode t)
-    (setq linum-format "%4d \u2502 ")))
+  (if (version<= "26.0.50" emacs-version)
+      (global-display-line-numbers-mode)
+    (progn
+      (global-linum-mode t)
+      (setq linum-format "%4d \u2502 ")))
 #+END_SRC
 
 ** Column Ruler
@@ -107,19 +107,19 @@ I like to display a column ruler at common styleguide limits
 
 *** Org-Mode
 #+BEGIN_SRC emacs-lisp
-      (require 'color)
+  (require 'color)
 
-      (use-package org
-        :ensure t
-        :commands (org-capture org-agenda)
-        :config
-        (add-hook 'org-mode-hook 'org-indent-mode)
-        (add-hook 'org-mode-hook 'no-linum))
+  (use-package org
+    :ensure t
+    :commands (org-capture org-agenda)
+    :config
+    (add-hook 'org-mode-hook 'org-indent-mode)
+    (add-hook 'org-mode-hook 'no-linum))
 
-      (use-package org-bullets
-        :ensure t
-        :config
-        (add-hook 'org-mode-hook (lambda () (org-bullets-mode 1))))
+  (use-package org-bullets
+    :ensure t
+    :config
+    (add-hook 'org-mode-hook (lambda () (org-bullets-mode 1))))
 #+END_SRC
 
 *** Modeline
@@ -173,28 +173,28 @@ I like to display a column ruler at common styleguide limits
 
 *** Dashboard
 #+BEGIN_SRC emacs-lisp
-    (defun no-linum ()
-      (display-line-numbers-mode -1))
+  (defun no-linum ()
+    (display-line-numbers-mode -1))
 
-    (use-package dashboard
-      :ensure t
-      :config
-      (setq dashboard-banner-logo-title "Welcome to the Isomorph Research Laboratories AXIOM Editing environment.")
-      (setq initial-buffer-choice (lambda () (get-buffer "*dashboard*"))) ; for emacs daemon
-      (setq dashboard-items '((projects . 5)
-                              (recents . 5)
-                              (agenda . 5)))
-      (setq dashboard-set-heading-icons t)
-      (dashboard-modify-heading-icons '((recents . "file-text")))
-      (setq dashboard-set-navigator t)
-      (setq dashboard-set-file-icons t)
-      (setq dashboard-startup-banner "~/.emacs.d/img/axiom.png") ; set to path to image file to customize
-      (setq dashboard-set-footer nil)
-      (dashboard-setup-startup-hook)
-      (setq dashboard-center-content t)
-      (add-hook 'dashboard-mode-hook 'no-linum) ; turn off line numbers for dashboard
-      (add-hook 'dashboard-mode-hook 'olivetti-mode)
-      (add-hook 'prog-mode-hook (lambda () (if (one-window-p) (olivetti-mode)))))
+  (use-package dashboard
+    :ensure t
+    :config
+    (setq dashboard-banner-logo-title "Welcome to the Isomorph Research Laboratories AXIOM Editing environment.")
+    (setq initial-buffer-choice (lambda () (get-buffer "*dashboard*"))) ; for emacs daemon
+    (setq dashboard-items '((projects . 5)
+                            (recents . 5)
+                            (agenda . 5)))
+    (setq dashboard-set-heading-icons t)
+    (dashboard-modify-heading-icons '((recents . "file-text")))
+    (setq dashboard-set-navigator t)
+    (setq dashboard-set-file-icons t)
+    (setq dashboard-startup-banner "~/.emacs.d/img/axiom.png") ; set to path to image file to customize
+    (setq dashboard-set-footer nil)
+    (dashboard-setup-startup-hook)
+    (setq dashboard-center-content t)
+    (add-hook 'dashboard-mode-hook 'no-linum) ; turn off line numbers for dashboard
+    (add-hook 'dashboard-mode-hook 'olivetti-mode)
+    (add-hook 'prog-mode-hook (lambda () (if (one-window-p) (olivetti-mode)))))
 #+END_SRC
 
 *** Rainbow Delimiters
@@ -265,28 +265,28 @@ I like to display a column ruler at common styleguide limits
 #+END_SRC
 
 *** Ligatures
-This can only be used if this build of emacs includes commit ~fe903c5ab7354b97f80ecf1b01ca3ff1027be446~, which
-did not make it into emacs 27.1. If emacs is build from =master= or =native-comp=, the issue should be fixed.
+=global-ligature-mode= can only be used if this build of emacs includes commit
+~fe903c5ab7354b97f80ecf1b01ca3ff1027be446~, which did not make it into emacs 27.1.
+If emacs is build from =master= or =native-comp=, the issue should be fixed.
 
 #+BEGIN_SRC emacs-lisp
-      (use-package ligature
-        :load-path "~/.emacs.d/mickeynp-ligature"
-        :config
-        ;; Enable traditional ligature support in eww-mode, if the
-        ;; `variable-pitch' face supports it
-        (ligature-set-ligatures 'eww-mode '("ff" "fi" "ffi"))
-        ;; Enable all Iosevka ligatures in programming modes
-        (ligature-set-ligatures 'prog-mode '("<--" "<---" "<<-" "<-" "->" "->>" "-->" "--->"
-                                             "<->" "<-->" "<--->" "<---->" "<!--" "<!---"
-                                             "<==" "<===" "<=" "=>" "==>" "===>" ">="
-                                             "<=>" "<==>" "<===>" "<====>"
-                                             "<~~" "<~" "~>" "~~>" "::" ":::" "==" "!="
-                                             "===" "!==" ":=" ":-" ":+" "<*" "<*>" "*>"
-                                             "<|" "<|>" "|>" "+:" "-:" "=:" "<***>" "++" "+++"))
-        ;; Enables ligature checks globally in all buffers. You can also do it
-        ;; per mode with `ligature-mode'.
-        ;(global-ligature-mode t) ; uncomment if fix commit in place
-        )
+  (use-package ligature
+    :load-path "~/.emacs.d/mickeynp-ligature"
+    :config
+    ;; Enable traditional ligature support in eww-mode, if the
+    ;; `variable-pitch' face supports it
+    (ligature-set-ligatures 'eww-mode '("ff" "fi" "ffi"))
+    ;; Enable all Iosevka ligatures in programming modes
+    (ligature-set-ligatures 'prog-mode '("<--" "<---" "<<-" "<-" "->" "->>" "-->" "--->"
+                                         "<->" "<-->" "<--->" "<---->" "<!--" "<!---"
+                                         "<==" "<===" "<=" "=>" "==>" "===>" ">="
+                                         "<=>" "<==>" "<===>" "<====>"
+                                         "<~~" "<~" "~>" "~~>" "::" ":::" "==" "!="
+                                         "===" "!==" ":=" ":-" ":+" "<*" "<*>" "*>"
+                                         "<|" "<|>" "|>" "+:" "-:" "=:" "<***>" "++" "+++"))
+
+    ;(global-ligature-mode t)
+    )
 
 #+END_SRC
 
@@ -384,7 +384,6 @@ did not make it into emacs 27.1. If emacs is build from =master= or =native-comp
     ("C-s" . swiper)
     ("C-r" . swiper)) ; replace standard search functionality
 #+END_SRC
-
 
 * Git/Github
 #+BEGIN_SRC emacs-lisp
@@ -502,8 +501,7 @@ They also require a 4-space indent.
 
     (setq tab-stop-list '(4 8 12 16 20 24 28 32 36 40 44 48 52 56 60))
     (setq tab-width 4)
-    (setq indent-tabs-mode nil)  ; use spaces only if nil
-    )
+    (setq indent-tabs-mode nil))
 
   (add-hook 'c-mode-common-hook 'my-c-mode-common-hook)
 #+END_SRC
