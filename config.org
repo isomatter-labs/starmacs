@@ -303,12 +303,12 @@ If emacs is build from =master= or =native-comp=, the issue should be fixed.
     :config
     (set-face-background 'mmm-default-submode-face nil)
     (mmm-add-classes
-      '((python-sql
+      '((embedded-sql
         :submode sql-mode
         :face mmm-code-submode-face
         :front "\\(--SQL\\)"
-        :back "\\(--SQL\\).*)")))
-    (mmm-add-mode-ext-class 'python-mode nil 'python-sql)) ; TODO: add hooks for other used languages
+        :back "\\(--SQL-END\\)")))
+    (mmm-add-mode-ext-class 'prog-mode nil 'embedded-sql))
 
 #+END_SRC
 
