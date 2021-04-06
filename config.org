@@ -192,9 +192,9 @@ I like to display a column ruler at common styleguide limits
     (setq dashboard-set-footer nil)
     (dashboard-setup-startup-hook)
     (setq dashboard-center-content t)
-    (add-hook 'dashboard-mode-hook 'no-linum) ; turn off line numbers for dashboard
-    (add-hook 'dashboard-mode-hook 'olivetti-mode)
-    (add-hook 'prog-mode-hook (lambda () (if (one-window-p) (olivetti-mode)))))
+    (add-hook 'dashboard-mode-hook 'no-linum)) ; turn off line numbers for dashboard
+    ;(add-hook 'dashboard-mode-hook 'olivetti-mode)
+    ;(add-hook 'prog-mode-hook (lambda () (if (one-window-p) (olivetti-mode)))))
 #+END_SRC
 
 *** Rainbow Delimiters
@@ -323,15 +323,17 @@ If emacs is build from =master= or =native-comp=, the issue should be fixed.
 #+END_SRC
 
 ** Zen Mode (Olivetti)
-#+BEGIN_SRC emacs-lisp
-  (use-package olivetti
-    :ensure t
-    :config
-    (setq-default olivetti-body-width 120)
-    (add-hook 'org-mode-hook 'olivetti-mode)
+Olivetti Mode is creating a recursive load, so it is disabled until that is fixed.
 
-    (global-set-key (kbd "<f12>") 'olivetti-mode)
-    (global-set-key (kbd "C-M-z") 'olivetti-mode))
+#+BEGIN_SRC emacs-lisp
+  ;; (use-package olivetti
+  ;;   :ensure t
+  ;;   :config
+  ;;   (setq-default olivetti-body-width 120)
+  ;;   (add-hook 'org-mode-hook 'olivetti-mode)
+
+  ;;   (global-set-key (kbd "<f12>") 'olivetti-mode)
+  ;;   (global-set-key (kbd "C-M-z") 'olivetti-mode))
 #+END_SRC
 
 * Project-Management
