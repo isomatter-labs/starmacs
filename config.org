@@ -433,28 +433,6 @@ Olivetti Mode is creating a recursive load, so it is disabled until that is fixe
 #+END_SRC
 
 * Language Specific IDE-Like Features
-** Scheme
-#+BEGIN_SRC emacs-lisp
-  (use-package geiser
-    :ensure t
-    :config
-    (add-hook 'scheme-mode-hook 'fira-code-mode))
-#+END_SRC
-
-** Common Lisp
-#+BEGIN_SRC emacs-lisp
-  (use-package slime
-    :ensure t
-    :config
-    (setq inferior-lisp-program "sbcl") ; remember to add sbcl to your path!
-    (setq slime-contribs '(slime-fancy)))
-
-  (use-package lispy
-    :ensure t
-    :config
-    (add-hook 'emacs-lisp-mode-hook (lambda () (lispy-mode 1))))
-#+END_SRC
-
 ** Haskell
 #+BEGIN_SRC emacs-lisp
   (use-package haskell-mode
