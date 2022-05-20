@@ -371,13 +371,12 @@ Olivetti Mode is creating a recursive load, so it is disabled until that is fixe
     (ivy-initial-inputs-alist nil)        ; no regexp by default
     (ivy-re-builders-alist                ; configure regexp engine.
       '((t . ivy--regex-ignore-order)))   ; allow input not in order
-    :config
-    (ivy-mode))
+    :init
+    (ivy-mode 1))
 
   (use-package counsel
     :ensure t
-    :after ivy
-    :bind
+    :bind*
     ("M-x" . counsel-M-x)
     ("C-h f" . counsel-describe-function)
     ("C-h v" . counsel-describe-variable)
@@ -388,10 +387,9 @@ Olivetti Mode is creating a recursive load, so it is disabled until that is fixe
 
   (use-package swiper
     :ensure t
-    :after ivy
-    :bind
-    ("C-s" . swiper)
-    ("C-r" . swiper)) ; replace standard search functionality
+    :bind*
+    ("C-s" . swiper-isearch)
+    ("C-r" . swiper-isearch-backward)) ; replace standard search functionality
 #+END_SRC
 
 * Git/Github
