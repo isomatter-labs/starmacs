@@ -275,10 +275,6 @@ I like to display a column ruler at common styleguide limits
 #+END_SRC
 
 *** Ligatures
-=global-ligature-mode= can only be used if this build of emacs includes commit
-~fe903c5ab7354b97f80ecf1b01ca3ff1027be446~, which did not make it into emacs 27.1.
-If emacs is build from =master= or =native-comp=, the issue should be fixed.
-
 #+BEGIN_SRC emacs-lisp
   (use-package ligature
     :load-path "~/.emacs.d/mickeynp-ligature"
@@ -295,7 +291,7 @@ If emacs is build from =master= or =native-comp=, the issue should be fixed.
                                          "===" "!==" ":=" ":-" ":+" "<*" "<*>" "*>"
                                          "<|" "<|>" "|>" "+:" "-:" "=:" "<***>" "++" "+++"))
 
-    ;(global-ligature-mode t)
+    (global-ligature-mode t)
     )
 
 #+END_SRC
