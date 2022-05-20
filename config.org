@@ -35,6 +35,19 @@
 #+END_SRC
 
 * Quality of Life Improvements
+** Keep Buffers Up to Date with Files
+When files on disk change, open buffers should be automatically updated to reflect those changes.
+#+BEGIN_SRC emacs-lisp
+  (global-auto-revert-mode t)
+#+END_SRC
+
+** Do Not Create Extra Files
+Don't create =backup~= or =#autosave#= files
+#+BEGIN_SRC emacs-lisp
+  (setq make-backup-files nil)
+  (setq auto-save-default nil)
+#+END_SRC
+
 ** Replace Selection
 When text is highlighted, typing should delete the highlighted text and insert what is typed.
 #+BEGIN_SRC emacs-lisp
