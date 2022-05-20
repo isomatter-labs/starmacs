@@ -271,6 +271,7 @@ I like to display a column ruler at common styleguide limits
 *** Icons
 #+BEGIN_SRC emacs-lisp
   (use-package all-the-icons
+    :if (display-graphic-p)
     :ensure t) ; recommend installing icons manually, this rarely works
 #+END_SRC
 
