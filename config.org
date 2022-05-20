@@ -256,14 +256,13 @@ I like to display a column ruler at common styleguide limits
   (defun set-fonts ()
     (interactive)
     (add-to-list 'default-frame-alist '(font . "Iosevka"))
-    (set-face-attribute 'default t :font "Iosevka")
+    (set-face-attribute 'default nil :font "Iosevka" :height 130)
     (set-face-attribute 'mode-line nil
                         :weight 'extra-bold ;should be _very_ bold
                         :font "Iosevka"     ;same font
                         :height 1.05)       ;should be a little larger than regular text
     (custom-set-faces
-      '(font-lock-comment-face ((t (:foreground "#5B6268" :weight light :slant italic :family "Iosevka")))))
-    (set-frame-font "Iosevka"))
+      '(font-lock-comment-face ((t (:foreground "#5B6268" :weight light :slant italic :family "Iosevka"))))))
 
   (set-fonts)
 #+END_SRC
@@ -420,6 +419,10 @@ Olivetti Mode is creating a recursive load, so it is disabled until that is fixe
 (setq tab-always-indent 'complete)
 #+END_SRC
 
+* Open Emacs GUI above terminal
+#+BEGIN_SRC emacs-lisp
+  (x-focus-frame nil)
+#+END_SRC
 * LSP Features
 ** Eglot
 #+BEGIN_SRC emacs-lisp
@@ -455,38 +458,4 @@ Olivetti Mode is creating a recursive load, so it is disabled until that is fixe
   (add-hook 'python-mode-hook
     (lambda ()
       (setq comment-start " # ")))
-#+END_SRC
-
-** C++
-*** Format on Save
-#+BEGIN_SRC emacs-lisp
-  (defun clang-format-on-save ()
-    (add-hook 'before-save-hook #'clang-format-buffer nil 'local))
-
-;(add-hook 'c++-mode-hook 'clang-format-on-save)
-;(add-hook 'c-mode-hook 'clang-format-on-save)
-#+END_SRC
-
-*** General QoL
-The styleguides I use ask for a 100-char column limit
-#+BEGIN_SRC emacs-lisp
-  (add-hook 'c++-mode-hook (lambda () (setq fill-column 100)))
-#+END_SRC
-
-They also require a 4-space indent.
-#+BEGIN_SRC emacs-lisp
-  (defun my-c-mode-common-hook ()
-    ;; my customizations for all of c-mode, c++-mode, objc-mode, java-mode
-    (c-set-offset 'substatement-open 0)
-    ;; other customizations can go here
-
-    (setq c++-tab-always-indent t)
-    (setq c-basic-offset 4)                  ;; Default is 2
-    (setq c-indent-level 4)                  ;; Default is 2
-
-    (setq tab-stop-list '(4 8 12 16 20 24 28 32 36 40 44 48 52 56 60))
-    (setq tab-width 4)
-    (setq indent-tabs-mode nil))
-
-  (add-hook 'c-mode-common-hook 'my-c-mode-common-hook)
 #+END_SRC
