@@ -437,6 +437,28 @@ this is more passive, and allows for more accidental discoveries.
     (global-blamer-mode 1))
 #+END_SRC
 
+* Syntax Checking
+** Flycheck
+#+BEGIN_SRC emacs-lisp
+  (use-package flycheck
+    :ensure t
+    :custom (flycheck-check-syntax-automatically '(save mode-enabled))
+    :init (global-flycheck-mode))
+#+END_SRC
+
+* Auto-Completion
+** Company-mode
+#+BEGIN_SRC emacs-lisp
+  (use-package company
+    :bind (:map company-active-map
+                ("C-n" . company-select-next)
+                ("C-p" . company-select-previous))
+    :custom
+    (company-idle-delay 0.3)
+    (company-toltip-align-annotations t)
+    :config
+    (global-company-mode t))
+#+END_SRC
 
 * Tab to Complete
 #+BEGIN_SRC emacs-lisp
@@ -447,6 +469,7 @@ this is more passive, and allows for more accidental discoveries.
 #+BEGIN_SRC emacs-lisp
   (x-focus-frame nil)
 #+END_SRC
+
 * LSP Features
 ** Eglot
 #+BEGIN_SRC emacs-lisp
@@ -482,4 +505,82 @@ this is more passive, and allows for more accidental discoveries.
   (add-hook 'python-mode-hook
     (lambda ()
       (setq comment-start " # ")))
+#+END_SRC
+
+** TypeScript
+** Add Node Modules Binaries
+This is taken from [[https://github.com/codesuki/add-node-modules-path/blob/master/add-node-modules-path.el][codesuki's function]] to add all of the binaries in the project's
+=node_modules= folder to the exec path, allowing use of local =prettier=, =eslint=, etc.
+#+BEGIN_SRC emacs-lisp
+  (require 's)
+
+(defgroup add-node-modules-path nil
+  "Put node_modules binaries into `exec-path'."
+  :prefix "add-node-modules-path-"
+  :group 'environment)
+
+;;;###autoload
+(defcustom add-node-modules-path-command "npm bin"
+  "Command to find the bin path."
+  :type 'string)
+
+;;;###autoload
+(defcustom add-node-modules-path-debug nil
+  "Enable verbose output when non nil."
+  :type 'boolean
+  :group 'add-node-modules-path)
+
+;;;###autoload
+(defun add-node-modules-path ()
+  "Run `npm bin` command and add the path to the `exec-path`.
+If `npm` command fails, it does nothing."
+  (interactive)
+
+  (let* ((res (s-chomp (shell-command-to-string add-node-modules-path-command)))
+         (exists (file-exists-p res))
+         )
+    (cond
+     (exists
+      (make-local-variable 'exec-path)
+      (add-to-list 'exec-path res)
+      (when add-node-modules-path-debug
+        (message "Added to `exec-path`: %s" res))
+      )
+     (t
+      (when add-node-modules-path-debug
+        (message "Failed to run `%s':\n %s" add-node-modules-path-command res))
+      ))
+    )
+  )
+
+(provide 'add-node-modules-path)
+#+END_SRC
+
+*** Tide
+#+BEGIN_SRC emacs-lisp
+  (defun setup-tide-mode ()
+    "Setup function for Tide"
+    (interactive)
+    (tide-setup)
+    (flycheck-mode +1)
+    (eldoc-mode +1)
+    (tide-hl-identifier-mode +1)
+    (company-mode +1))
+
+  (use-package tide
+    :ensure t
+    :after (typescript-mode flycheck company)
+    :hook (typescript-mode . setup-tide-mode)
+          (typescript-mode . tide-hl-identifier-mode))
+#+END_SRC
+
+*** Prettier
+#+BEGIN_SRC emacs-lisp
+        (use-package prettier-js
+          :ensure t
+          :after (typescript-mode)
+          :hook
+          (typescript-mode . prettier-js-mode)
+          (typescript-mode . add-node-modules-path)
+          (before-save . prettier-js))
 #+END_SRC
