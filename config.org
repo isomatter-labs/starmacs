@@ -508,7 +508,7 @@ this is more passive, and allows for more accidental discoveries.
 #+END_SRC
 
 ** TypeScript
-** Add Node Modules Binaries
+*** Add Node Modules Binaries
 This is taken from [[https://github.com/codesuki/add-node-modules-path/blob/master/add-node-modules-path.el][codesuki's function]] to add all of the binaries in the project's
 =node_modules= folder to the exec path, allowing use of local =prettier=, =eslint=, etc.
 #+BEGIN_SRC emacs-lisp
