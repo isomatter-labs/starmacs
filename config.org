@@ -16,6 +16,22 @@
   (add-to-list 'load-path "~/.emacs.d/modules") ; add local files
 #+END_SRC
 
+** Straight
+#+BEGIN_SRC emacs-lisp
+(defvar bootstrap-version)
+(let ((bootstrap-file
+       (expand-file-name "straight/repos/straight.el/bootstrap.el" user-emacs-directory))
+      (bootstrap-version 5))
+  (unless (file-exists-p bootstrap-file)
+    (with-current-buffer
+        (url-retrieve-synchronously
+         "https://raw.githubusercontent.com/raxod502/straight.el/develop/install.el"
+         'silent 'inhibit-cookies)
+      (goto-char (point-max))
+      (eval-print-last-sexp)))
+  (load bootstrap-file nil 'nomessage))
+  #+END_SRC
+
 ** use-package
 #+BEGIN_SRC emacs-lisp
   (unless (package-installed-p 'use-package)
@@ -583,4 +599,30 @@ If `npm` command fails, it does nothing."
           (typescript-mode . prettier-js-mode)
           (typescript-mode . add-node-modules-path)
           (before-save . prettier-js))
+#+END_SRC
+
+* AI-Assisted Programming
+** Github Copilot
+#+BEGIN_SRC emacs-lisp
+  (use-package copilot
+    :straight (:host github :repo "zerolfx/copilot.el" :files ("dist" "*.el"))
+    :hook (prog-mode-hook . copilot-mode)
+    :ensure t)
+
+  ; complete by copilot first, then company-mode
+(defun my-tab ()
+  (interactive)
+  (or (copilot-accept-completion)
+      (company-indent-or-complete-common nil)))
+
+; modify company-mode behaviors
+(with-eval-after-load 'company
+  ;; disable inline previews
+  (delq 'company-preview-if-just-one-frontend company-frontends)
+
+  (define-key company-mode-map (kbd "<tab>") 'my-tab)
+  (define-key company-mode-map (kbd "TAB") 'my-tab)
+  (define-key company-active-map (kbd "<tab>") 'my-tab)
+  (define-key company-active-map (kbd "TAB") 'my-tab))
+  ;; you can utilize :map :hook and :config to customize copilot
 #+END_SRC
