@@ -289,28 +289,6 @@ I like to display a column ruler at common styleguide limits
     :ensure t) ; recommend installing icons manually, this rarely works
 #+END_SRC
 
-*** Ligatures
-#+BEGIN_SRC emacs-lisp
-  (use-package ligature
-    :load-path "~/.emacs.d/mickeynp-ligature"
-    :config
-    ;; Enable traditional ligature support in eww-mode, if the
-    ;; `variable-pitch' face supports it
-    (ligature-set-ligatures 'eww-mode '("ff" "fi" "ffi"))
-    ;; Enable all Iosevka ligatures in programming modes
-    (ligature-set-ligatures 'prog-mode '("<--" "<---" "<<-" "<-" "->" "->>" "-->" "--->"
-                                         "<->" "<-->" "<--->" "<---->" "<!--" "<!---"
-                                         "<==" "<===" "<=" "=>" "==>" "===>" ">="
-                                         "<=>" "<==>" "<===>" "<====>"
-                                         "<~~" "<~" "~>" "~~>" "::" ":::" "==" "!="
-                                         "===" "!==" ":=" ":-" ":+" "<*" "<*>" "*>"
-                                         "<|" "<|>" "|>" "+:" "-:" "=:" "<***>" "++" "+++"))
-
-    (global-ligature-mode t)
-    )
-
-#+END_SRC
-
 ** SQL Highlighting
 #+BEGIN_SRC emacs-lisp
   (add-to-list 'auto-mode-alist '("\\.sqli\\'" . sql-mode))
@@ -430,29 +408,6 @@ Olivetti Mode is creating a recursive load, so it is disabled until that is fixe
         (global-diff-hl-mode))
 #+END_SRC
 
-** Blamer
-Add [[https://gitlens.amod.io/][GitLens]]-style line annotations after a given pause.
-While Magit already has a way to annotate the last commit touching a line,
-this is more passive, and allows for more accidental discoveries.
-#+BEGIN_SRC emacs-lisp
-  (use-package blamer
-    :ensure t
-    :bind (("s-i" . blamer-show-commit-info))
-    :defer 20
-    :custom
-    (blamer-idle-time 0.3)
-    (blamer-min-offset 70)
-    (blamer-prettify-time-p t)
-
-    :custom-face
-    (blamer-face ((t :foreground "#7a88cf"
-                     :background nil
-                     :height 140
-                     :italic t)))
-    :config
-    (global-blamer-mode 1))
-#+END_SRC
-
 * Syntax Checking
 ** Flycheck
 #+BEGIN_SRC emacs-lisp
@@ -489,24 +444,17 @@ this is more passive, and allows for more accidental discoveries.
 * LSP Features
 ** Eglot
 #+BEGIN_SRC emacs-lisp
-  (use-package eglot
-    :ensure t
-    :config
-    (add-hook 'python-mode-hook 'eglot-ensure)
-    (add-hook 'haskell-mode-hook 'eglot-ensure)
-    (add-hook 'c-mode-hook 'eglot-ensure)
-    (add-hook 'c++-mode-hook 'eglot-ensure))
+    (use-package eglot
+      :ensure t
+      :hook
+      (python-mode-hook . eglot-ensure)
+      (haskell-mode-hook . eglot-ensure)
+      (c-mode-hook . eglot-ensure)
+      (c++-mode-hook . eglot-ensure)
+      (go-mode-hook . eglot-ensure))
 #+END_SRC
 
 * Language Specific IDE-Like Features
-** Haskell
-#+BEGIN_SRC emacs-lisp
-  (use-package haskell-mode
-    :ensure t
-    :config
-    (add-hook 'haskell-mode 'fira-code-mode))
-#+END_SRC
-
 ** Python
 *** Auto-PEP8 On Save
 #+BEGIN_SRC emacs-lisp
@@ -543,7 +491,7 @@ This is taken from [[https://github.com/codesuki/add-node-modules-path/blob/mast
 ;;;###autoload
 (defcustom add-node-modules-path-debug nil
   "Enable verbose output when non nil."
-  :type 'boolean
+  :type 'boolpean
   :group 'add-node-modules-path)
 
 ;;;###autoload
@@ -604,25 +552,22 @@ If `npm` command fails, it does nothing."
 * AI-Assisted Programming
 ** Github Copilot
 #+BEGIN_SRC emacs-lisp
+   ;; accept completion from copilot and fallback to company
+  (defun my-tab ()
+    (interactive)
+    (or (copilot-accept-completion)
+        (Companyg-indent-or-complete-common nil)))
+
   (use-package copilot
+    :after company
     :straight (:host github :repo "zerolfx/copilot.el" :files ("dist" "*.el"))
-    :hook (prog-mode-hook . copilot-mode)
-    :ensure t)
-
-  ; complete by copilot first, then company-mode
-(defun my-tab ()
-  (interactive)
-  (or (copilot-accept-completion)
-      (company-indent-or-complete-common nil)))
-
-; modify company-mode behaviors
-(with-eval-after-load 'company
-  ;; disable inline previews
-  (delq 'company-preview-if-just-one-frontend company-frontends)
-
-  (define-key company-mode-map (kbd "<tab>") 'my-tab)
-  (define-key company-mode-map (kbd "TAB") 'my-tab)
-  (define-key company-active-map (kbd "<tab>") 'my-tab)
-  (define-key company-active-map (kbd "TAB") 'my-tab))
-  ;; you can utilize :map :hook and :config to customize copilot
+    :hook (prog-mode . copilot-mode)
+    :bind (("C-TAB" . 'copilot-accept-completion-by-word)
+           ("C-<tab>" . 'copilot-accept-completion-by-word)
+           :map company-active-map
+           ("<tab>" . 'my-tab)
+           ("TAB" . 'my-tab)
+           :map company-mode-map
+           ("<tab>" . 'my-tab)
+           ("TAB" . 'my-tab)))
 #+END_SRC
