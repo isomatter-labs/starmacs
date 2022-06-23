@@ -241,14 +241,14 @@ I like to display a column ruler at common styleguide limits
   (use-package all-the-icons
   :if (display-graphic-p))
 
-  (defun install-iosevka ()
+  (defun install-plex ()
     (when (and (window-system) ( not (string-equal system-type "windows-nt")))
       (progn
-        (message "Installing Iosevka -- You might want to grab a cup of something...")
-        (call-process "/bin/bash" nil nil nil "-c" "wget 'https://github.com/be5invis/Iosevka/releases/download/v5.1.1/ttf-iosevka-5.1.1.zip' -O ~/.emacs.d/fonts/iosevka.zip")
-        (call-process "/bin/bash" nil nil nil "-c" "unzip ~/.emacs.d/fonts/iosevka.zip -d ~/.local/share/fonts")
-        (call-process "/bin/bash" nil nil nil "-c" "rm ~/.emacs.d/fonts/iosekva.zip")
-        (message "Installed Iosevka"))))
+        (message "Installing IBM Plex -- You might want to grab a cup of something...")
+        (call-process "/bin/bash" nil nil nil "-c" "wget 'https://github.com/IBM/plex/releases/download/v6.0.2/OpenType.zip' -O ~/.emacs.d/fonts/plex.zip")
+        (call-process "/bin/bash" nil nil nil "-c" "unzip ~/.emacs.d/fonts/plex.zip -d ~/.local/share/fonts")
+        (call-process "/bin/bash" nil nil nil "-c" "rm ~/.emacs.d/fonts/plex.zip")
+        (message "Installed IBM Plex"))))
 
   (defun cache-fonts ()
     (unless
@@ -262,8 +262,8 @@ I like to display a column ruler at common styleguide limits
     (progn
       (unless (file-directory-p "~/.local/share/fonts")
         (make-directory "~/.local/share/fonts" :parents))
-      (unless (member "Iosevka" (font-family-list))
-        (install-iosevka))
+      (unless (member "IBM Plex Mono" (font-family-list))
+        (install-plex))
       (cache-fonts)))
 #+END_SRC
 
@@ -273,11 +273,11 @@ I like to display a column ruler at common styleguide limits
     (interactive)
     (set-face-attribute 'mode-line nil
                         :weight 'extra-bold ;should be _very_ bold
-                        :font "Iosevka"     ;same font
+                        :font "IBM Plex Mono"     ;same font
                         :height 1.05)       ;should be a little larger than regular text
     (custom-set-faces
-      '(font-lock-comment-face ((t (:foreground "#5B6268" :weight light :slant italic :family "Iosevka"))))))
-    (set-face-attribute 'default nil :font "Iosevka" :height 140)
+      '(font-lock-comment-face ((t (:foreground "#5B6268" :weight light :slant italic :family "IBM Plex Mono"))))))
+    (set-face-attribute 'default nil :font "IBM Plex Mono" :height 140)
 
   (set-fonts)
 #+END_SRC
@@ -316,20 +316,6 @@ I like to display a column ruler at common styleguide limits
     (revert-buffer :ignore-auto :noconfirm))
 
   (global-set-key (kbd "<f5>") 'revert-buffer-no-confirm)
-#+END_SRC
-
-** Zen Mode (Olivetti)
-Olivetti Mode is creating a recursive load, so it is disabled until that is fixed.
-
-#+BEGIN_SRC emacs-lisp
-  ;; (use-package olivetti
-  ;;   :ensure t
-  ;;   :config
-  ;;   (setq-default olivetti-body-width 120)
-  ;;   (add-hook 'org-mode-hook 'olivetti-mode)
-
-  ;;   (global-set-key (kbd "<f12>") 'olivetti-mode)
-  ;;   (global-set-key (kbd "C-M-z") 'olivetti-mode))
 #+END_SRC
 
 * Project-Management
@@ -397,7 +383,7 @@ Olivetti Mode is creating a recursive load, so it is disabled until that is fixe
     :ensure t
     :config
     (magithub-feature-autoinject t)
-    (setq magithub-clone-default-directory "~/octokitty/")
+    (setq magithub-clone-default-directory "~/Development/")
     (setq auth-sources '("~/.authinfo")))
 #+END_SRC
 
