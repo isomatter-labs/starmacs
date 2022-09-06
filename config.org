@@ -16,22 +16,6 @@
   (add-to-list 'load-path "~/.emacs.d/modules") ; add local files
 #+END_SRC
 
-** Straight
-#+BEGIN_SRC emacs-lisp
-(defvar bootstrap-version)
-(let ((bootstrap-file
-       (expand-file-name "straight/repos/straight.el/bootstrap.el" user-emacs-directory))
-      (bootstrap-version 5))
-  (unless (file-exists-p bootstrap-file)
-    (with-current-buffer
-        (url-retrieve-synchronously
-         "https://raw.githubusercontent.com/raxod502/straight.el/develop/install.el"
-         'silent 'inhibit-cookies)
-      (goto-char (point-max))
-      (eval-print-last-sexp)))
-  (load bootstrap-file nil 'nomessage))
-  #+END_SRC
-
 ** use-package
 #+BEGIN_SRC emacs-lisp
   (unless (package-installed-p 'use-package)
@@ -100,8 +84,6 @@ When text is highlighted, typing should delete the highlighted text and insert w
           (newline-mark 10 [172 10])
           (tab-mark 9 [187 9] [92 9])))
   (global-whitespace-mode 1)
-
-  (setq-default indent-tabs-mode nil) ; never indent with tabs
 #+END_SRC
 
 ** Line Numbers
@@ -117,7 +99,7 @@ When text is highlighted, typing should delete the highlighted text and insert w
 I like to display a column ruler at common styleguide limits
 (famously, 80 characters, but also often 100 and 120 characters).
 #+BEGIN_SRC emacs-lisp
-  (add-hook 'prog-mode-hook #'display-fill-column-indicator-mode)
+  ;; (add-hook 'prog-mode-hook #'display-fill-column-indicator-mode)
 #+END_SRC
 
 ** Look
@@ -149,6 +131,14 @@ I like to display a column ruler at common styleguide limits
     :ensure t
     :config
     (add-hook 'org-mode-hook (lambda () (org-bullets-mode 1))))
+#+END_SRC
+
+*** Markdown
+#+BEGIN_SRC emacs-lisp
+  (use-package markdown-mode
+  :ensure t
+  :mode ("README\\.md\\'" . gfm-mode)
+  :init (setq markdown-command "multimarkdown"))
 #+END_SRC
 
 *** Modeline
@@ -202,28 +192,26 @@ I like to display a column ruler at common styleguide limits
 
 *** Dashboard
 #+BEGIN_SRC emacs-lisp
-  (defun no-linum ()
-    (display-line-numbers-mode -1))
+      (defun no-linum ()
+        (display-line-numbers-mode -1))
 
-  (use-package dashboard
-    :ensure t
-    :config
-    (setq dashboard-banner-logo-title "Welcome to the Isomorph Research Laboratories AXIOM Editing environment.")
-    (setq initial-buffer-choice (lambda () (get-buffer "*dashboard*"))) ; for emacs daemon
-    (setq dashboard-items '((projects . 5)
-                            (recents . 5)
-                            (agenda . 5)))
-    (setq dashboard-set-heading-icons t)
-    (dashboard-modify-heading-icons '((recents . "file-text")))
-    (setq dashboard-set-navigator t)
-    (setq dashboard-set-file-icons t)
-    (setq dashboard-startup-banner "~/.emacs.d/img/axiom.png") ; set to path to image file to customize
-    (setq dashboard-set-footer nil)
-    (dashboard-setup-startup-hook)
-    (setq dashboard-center-content t)
-    (add-hook 'dashboard-mode-hook 'no-linum)) ; turn off line numbers for dashboard
-    ;(add-hook 'dashboard-mode-hook 'olivetti-mode)
-    ;(add-hook 'prog-mode-hook (lambda () (if (one-window-p) (olivetti-mode)))))
+      (use-package dashboard
+        :ensure t
+        :config
+        (setq dashboard-banner-logo-title "Welcome to Emacs, A hackable text editor for the 21st Century!")
+        (setq initial-buffer-choice (lambda () (get-buffer "*dashboard*"))) ; for emacs daemon
+        (setq dashboard-items '((projects . 5)
+                                (recents . 5)
+                                (agenda . 5)))
+        (dashboard-modify-heading-icons '((recents . "file-text")))
+        (setq dashboard-set-navigator t)
+        (setq dashboard-set-file-icons t)
+        (setq dashboard-startup-banner "~/.emacs.d/img/emacs.png") ; set to path to image file to customize
+        (setq dashboard-set-footer nil)
+        (dashboard-setup-startup-hook)
+        (setq dashboard-center-content t)
+        (add-hook 'dashboard-mode-hook 'no-linum) ; turn off line numbers for dashboard
+        (add-hook 'dashboard-mode-hook 'dired-sidebar-hide-sidebar))
 #+END_SRC
 
 *** Rainbow Delimiters
@@ -235,12 +223,37 @@ I like to display a column ruler at common styleguide limits
       (add-hook 'prog-mode-hook 'rainbow-delimiters-mode)))
 #+END_SRC
 
+*** Evil Mode
+#+BEGIN_SRC emacs-lisp
+  (use-package evil
+    :ensure t
+    :defer .1 ;; don't block emacs when starting, load evil immediately after startup
+    :init
+    (setq evil-want-integration nil) ;; required by evil-collection
+    (setq evil-search-module 'evil-search)
+    (setq evil-ex-complete-emacs-commands nil)
+    (setq evil-vsplit-window-right t) ;; like vim's 'splitright'
+    (setq evil-split-window-below t) ;; like vim's 'splitbelow'
+    (setq evil-shift-round nil)
+    (setq evil-want-C-u-scroll t)
+    (setq evil-default-state 'normal)
+    :config
+    (evil-mode)
+    (add-hook 'prog-mode-hook 'evil-mode)
+      ;; visual hints while editing
+  (use-package evil-goggles
+    :ensure t
+    :config
+    (evil-goggles-use-diff-faces)
+    (evil-goggles-mode))
+
+  (message "Loading evil-mode...done"))
+
+#+END_SRC emacs-lisp
+
 ** Fonts
 *** Installing
 #+BEGIN_SRC emacs-lisp
-  (use-package all-the-icons
-  :if (display-graphic-p))
-
   (defun install-plex ()
     (when (and (window-system) ( not (string-equal system-type "windows-nt")))
       (progn
@@ -269,24 +282,13 @@ I like to display a column ruler at common styleguide limits
 
 *** Defaults
 #+BEGIN_SRC emacs-lisp
-  (defun set-fonts ()
-    (interactive)
-    (set-face-attribute 'mode-line nil
+  (set-face-attribute 'default nil :font "IBM Plex Mono" :height 140)
+  (set-face-attribute 'mode-line nil
                         :weight 'extra-bold ;should be _very_ bold
                         :font "IBM Plex Mono"     ;same font
                         :height 1.05)       ;should be a little larger than regular text
-    (custom-set-faces
-      '(font-lock-comment-face ((t (:foreground "#5B6268" :weight light :slant italic :family "IBM Plex Mono"))))))
-    (set-face-attribute 'default nil :font "IBM Plex Mono" :height 140)
 
-  (set-fonts)
-#+END_SRC
-
-*** Icons
-#+BEGIN_SRC emacs-lisp
-  (use-package all-the-icons
-    :if (display-graphic-p)
-    :ensure t) ; recommend installing icons manually, this rarely works
+  (set-face-attribute 'font-lock-comment-face nil :foreground "#5B6268" :slant 'italic :weight 'light :font "IBM Plex Mono")
 #+END_SRC
 
 ** SQL Highlighting
@@ -316,6 +318,15 @@ I like to display a column ruler at common styleguide limits
     (revert-buffer :ignore-auto :noconfirm))
 
   (global-set-key (kbd "<f5>") 'revert-buffer-no-confirm)
+  (global-set-key (kbd "s-r") 'revert-buffer-no-confirm)
+#+END_SRC
+
+** Better Navigation
+#+BEGIN_SRC emacs-lisp
+  (global-set-key (kbd "C-s-h") 'windmove-left)
+  (global-set-key (kbd "C-s-j") 'windmove-down)
+  (global-set-key (kbd "C-s-k") 'windmove-up)
+  (global-set-key (kbd "C-s-l") 'windmove-right)
 #+END_SRC
 
 * Project-Management
@@ -331,6 +342,21 @@ I like to display a column ruler at common styleguide limits
     ("C-c p" . projectile-command-map)
     :config
     (projectile-global-mode))
+#+END_SRC
+
+** Tree View
+#+BEGIN_SRC emacs-lisp
+   (use-package vscode-icon
+     :ensure t
+     :commands (vscode-icon-for-file))
+
+   (use-package dired-sidebar
+     :ensure t
+     :commands (dired-sidebar-toggle-sidebar)
+     :config
+         (global-set-key (kbd "s-b") 'dired-sidebar-toggle-sidebar))
+
+  (dired-sidebar-show-sidebar)
 #+END_SRC
 
 * Searching and Fuzzy-Finding
@@ -408,8 +434,8 @@ I like to display a column ruler at common styleguide limits
 #+BEGIN_SRC emacs-lisp
   (use-package company
     :bind (:map company-active-map
-                ("C-n" . company-select-next)
-                ("C-p" . company-select-previous))
+                ("C-j" . company-select-next)
+                ("C-k" . company-select-previous))
     :custom
     (company-idle-delay 0.3)
     (company-toltip-align-annotations t)
@@ -428,16 +454,39 @@ I like to display a column ruler at common styleguide limits
 #+END_SRC
 
 * LSP Features
-** Eglot
+** LSP-Mode
 #+BEGIN_SRC emacs-lisp
-    (use-package eglot
+  (use-package lsp-mode
+    :ensure t
+    :init
+    ;; set prefix for lsp-command-keymap (few alternatives - "C-l", "C-c l")
+    (setq lsp-keymap-prefix "C-c l")
+    :hook ((python-mode . lsp)
+           (haskell-mode . lsp)
+           (c-mode . lsp)
+           (go-mode . lsp)
+           ;; if you want which-key integration
+           (lsp-mode . lsp-enable-which-key-integration))
+    :commands lsp)
+
+  ;; optionally
+  (use-package lsp-ui :ensure t :commands lsp-ui-mode)
+  (use-package lsp-ivy :ensure t :commands lsp-ivy-workspace-symbol)
+  (use-package lsp-treemacs :ensure t :commands lsp-treemacs-errors-list)
+  (use-package dap-mode :ensure t)
+  ;; (use-package dap-LANGUAGE) to load the dap adapter for your language
+
+  ;; optional if you want which-key integration
+  (use-package which-key
       :ensure t
-      :hook
-      (python-mode-hook . eglot-ensure)
-      (haskell-mode-hook . eglot-ensure)
-      (c-mode-hook . eglot-ensure)
-      (c++-mode-hook . eglot-ensure)
-      (go-mode-hook . eglot-ensure))
+      :config
+      (which-key-mode))
+#+END_SRC
+
+** Tree-Sitter
+#+BEGIN_SRC emacs-lisp
+(use-package tree-sitter :ensure t)
+(use-package tree-sitter-langs :ensure t)
 #+END_SRC
 
 * Language Specific IDE-Like Features
@@ -535,6 +584,16 @@ If `npm` command fails, it does nothing."
           (before-save . prettier-js))
 #+END_SRC
 
+** Julia
+#+BEGIN_SRC emacs-lisp
+  (use-package vterm
+    :ensure t)
+
+  (use-package julia-snail
+    :ensure t
+    :hook (julia-mode . julia-snail-mode))
+#+END_SRC
+
 * AI-Assisted Programming
 ** Github Copilot
 #+BEGIN_SRC emacs-lisp
@@ -546,7 +605,6 @@ If `npm` command fails, it does nothing."
 
   (use-package copilot
     :after company
-    :straight (:host github :repo "zerolfx/copilot.el" :files ("dist" "*.el"))
     :hook (prog-mode . copilot-mode)
     :bind (("C-TAB" . 'copilot-accept-completion-by-word)
            ("C-<tab>" . 'copilot-accept-completion-by-word)
