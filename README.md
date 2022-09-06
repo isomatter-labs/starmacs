@@ -21,7 +21,7 @@ Axiom intends to be a set of sane defaults for emacs, and nothing more.
 As such, dependency on packages is minimized as much as is practical.
 
 Ideally, Axiom is mostly an aesthetic overhaul, with the only major functional changes
-	being the inclusion of Ivy, magit and eglot.
+being the inclusion of Ivy, magit and eglot.
 
 This is intended to allow a new emacs user to learn emacs (and not a custom layer sitting on it)
 without sacrificing the kinds of features present in their old editor. LSP is only becoming
