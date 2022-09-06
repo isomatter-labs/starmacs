@@ -17,13 +17,15 @@
    '("77113617a0642d74767295c4408e17da3bfd9aa80aaa2b4eeb34680f6172d71a" default))
  '(org-agenda-files nil)
  '(package-selected-packages
-   '(counsel-projectile dap-python evil-goggles dired-sidebar vscode-icon neotree straight prettier-js rjsx-mode flyckeck tide blamer use-package)))
+   '(solaire-mode mini-modeline company-box visual-fill-column counsel-projectile dap-python evil-goggles dired-sidebar vscode-icon neotree straight prettier-js rjsx-mode flyckeck tide blamer use-package)))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
  '(blamer-face ((t :foreground "#7a88cf" :background nil :height 140 :italic t)))
+ '(treemacs-fringe-indicator-face ((t (:inherit font-lock-doc-face))))
+ '(treemacs-git-ignored-face ((t (:inherit (shadow)))))
  '(whitespace-newline ((t (:foreground "#525252"))))
  '(whitespace-space ((t (:foreground "#525252"))))
  '(whitespace-tab ((t (:foreground "#E06C75")))))

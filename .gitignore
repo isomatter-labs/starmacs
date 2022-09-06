@@ -5,6 +5,8 @@ elpa
 magithub
 auto-save-list
 config.el
+treemacs-atom-theme.el
+bookmarks
 .last-package-update-day
 /projects
 *.cache

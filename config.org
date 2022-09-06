@@ -1,7 +1,9 @@
 #+TITLE: Emacs Config
 #+AUTHOR: Matthew Cooper Healy
 
+
 * Package Management
+
 ** Package Repositories
 #+BEGIN_SRC emacs-lisp
   (require 'package)
@@ -15,6 +17,7 @@
 
   (add-to-list 'load-path "~/.emacs.d/modules") ; add local files
 #+END_SRC
+
 
 ** use-package
 #+BEGIN_SRC emacs-lisp
@@ -34,12 +37,41 @@
     (auto-package-update-maybe))
 #+END_SRC
 
+
 * Quality of Life Improvements
+
+** Solaire Mode
+#+BEGIN_SRC emacs-lisp
+  (defun axiom/real-buffer-p (&optional buffer)
+    "Determines whether BUFFER is real."
+    (not (or (string-match-p
+                (regexp-opt '("*Treemacs"
+                            "*vterm*"
+                            " *Minibuf"
+                            " *Echo Area"
+                            "*Process List*"
+                            "*Ediff"
+                            " *LV*"
+                            "*Ilist*"))
+                (buffer-name buffer))
+            (minibufferp))))
+
+  (use-package solaire-mode
+    :ensure t
+    :commands (solaire-global-mode)
+    :custom
+    (solaire-mode-real-buffer-fn #'axiom/real-buffer-p)
+    :init
+    (solaire-global-mode 1))
+#+END_SRC
+
+
 ** Keep Buffers Up to Date with Files
 When files on disk change, open buffers should be automatically updated to reflect those changes.
 #+BEGIN_SRC emacs-lisp
-  (global-auto-revert-mode t)
+ (global-auto-revert-mode t)
 #+END_SRC
+
 
 ** Do Not Create Extra Files
 Don't create =backup~= or =#autosave#= files
@@ -48,11 +80,13 @@ Don't create =backup~= or =#autosave#= files
   (setq auto-save-default nil)
 #+END_SRC
 
+
 ** Replace Selection
 When text is highlighted, typing should delete the highlighted text and insert what is typed.
 #+BEGIN_SRC emacs-lisp
   (delete-selection-mode 1)
 #+END_SRC
+
 
 ** Usage Guides
 =discover.el= mostly just helps with =dired= mode, but it's worth including for new users.
@@ -63,10 +97,12 @@ When text is highlighted, typing should delete the highlighted text and insert w
     (global-discover-mode 1))
 #+END_SRC
 
+
 ** Mouse in Terminal
 #+BEGIN_SRC emacs-lisp
   (xterm-mouse-mode 1)
 #+END_SRC
+
 
 ** Whitespace
 #+BEGIN_SRC emacs-lisp
@@ -86,14 +122,6 @@ When text is highlighted, typing should delete the highlighted text and insert w
   (global-whitespace-mode 1)
 #+END_SRC
 
-** Line Numbers
-#+BEGIN_SRC emacs-lisp
-  (if (version<= "26.0.50" emacs-version)
-      (global-display-line-numbers-mode)
-    (progn
-      (global-linum-mode t)
-      (setq linum-format "%4d \u2502 ")))
-#+END_SRC
 
 ** Column Ruler
 I like to display a column ruler at common styleguide limits
@@ -102,7 +130,9 @@ I like to display a column ruler at common styleguide limits
   ;; (add-hook 'prog-mode-hook #'display-fill-column-indicator-mode)
 #+END_SRC
 
+
 ** Look
+
 *** Theme
 #+BEGIN_SRC emacs-lisp
   (use-package doom-themes
@@ -116,10 +146,12 @@ I like to display a column ruler at common styleguide limits
         (load-theme 'doom-one t))) ; Only load in GUI to reduce issues with comment-coloring
 #+END_SRC
 
+
 *** Org Mode
 Org Mode is one of the hallmark features of Emacs. It is a rich document editor,
 project planner, task and time tracker, blogging engine, and literate coding
 utility all wrapped up in one package.
+
 
 **** Better Font Faces
 The axiom/org-font-setup function configures various text faces to tweak the sizes
@@ -143,7 +175,7 @@ like we're editing a document in org-mode. We switch back to fixed width
                   (org-level-6 . 1.1)
                   (org-level-7 . 1.1)
                   (org-level-8 . 1.1)))
-    (set-face-attribute (car face) nil :font "IBM Plex Sans" :weight 'regular :height (cdr face)))
+    (set-face-attribute (car face) nil :font "IBM Plex Serif" :weight 'regular :height (cdr face)))
 
   ;; Ensure that anything that should be fixed-pitch in Org files appears that way
   (set-face-attribute 'org-block nil :foreground nil :inherit 'fixed-pitch)
@@ -154,6 +186,7 @@ like we're editing a document in org-mode. We switch back to fixed width
   (set-face-attribute 'org-meta-line nil :inherit '(font-lock-comment-face fixed-pitch))
   (set-face-attribute 'org-checkbox nil :inherit 'fixed-pitch))
 #+END_SRC
+
 
 **** Basic Config
 This section contains the basic configuration for org-mode plus the
@@ -260,35 +293,33 @@ explanation.
 
     (setq org-capture-templates
       `(("t" "Tasks / Projects")
-        ("tt" "Task" entry (file+olp "~/Projects/Code/emacs-from-scratch/OrgFiles/Tasks.org" "Inbox")
+        ("tt" "Task" entry (file+olp "~/Development/org-files/tasks.org" "Inbox")
             "* TODO %?\n  %U\n  %a\n  %i" :empty-lines 1)
 
         ("j" "Journal Entries")
         ("jj" "Journal" entry
-            (file+olp+datetree "~/Projects/Code/emacs-from-scratch/OrgFiles/Journal.org")
+            (file+olp+datetree "~/Development/org-files/journal.org")
             "\n* %<%I:%M %p> - Journal :journal:\n\n%?\n\n"
             ;; ,(dw/read-file-as-string "~/Notes/Templates/Daily.org")
             :clock-in :clock-resume
             :empty-lines 1)
         ("jm" "Meeting" entry
-            (file+olp+datetree "~/Projects/Code/emacs-from-scratch/OrgFiles/Journal.org")
+            (file+olp+datetree "~/Development/org-files/journal.org")
             "* %<%I:%M %p> - %a :meetings:\n\n%?\n\n"
             :clock-in :clock-resume
             :empty-lines 1)
 
         ("w" "Workflows")
-        ("we" "Checking Email" entry (file+olp+datetree "~/Projects/Code/emacs-from-scratch/OrgFiles/Journal.org")
-            "* Checking Email :email:\n\n%?" :clock-in :clock-resume :empty-lines 1)
+        ("we" "Checking Email" entry (file+olp+datetree "~/Development/org-files/journal.org")
+            "* Checking Email :email:\n\n%?" :clock-in :clock-resume :empty-lines 1)))
 
-        ("m" "Metrics Capture")
-        ("mw" "Weight" table-line (file+headline "~/Projects/Code/emacs-from-scratch/OrgFiles/Metrics.org" "Weight")
-        "| %U | %^{Weight} | %^{Notes} |" :kill-buffer t)))
 
     (define-key global-map (kbd "C-c j")
       (lambda () (interactive) (org-capture nil "jj")))
 
     (axiom/org-font-setup))
 #+END_SRC
+
 
 **** Nicer Heading Bullets
 org-bullets replaces the heading stars in org-mode buffers with nicer looking
@@ -297,11 +328,13 @@ which we may cover in a later video.
 
 #+BEGIN_SRC emacs-lisp
   (use-package org-bullets
+    :ensure t
     :after org
     :hook (org-mode . org-bullets-mode)
     :custom
     (org-bullets-bullet-list '("◉" "○" "●" "○" "●" "○" "●")))
 #+END_SRC
+
 
 **** Center Org Buffers
 We use visual-fill-column to center org-mode buffers for a more pleasing writing
@@ -316,8 +349,10 @@ so you can remove the block below if you don't like the behavior.
     (visual-fill-column-mode 1))
 
   (use-package visual-fill-column
+    :ensure t
     :hook (org-mode . axiom/org-mode-visual-fill))
 #+END_SRC
+
 
 **** Configure Babel Languages
 To execute or export code in org-mode code blocks, you'll need to set up
@@ -332,6 +367,7 @@ documents all of the languages that you can use with org-babel.
 
   (push '("conf-unix" . conf-unix) org-src-lang-modes)
 #+END_SRC
+
 
 **** Structure Templates
 Org Mode's structure templates feature enables you to quickly insert code blocks
@@ -353,6 +389,7 @@ second to contain the name of the language as it is known by Org Babel.
   (add-to-list 'org-structure-template-alist '("py" . "src python"))
 #+END_SRC
 
+
 *** Markdown
 #+BEGIN_SRC emacs-lisp
   (use-package markdown-mode
@@ -361,6 +398,7 @@ second to contain the name of the language as it is known by Org Babel.
   :init (setq markdown-command "multimarkdown"))
 #+END_SRC
 
+
 *** Modeline
 #+BEGIN_SRC emacs-lisp
   (use-package doom-modeline
@@ -368,12 +406,14 @@ second to contain the name of the language as it is known by Org Babel.
     :custom ((doom-modeline-height 15)))
 #+END_SRC
 
+
 *** Command Log Mode
 command-log-mode is useful for displaying a panel showing each key binding you use in a panel on the right side of the frame. Great for live streams and screencasts!
 #+BEGIN_SRC emacs-lisp
   (use-package command-log-mode
     :ensure t)
 #+END_SRC
+
 
 
 *** Quality of Life
@@ -402,10 +442,29 @@ command-log-mode is useful for displaying a panel showing each key binding you u
   (add-hook mode (lambda () (display-line-numbers-mode 0))))
 #+END_SRC
 
+
+*** Titlebar
+#+BEGIN_SRC emacs-lisp
+  (defcustom axiom--title-show-bufname t
+  "Whether to include bufname to titlebar.
+Bufname is not necessary on GNOME, but may be useful in other DEs."
+  :type 'boolean
+  :group 'local-config)
+
+(setq-default frame-title-format
+              '(:eval (let ((match (string-match "[ *]" (buffer-name))))
+                        (if (or (and match (= match 0))
+                                (not axiom--title-show-bufname))
+                            "Emacs"
+                          "%b — Emacs"))))
+#+END_SRC
+
+
 *** Cursor
 #+BEGIN_SRC emacs-lisp
   (setq-default cursor-type '(bar . 1))
 #+END_SRC
+
 
 *** Truncate, Don't Wrap
 #+BEGIN_SRC emacs-lisp
@@ -430,11 +489,13 @@ command-log-mode is useful for displaying a panel showing each key binding you u
      #b00000000])
 #+END_SRC
 
+
 *** Focus Line
 #+BEGIN_SRC emacs-lisp
   (if (window-system)
       (global-hl-line-mode 1))
 #+END_SRC
+
 
 *** Dashboard
 #+BEGIN_SRC emacs-lisp
@@ -460,6 +521,7 @@ command-log-mode is useful for displaying a panel showing each key binding you u
         (add-hook 'dashboard-mode-hook 'dired-sidebar-hide-sidebar))
 #+END_SRC
 
+
 *** Rainbow Delimiters
 #+BEGIN_SRC emacs-lisp
   (use-package rainbow-delimiters
@@ -468,6 +530,7 @@ command-log-mode is useful for displaying a panel showing each key binding you u
     (progn
       (add-hook 'prog-mode-hook 'rainbow-delimiters-mode)))
 #+END_SRC
+
 
 *** Evil Mode
 #+BEGIN_SRC emacs-lisp
@@ -518,7 +581,14 @@ command-log-mode is useful for displaying a panel showing each key binding you u
 
 #+END_SRC emacs-lisp
 
+
 ** Fonts
+*** =font-installed-p=
+#+BEGIN_SRC emacs-lisp
+  (defun axiom/font-installed-p (font-name)
+    (find-font (font-spec :name font-name)))
+#+END_SRC
+
 *** Installing
 #+BEGIN_SRC emacs-lisp
   (defun install-plex ()
@@ -547,6 +617,17 @@ command-log-mode is useful for displaying a panel showing each key binding you u
       (cache-fonts)))
 #+END_SRC
 
+
+*** All the Icons
+#+BEGIN_SRC emacs-lisp
+(use-package all-the-icons
+  :config
+  (when (and (not (axiom/font-installed-p "all-the-icons"))
+             (window-system))
+    (all-the-icons-install-fonts t)))
+#+END_SRC
+
+
 *** Defaults
 #+BEGIN_SRC emacs-lisp
   (defvar axiom/default-font-size 140)
@@ -554,7 +635,8 @@ command-log-mode is useful for displaying a panel showing each key binding you u
 
   (set-face-attribute 'default nil :font "IBM Plex Mono" :height axiom/default-font-size)
   (set-face-attribute 'fixed-pitch nil :font "IBM Plex Mono" :height axiom/default-font-size)
-  (set-face-attribute 'variable-pitch nil :font "IBM Plex Sans" :height axiom/default-variable-font-size :weight 'regular)
+  (if (member "Deja Vu Sans" (font-family-list))
+    (set-face-attribute 'variable-pitch nil :font "Deja Vu Sans 10" :height axiom/default-variable-font-size :weight 'regular))
   (set-face-attribute 'font-lock-comment-face nil :foreground "#5B6268" :slant 'italic :weight 'light :font "IBM Plex Mono")
   (set-face-attribute 'mode-line nil
                         :weight 'extra-bold ;should be _very_ bold
@@ -562,6 +644,7 @@ command-log-mode is useful for displaying a panel showing each key binding you u
                         :height 1.05)       ;should be a little larger than regular text
 
 #+END_SRC
+
 
 ** SQL Highlighting
 #+BEGIN_SRC emacs-lisp
@@ -582,6 +665,7 @@ command-log-mode is useful for displaying a panel showing each key binding you u
 
 #+END_SRC
 
+
 ** Quick Reload
 #+BEGIN_SRC emacs-lisp
   (defun revert-buffer-no-confirm ()
@@ -592,6 +676,7 @@ command-log-mode is useful for displaying a panel showing each key binding you u
   (global-set-key (kbd "<f5>") 'revert-buffer-no-confirm)
   (global-set-key (kbd "s-r") 'revert-buffer-no-confirm)
 #+END_SRC
+
 
 ** Which Key
 which-key is a useful UI panel that appears when you start pressing any key
@@ -609,6 +694,7 @@ key bindings in the mode of your current buffer.
   (setq which-key-idle-delay 1))
 #+END_SRC
 
+
 ** Better Window Navigation
 #+BEGIN_SRC emacs-lisp
   (global-set-key (kbd "C-s-h") 'windmove-left)
@@ -617,7 +703,9 @@ key bindings in the mode of your current buffer.
   (global-set-key (kbd "C-s-l") 'windmove-right)
 #+END_SRC
 
+
 * Project-Management
+
 ** Projectile
 #+BEGIN_SRC emacs-lisp
   (use-package projectile
@@ -642,30 +730,372 @@ key bindings in the mode of your current buffer.
     :config (counsel-projectile-mode))
 #+END_SRC
 
-** Tree View
+
+** Line Height
 #+BEGIN_SRC emacs-lisp
-  (defun axiom/treemacs-setup-title ()
-  (let ((bg (face-attribute 'default :background))
-        (fg (face-attribute 'default :foreground)))
-    (face-remap-add-relative 'header-line
-                             :background bg :foreground fg
-                             :box `(:line-width ,(/ (line-pixel-height) 2) :color ,bg)))
-  (setq header-line-format
-        '((:eval
-           (let* ((text (treemacs-workspace->name (treemacs-current-workspace)))
-                  (extra-align (+ (/ (length text) 2) 1))
-                  (width (- (/ (window-width) 2) extra-align)))
-             (concat (make-string width ?\s) text))))))
-
-   (use-package treemacs
-     :ensure t
-     :config
-         (global-set-key (kbd "s-b") 'treemacs))
-
-  (dired-sidebar-show-sidebar)
+  (defvar axiom--line-pixel-height (line-pixel-height)
+  "Line height in pixels.
+Used in various places to avoid getting wrong line height when
+`text-scale-mode' is active.")
 #+END_SRC
 
+
+** Treemacs
+
+*** Theme
+#+BEGIN_SRC emacs-lisp :tangle ./treemacs-atom-theme.el
+;;; treemacs-atom-theme.el --- Atom inspired theme for Treemacs -*- lexical-binding: t; buffer-read-only: t; no-byte-compile: t -*-
+;;;
+;;; Commentary:
+;;; Simple Atom inspired theme for Treemacs package.
+;;; Does not provide different kinds of icons for different file extensions.
+;;; This file was automatically generated by `org-babel-tangle'.
+;;; Do not change this file.  Treemacs theme config is located in README.org at `user-emacs-directory'
+;;;
+;;; Code:
+
+(require 'treemacs)
+(require 'all-the-icons)
+
+(defvar axiom--treemacs-icon-face
+  '(:foreground unspecified
+    :background unspecified
+    :inherit shadow
+    :slant normal
+    :weight normal))
+
+(treemacs-create-theme "Atom"
+  :config
+  (progn
+    (treemacs-create-icon
+     :icon (format " %s\t%s\t"
+                   (all-the-icons-octicon
+                    "chevron-down"
+                    :height 0.75
+                    :v-adjust 0.1
+                    :face axiom--treemacs-icon-face)
+                   (all-the-icons-octicon
+                    "file-directory"
+                    :v-adjust 0
+                    :face axiom--treemacs-icon-face))
+     :fallback (propertize "- " 'face 'shadow)
+     :extensions (root-open))
+    (treemacs-create-icon
+     :icon (format " %s\t%s\t"
+                   (all-the-icons-octicon
+                    "chevron-right"
+                    :height 0.75
+                    :v-adjust 0.1
+                    :face axiom--treemacs-icon-face)
+                   (all-the-icons-octicon
+                    "file-directory"
+                    :v-adjust 0
+                    :face axiom--treemacs-icon-face))
+     :fallback (propertize "+ " 'face 'shadow)
+     :extensions (root-closed))
+    (treemacs-create-icon
+     :icon (format " %s\t%s\t"
+                   (all-the-icons-octicon
+                    "chevron-down"
+                    :height 0.75
+                    :v-adjust 0.1
+                    :face axiom--treemacs-icon-face)
+                   (all-the-icons-octicon
+                    "file-directory"
+                    :v-adjust 0
+                    :face axiom--treemacs-icon-face))
+     :fallback (propertize "- " 'face 'shadow)
+     :extensions (dir-open))
+    (treemacs-create-icon
+     :icon (format " %s\t%s\t"
+                   (all-the-icons-octicon
+                    "chevron-right"
+                    :height 0.75
+                    :v-adjust 0.1
+                    :face axiom--treemacs-icon-face)
+                   (all-the-icons-octicon
+                    "file-directory"
+                    :v-adjust 0
+                    :face axiom--treemacs-icon-face))
+     :fallback (propertize "+ " 'face 'shadow)
+     :extensions (dir-closed))
+    (treemacs-create-icon
+     :icon (format "  %s\t"
+                   (all-the-icons-octicon
+                    "chevron-down"
+                    :height 0.75
+                    :v-adjust 0.1
+                    :face axiom--treemacs-icon-face))
+     :fallback (propertize "▾ " 'face 'font-lock-string-face)
+     :extensions (tag-open))
+    (treemacs-create-icon
+     :icon (format "  %s\t"
+                   (all-the-icons-octicon
+                    "chevron-right"
+                    :height 0.75
+                    :v-adjust 0.1
+                    :face axiom--treemacs-icon-face))
+     :fallback (propertize "▸ " 'face 'font-lock-string-face)
+     :extensions (tag-closed))
+    (treemacs-create-icon
+     :icon (format "  %s\t"
+                   (all-the-icons-octicon
+                    "tag"
+                    :height 0.9
+                    :v-adjust 0
+                    :face axiom--treemacs-icon-face))
+     :fallback ""
+     :extensions (tag-leaf))
+    (treemacs-create-icon
+     :icon (format " %s\t"
+                   (all-the-icons-octicon
+                    "flame"
+                    :v-adjust 0
+                    :face axiom--treemacs-icon-face))
+     :fallback ""
+     :extensions (error))
+    (treemacs-create-icon
+     :icon (format " %s\t"
+                   (all-the-icons-octicon
+                    "stop"
+                    :v-adjust 0
+                    :face axiom--treemacs-icon-face))
+     :fallback ""
+     :extensions (warning))
+    (treemacs-create-icon
+     :icon (format " %s\t"
+                   (all-the-icons-octicon
+                    "info"
+                    :height 0.75
+                    :v-adjust 0.1
+                    :face axiom--treemacs-icon-face))
+     :fallback ""
+     :extensions (info))
+    (treemacs-create-icon
+     :icon (format "   %s\t"
+                   (all-the-icons-octicon
+                    "file-media"
+                    :v-adjust 0
+                    :face axiom--treemacs-icon-face))
+     :fallback ""
+     :extensions ("png" "jpg" "jpeg" "gif" "ico" "tif" "tiff" "svg" "bmp"
+                  "psd" "ai" "eps" "indd" "mov" "avi" "mp4" "webm" "mkv"
+                  "wav" "mp3" "ogg" "midi"))
+    (treemacs-create-icon
+     :icon (format "   %s\t"
+                   (all-the-icons-octicon
+                    "file-code"
+                    :v-adjust 0
+                    :face axiom--treemacs-icon-face))
+     :fallback ""
+     :extensions ("yml" "yaml" "sh" "zsh" "fish" "c" "h" "cpp" "cxx" "hpp"
+                  "tpp" "cc" "hh" "hs" "lhs" "cabal" "py" "pyc" "rs" "el" "erl"
+                  "elc" "clj" "cljs" "cljc" "ts" "tsx" "vue" "css" "html"
+                  "htm" "dart" "java" "kt" "scala" "sbt" "go" "js" "jsx"
+                  "hy" "json" "jl" "ex" "exs" "eex" "ml" "mli" "pp" "dockerfile"
+                  "vagrantfile" "j2" "jinja2" "tex" "racket" "rkt" "rktl" "rktd"
+                  "scrbl" "scribble" "plt" "makefile" "elm" "xml" "xsl" "rb"
+                  "scss" "lua" "lisp" "scm" "sql" "toml" "nim" "pl" "pm" "perl"
+                  "vimrc" "tridactylrc" "vimperatorrc" "ideavimrc" "vrapperrc"
+                  "cask" "r" "re" "rei" "bashrc" "zshrc" "inputrc" "editorconfig"
+                  "gitconfig" "gitignore" "gitmodules" "gitattributes" "conf" "lock"
+                  "project" "fnl" "config"))
+    (treemacs-create-icon
+     :icon (format "   %s\t"
+                   (all-the-icons-octicon
+                    "book"
+                    :v-adjust 0
+                    :face axiom--treemacs-icon-face))
+     :fallback ""
+     :extensions ("lrf" "lrx" "cbr" "cbz" "cb7" "cbt" "cba" "chm" "djvu"
+                  "doc" "docx" "pdb" "pdb" "fb2" "xeb" "ceb" "inf" "azw"
+                  "azw3" "kf8" "kfx" "lit" "prc" "mobi" "pkg" "opf" "txt"
+                  "pdb" "ps" "rtf" "pdg" "xml" "tr2" "tr3" "oxps" "xps"))
+    (treemacs-create-icon
+     :icon (format "   %s\t" (all-the-icons-octicon
+                              "file-text"
+                              :v-adjust 0
+                              :face axiom--treemacs-icon-face))
+     :fallback ""
+     :extensions ("md" "markdown" "rst" "log" "org" "txt"
+                  "contribute" "license" "readme" "changelog"))
+    (treemacs-create-icon
+     :icon (format "   %s\t" (all-the-icons-octicon
+                              "file-binary"
+                              :v-adjust 0
+                              :face axiom--treemacs-icon-face))
+     :fallback ""
+     :extensions ("exe" "dll" "obj" "so" "o" "out"))
+    (treemacs-create-icon
+     :icon (format "   %s\t" (all-the-icons-octicon
+                              "file-pdf"
+                              :v-adjust 0
+                              :face axiom--treemacs-icon-face))
+     :fallback ""
+     :extensions ("pdf"))
+    (treemacs-create-icon
+     :icon (format "   %s\t" (all-the-icons-octicon
+                              "file-zip"
+                              :v-adjust 0
+                              :face axiom--treemacs-icon-face))
+     :fallback ""
+     :extensions ("zip" "7z" "tar" "gz" "rar" "tgz"))
+    (treemacs-create-icon
+     :icon (format "   %s\t" (all-the-icons-octicon
+                              "file-text"
+                              :v-adjust 0
+                              :face axiom--treemacs-icon-face))
+     :fallback ""
+     :extensions (fallback))))
+
+(provide 'treemacs-atom-theme)
+;;; treemacs-atom-theme.el ends here
+#+END_SRC
+
+
+*** Config
+#+BEGIN_SRC emacs-lisp
+    (defun axiom/treemacs-setup-title ()
+      (let ((bg (face-attribute 'default :background))
+                    (fg (face-attribute 'default :foreground)))
+                (face-remap-add-relative 'header-line
+                                 :background bg :foreground fg
+                                 :box `(:line-width ,(/ (line-pixel-height) 2) :color ,bg)))
+                (setq header-line-format
+                    '((:eval
+                        (let* ((text (treemacs-workspace->name (treemacs-current-workspace)))
+                                (extra-align (+ (/ (length text) 2) 1))
+                                (width (- (/ (window-width) 2) extra-align)))
+                 (concat (make-string width ?\s) text))))))
+
+  (use-package treemacs
+  :when window-system
+  :commands (treemacs-follow-mode
+             treemacs-filewatch-mode
+             treemacs-load-theme)
+  :bind (("C-c t" . treemacs-select-window)
+         ("s-b" . 'treemacs)
+         ("s-\\" . 'treemacs)
+         :map treemacs-mode-map
+         ([C-tab] . axiom/treemacs-expand-all-projects)
+         ("<drag-mouse-1>" . ignore)
+         ("q" . nil))
+  :hook ((after-init . axiom/treemacs-after-init-setup)
+         (treemacs-mode . axiom/after-treemacs-setup)
+         (treemacs-switch-workspace . axiom/treemacs-expand-all-projects)
+         (treemacs-switch-workspace . treemacs-set-fallback-workspace)
+         (treemacs-mode . axiom/treemacs-setup-title)
+         (axiom--theme-change . axiom/treemacs-setup-title)
+         (axiom--theme-change . axiom/treemacs-setup-faces)
+         (axiom--theme-change . axiom/treemacs-variable-pitch-labels))
+  :custom-face
+  (treemacs-fringe-indicator-face ((t (:inherit font-lock-doc-face))))
+  (treemacs-git-ignored-face ((t (:inherit (shadow)))))
+  :custom
+  (treemacs-width 32)
+  (treemacs-is-never-other-window t)
+  (treemacs-space-between-root-nodes nil)
+  (treemacs-indentation 2)
+  :config
+  (treemacs-follow-mode t)
+  (treemacs-filewatch-mode 1)
+  (defun axiom/treemacs-setup-faces ()
+    (set-face-attribute 'treemacs-root-face nil
+                        :foreground nil
+                        :underline nil
+                        :inherit 'treemacs-directory-face
+                        :height 1.0
+                        :weight 'normal))
+  (axiom/treemacs-setup-faces)
+  :init
+  (defun axiom/treemacs-expand-all-projects (&optional _)
+    "Expand all projects."
+    (interactive)
+    (save-excursion
+      (treemacs--forget-last-highlight)
+      (dolist (project (treemacs-workspace->projects (treemacs-current-workspace)))
+        (-when-let (pos (treemacs-project->position project))
+          (when (eq 'root-node-closed (treemacs-button-get pos :state))
+            (goto-char pos)
+            (treemacs--expand-root-node pos)))))
+    (treemacs--maybe-recenter 'on-distance))
+  (defun axiom/treemacs-variable-pitch-labels (&rest _)
+    (dolist (face '(treemacs-file-face
+                    treemacs-tags-face
+                    treemacs-directory-face
+                    treemacs-directory-collapsed-face
+                    treemacs-term-node-face
+                    treemacs-help-title-face
+                    treemacs-help-column-face
+                    treemacs-git-added-face
+                    treemacs-git-ignored-face
+                    treemacs-git-renamed-face
+                    treemacs-git-conflict-face
+                    treemacs-git-modified-face
+                    treemacs-git-unmodified-face
+                    treemacs-git-untracked-face
+                    treemacs-root-unreadable-face
+                    treemacs-root-remote-face
+                    treemacs-root-remote-unreadable-face
+                    treemacs-root-remote-disconnected-face
+                    treemacs-fringe-indicator-face
+                    treemacs-on-failure-pulse-face
+                    treemacs-on-success-pulse-face))
+      (let* ((faces (face-attribute face :inherit nil))
+             (faces (if (listp faces) faces (list faces))))
+        (unless (memq 'variable-pitch faces)
+          (set-face-attribute
+           face nil :inherit
+           `(variable-pitch ,@(delq 'unspecified faces)))))))
+  (defun axiom/treemacs-after-init-setup ()
+    "Set treemacs theme, open treemacs, and expand all projects."
+    (load-file (expand-file-name "treemacs-atom-theme.el" user-emacs-directory))
+    (treemacs-load-theme "Atom")
+    (treemacs)
+    (treemacs-fringe-indicator-mode -1)
+    (axiom/treemacs-expand-all-projects)
+    (windmove-right))
+  (defun axiom/after-treemacs-setup ()
+    "Set treemacs buffer common settings."
+    (setq tab-width 1
+          mode-line-format nil
+          line-spacing 5)
+    (setq-local scroll-step 1)
+    (setq-local scroll-conservatively 10000)
+    (setq-local scroll-margin 0)
+    (set-window-fringes nil 1 1 nil)
+    (axiom/treemacs-variable-pitch-labels))
+  (define-advice treemacs-select-window (:after () axiom:treemacs-setup-fringes)
+    "Set treemacs buffer fringes."
+    (set-window-fringes nil 1 1 t))
+  (define-advice treemacs-root-down (:after () axiom:treemacs-root-down)
+    "Open all projects on root down"
+    (axiom/treemacs-expand-all-projects))
+  (defun axiom/treemacs-setup-title ()
+    (when-let ((treemacs-buffer (treemacs-get-local-buffer)))
+      (with-current-buffer treemacs-buffer
+        (let ((bg (if (and (facep 'solaire-default-face)
+                           (not (eq (face-attribute 'solaire-default-face :background)
+                                    'unspecified)))
+                      (face-attribute 'solaire-default-face :background)
+                    (face-attribute 'default :background)))
+              (fg (face-attribute 'default :foreground)))
+          (face-remap-add-relative 'header-line
+                                   :background bg
+                                   :foreground fg
+                                   :box (list :line-width (/ axiom--line-pixel-height 4) :color bg)))
+        (setq header-line-format
+              '((:eval
+                 (let* ((text (treemacs-workspace->name (treemacs-current-workspace)))
+                        (extra-align (+ (/ (length text) 2) 1))
+                        (width (- (/ (window-width) 2) extra-align)))
+                   (concat (make-string width ?\s) text)))))))))
+
+#+END_SRC
+
+
 * Searching and Fuzzy-Finding
+
 ** Ivy
 #+BEGIN_SRC emacs-lisp
   (use-package ivy
@@ -718,6 +1148,7 @@ key bindings in the mode of your current buffer.
     ("C-r" . swiper-isearch-backward)) ; replace standard search functionality
 #+END_SRC
 
+
 ** Helpful Help Commands
 Helpful adds a lot of very helpful (get it?) information to Emacs' describe-
 command buffers. For example, if you use describe-function, you will not only
@@ -737,7 +1168,9 @@ It is very useful for figuring out how things work in Emacs.
     ([remap describe-key] . helpful-key))
 #+END_SRC
 
+
 * Git/Github
+
 ** Magit
 #+BEGIN_SRC emacs-lisp
   (use-package magit
@@ -761,16 +1194,49 @@ It is very useful for figuring out how things work in Emacs.
         (global-diff-hl-mode))
 #+END_SRC
 
+
 * Syntax Checking
+
 ** Flycheck
 #+BEGIN_SRC emacs-lisp
   (use-package flycheck
-    :ensure t
-    :custom (flycheck-check-syntax-automatically '(save mode-enabled))
-    :init (global-flycheck-mode))
+      :ensure t
+      :custom (flycheck-check-syntax-automatically '(save mode-enabled))
+      :init (global-flycheck-mode))
+
+  (defvar-local axiom--mode-line-flycheck "")
+
+  (defun axiom/mode-line-update-flycheck (&rest _)
+    (setq axiom--mode-line-flycheck
+          (if (bound-and-true-p flycheck-mode)
+              (concat
+               "  "
+               (pcase flycheck-last-status-change
+                 (`not-checked (propertize "-/-" 'help-echo "Flycheck: not checked"))
+                 (`no-checker (propertize "-" 'help-echo "Flycheck: no checker"))
+                 (`running (propertize "*/*" 'help-echo "Flycheck: checking"))
+                 (`errored (propertize "!" 'help-echo "Flycheck: error"))
+                 (`finished
+                  (let-alist (flycheck-count-errors flycheck-current-errors)
+                    (propertize (format "%s/%s" (or .error 0) (or .warning 0))
+                                'help-echo (if (or .error .warning)
+                                               (concat "Flycheck: "
+                                                       (when .error (format "%d errors%s" .error (if .warning ", " "")))
+                                                       (when .warning (format "%d warnings" .warning))
+                                                       "\nmouse-1: list errors")
+                                             "Flycheck: no errors or warnings")
+                                'local-map 'flycheck-error-list-mode-line-map)))
+                 (`interrupted (propertize "x" 'help-echo "Flycheck: interrupted"))
+                 (`suspicious (propertize "?" 'help-echo "Flycheck: suspicious"))))
+            "")))
+
+  (add-hook 'flycheck-status-changed-functions #'axiom/mode-line-update-flycheck)
+  (add-hook 'flycheck-mode-hook #'axiom/mode-line-update-flycheck)
 #+END_SRC
 
+
 * Auto-Completion
+
 ** Company-mode
 #+BEGIN_SRC emacs-lisp
   (use-package company
@@ -788,20 +1254,25 @@ It is very useful for figuring out how things work in Emacs.
     (company-tooltip-align-annotations t))
 
   (use-package company-box
+    :ensure t
     :hook (company-mode . company-box-mode))
 #+END_SRC
+
 
 * Tab to Complete
 #+BEGIN_SRC emacs-lisp
 (setq tab-always-indent 'complete)
 #+END_SRC
 
+
 * Open Emacs GUI above terminal
 #+BEGIN_SRC emacs-lisp
   (x-focus-frame nil)
 #+END_SRC
 
+
 * LSP Features
+
 ** LSP-Mode
 #+BEGIN_SRC emacs-lisp
   (defun axiom/lsp-mode-setup ()
@@ -854,14 +1325,18 @@ It is very useful for figuring out how things work in Emacs.
   (use-package lsp-ivy)
 #+END_SRC
 
+
 ** Tree-Sitter
 #+BEGIN_SRC emacs-lisp
 (use-package tree-sitter :ensure t)
 (use-package tree-sitter-langs :ensure t)
 #+END_SRC
 
+
 * Language Specific IDE-Like Features
+
 ** Python
+
 *** Auto-PEP8 On Save
 #+BEGIN_SRC emacs-lisp
   (use-package py-autopep8
@@ -884,12 +1359,14 @@ It is very useful for figuring out how things work in Emacs.
     :hook (python-mode . lsp-deferred))
 #+END_SRC
 
+
 *** PEP8-compliant comments
 #+BEGIN_SRC emacs-lisp
   (add-hook 'python-mode-hook
     (lambda ()
       (setq comment-start " # ")))
 #+END_SRC
+
 
 ** TypeScript
 #+BEGIN_SRC emacs-lisp
@@ -899,6 +1376,7 @@ It is very useful for figuring out how things work in Emacs.
     :config
     (setq typescript-indent-level 2))
 #+END_SRC
+
 
 *** Prettier
 #+BEGIN_SRC emacs-lisp
@@ -910,6 +1388,7 @@ It is very useful for figuring out how things work in Emacs.
           (typescript-mode . add-node-modules-path)
           (before-save . prettier-js))
 #+END_SRC
+
 
 ** Julia
 #+BEGIN_SRC emacs-lisp
