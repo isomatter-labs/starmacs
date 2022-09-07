@@ -12,3 +12,4 @@ bookmarks
 *.cache
 .lsp-session-*
 forge-database.sqlite
+quelpa
