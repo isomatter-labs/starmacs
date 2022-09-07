@@ -375,21 +375,6 @@ so you can remove the block below if you don't like the behavior.
 #+END_SRC
 
 
-**** Configure Babel Languages
-To execute or export code in org-mode code blocks, you'll need to set up
-org-babel-load-languages for each language you'd like to use. This page
-documents all of the languages that you can use with org-babel.
-
-#+BEGIN_SRC emacs-lisp
-  (org-babel-do-load-languages
-    'org-babel-load-languages
-    '((emacs-lisp . t)
-      (python . t)))
-
-  (push '("conf-unix" . conf-unix) org-src-lang-modes)
-#+END_SRC
-
-
 **** Structure Templates
 Org Mode's structure templates feature enables you to quickly insert code blocks
 into your Org files in combination with org-tempo by typing < followed by the
@@ -550,6 +535,60 @@ Bufname is not necessary on GNOME, but may be useful in other DEs."
     :init
     (progn
       (add-hook 'prog-mode-hook 'rainbow-delimiters-mode)))
+#+END_SRC
+
+
+*** Treemacs
+#+BEGIN_SRC emacs-lisp
+  (use-package treemacs
+  :ensure t
+  :defer t
+  :init
+  (with-eval-after-load 'winum
+    (define-key winum-keymap (kbd "M-0") #'treemacs-select-window))
+  :config
+  (progn
+    ;; The default width and height of the icons is 22 pixels. If you are
+    ;; using a Hi-DPI display, uncomment this to double the icon size.
+    ;;(treemacs-resize-icons 44)
+
+    (treemacs-follow-mode t)
+    (treemacs-filewatch-mode t)
+    (treemacs-fringe-indicator-mode 'always)
+    (when treemacs-python-executable
+      (treemacs-git-commit-diff-mode t))
+
+    (pcase (cons (not (null (executable-find "git")))
+                 (not (null treemacs-python-executable)))
+      (`(t . t)
+       (treemacs-git-mode 'deferred))
+      (`(t . _)
+       (treemacs-git-mode 'simple)))
+
+    (treemacs-hide-gitignored-files-mode nil))
+  :bind
+  (:map global-map
+        ("M-0"       . treemacs-select-window)
+        ("C-x t 1"   . treemacs-delete-other-windows)
+        ("s-b"       . treemacs)
+        ("s-\"       . treemacs)
+        ("C-x t d"   . treemacs-select-directory)
+        ("C-x t B"   . treemacs-bookmark)
+        ("C-x t C-t" . treemacs-find-file)
+        ("C-x t M-t" . treemacs-find-tag)))
+
+(use-package treemacs-evil
+  :after (treemacs evil)
+  :ensure t)
+
+(use-package treemacs-projectile
+  :after (treemacs projectile)
+  :ensure t)
+
+(use-package treemacs-magit
+  :after (treemacs magit)
+  :ensure t)
+
 #+END_SRC
 
 
@@ -940,6 +979,16 @@ It is very useful for figuring out how things work in Emacs.
 
 * LSP Features
 
+** DAP-Mode
+#+BEGIN_SRC emacs-lisp
+  (use-package posframe :ensure t)
+  (use-package dap-mode
+    :ensure t
+    :hook
+    (lsp-mode . dap-mode)
+    (lsp-mode . dap-ui-mode))
+#+END_SRC
+
 ** LSP-Mode
 #+BEGIN_SRC emacs-lisp
   (defun axiom/lsp-mode-setup ()
@@ -951,6 +1000,7 @@ It is very useful for figuring out how things work in Emacs.
     :after evil
     :commands (lsp lsp-deferred)
     :hook (lsp-mode . axiom/lsp-mode-setup)
+          (lsp-mode . lsp-lens-mode)
     :init
     (setq lsp-keymap-prefix "C-c l")  ;; Or 'C-l', 's-l'
     :config
@@ -982,7 +1032,7 @@ It is very useful for figuring out how things work in Emacs.
                   lsp-ui-doc-alignment 'frame
                   lsp-ui-doc-header nil
                   lsp-ui-doc-include-signature t
-                  lsp-ui-doc-use-childframe t)
+                  lsp-ui-doc-use-webkit t)
     :commands lsp-ui-mode
     :bind (:map evil-normal-state-map
                 ("gd" . lsp-ui-peek-find-definitions)
@@ -998,8 +1048,9 @@ It is very useful for figuring out how things work in Emacs.
 
 ** Tree-Sitter
 #+BEGIN_SRC emacs-lisp
-(use-package tree-sitter :ensure t)
-(use-package tree-sitter-langs :ensure t)
+  (use-package tree-sitter :ensure t
+  :hook (prog-mode . tree-sitter-mode))
+  (use-package tree-sitter-langs :ensure t)
 #+END_SRC
 
 
@@ -1012,7 +1063,7 @@ It is very useful for figuring out how things work in Emacs.
   (use-package py-autopep8
     :ensure t
     :config
-    (setq lsp-idle-delay 0.5
+    (setq lsp-idle-delay 0
           lsp-enable-symbol-highlighting t
           lsp-enable-snippet nil  ;; Not supported by company capf, which is the recommended company backend
           lsp-pyls-plugins-flake8-enabled t)
@@ -1041,22 +1092,11 @@ It is very useful for figuring out how things work in Emacs.
 ** TypeScript
 #+BEGIN_SRC emacs-lisp
   (use-package typescript-mode
+    :ensure t
     :mode "\\.ts\\'"
     :hook (typescript-mode . lsp-deferred)
     :config
     (setq typescript-indent-level 2))
-#+END_SRC
-
-
-*** Prettier
-#+BEGIN_SRC emacs-lisp
-        (use-package prettier-js
-          :ensure t
-          :after (typescript-mode)
-          :hook
-          (typescript-mode . prettier-js-mode)
-          (typescript-mode . add-node-modules-path)
-          (before-save . prettier-js))
 #+END_SRC
 
 
@@ -1065,9 +1105,52 @@ It is very useful for figuring out how things work in Emacs.
   (use-package vterm
     :ensure t)
 
+  (use-package julia-mode
+    :ensure t
+    :interpreter ("julia" . julia-mode))
+
   (use-package julia-snail
     :ensure t
     :hook
-        (julia-mode . julia-snail-mode)
-        (julia-mode . lsp-deferred))
+        (julia-mode . julia-snail-mode))
+
+  ;; (quelpa '(lsp-julia :fetcher github
+  ;;                   :repo "gdkrmr/lsp-julia"
+  ;;                   :files (:defaults "languageserver")))
+
+  ;; (use-package lsp-julia
+  ;;   :ensure t
+  ;;   :hook
+  ;;       (julia-mode . lsp-deferred)
+  ;;   :config
+  ;;       (setq lsp-julia-default-environment "~/.julia/environments/v1.7"))
+
+#+END_SRC
+
+
+** Scala
+#+BEGIN_SRC emacs-lisp
+    ;; Enable scala-mode for highlighting, indentation and motion commands
+  (use-package scala-mode
+    :ensure t
+    :interpreter
+      ("scala" . scala-mode))
+
+  ;; Enable sbt mode for executing sbt commands
+  (use-package sbt-mode
+    :ensure t
+    :commands sbt-start sbt-command
+    :config
+    ;; WORKAROUND: https://github.com/ensime/emacs-sbt-mode/issues/31
+    ;; allows using SPACE when in the minibuffer
+    (substitute-key-definition
+     'minibuffer-complete-word
+     'self-insert-command
+     minibuffer-local-completion-map)
+     ;; sbt-supershell kills sbt-mode:  https://github.com/hvesalai/emacs-sbt-mode/issues/152
+     (setq sbt:program-options '("-Dsbt.supershell=false")))
+
+  (use-package lsp-metals
+    :ensure t
+    :hook (scala-mode . lsp-deferred))
 #+END_SRC
