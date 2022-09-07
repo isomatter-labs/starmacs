@@ -610,6 +610,7 @@ Bufname is not necessary on GNOME, but may be useful in other DEs."
       "t"  '(:ignore t :which-key "toggles")
       "b" '(counsel-switch-buffer :which-key "Switch Buffer")
       "p" '(projectile-find-file :which-key "Find File")
+      "<tab>" '(projectile-switch-project :which-key "Switch Project")
       "f" '(treemacs :which-key "Toggle Treemacs")))
 
   (use-package evil
