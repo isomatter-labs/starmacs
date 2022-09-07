@@ -10,3 +10,5 @@ bookmarks
 .last-package-update-day
 /projects
 *.cache
+.lsp-session-*
+forge-database.sqlite
