@@ -17,7 +17,7 @@
    '("77113617a0642d74767295c4408e17da3bfd9aa80aaa2b4eeb34680f6172d71a" default))
  '(org-agenda-files nil)
  '(package-selected-packages
-   '(general helpful quelpa-use-package lsp-julia typescript-mode solaire-mode mini-modeline company-box visual-fill-column counsel-projectile dap-python evil-goggles dired-sidebar vscode-icon neotree straight prettier-js rjsx-mode flyckeck tide blamer use-package)))
+   '(evil-goggles evil-collection why-this which-key visual-fill-column typescript-mode treemacs-projectile treemacs-magit treemacs-evil tree-sitter-langs solaire-mode sbt-mode rainbow-delimiters quelpa-use-package py-autopep8 prettier-js org-bullets mmm-mode magithub lsp-ui lsp-metals lsp-julia lsp-ivy julia-snail ivy-rich helpful general forge flycheck doom-themes doom-modeline discover diff-hl dashboard counsel-projectile company-box command-log-mode auto-package-update all-the-icons)))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.

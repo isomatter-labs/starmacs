@@ -611,7 +611,8 @@ Bufname is not necessary on GNOME, but may be useful in other DEs."
       "b" '(counsel-switch-buffer :which-key "Switch Buffer")
       "p" '(projectile-find-file :which-key "Find File")
       "<tab>" '(projectile-switch-project :which-key "Switch Project")
-      "f" '(treemacs :which-key "Toggle Treemacs")))
+      "f" '(treemacs :which-key "Toggle Treemacs")
+      "g" '(why-this-mode) :which-key "Toggle inline blame messages"))
 
   (use-package evil
     :ensure t
@@ -901,6 +902,16 @@ It is very useful for figuring out how things work in Emacs.
         :ensure t
         :config
         (global-diff-hl-mode))
+#+END_SRC
+
+
+** Why This?
+=why-this= shows blam information for the currently selected line (or region) along the right side of the current line
+#+BEGIN_SRC emacs-lisp
+  (use-package why-this
+    :ensure t
+    :custom (why-this-idle-delay 0)
+    :config (global-why-this-mode))
 #+END_SRC
 
 
