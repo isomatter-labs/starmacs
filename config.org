@@ -645,7 +645,7 @@ Bufname is not necessary on GNOME, but may be useful in other DEs."
     (evil-goggles-use-diff-faces)
     (evil-goggles-mode))
 
-#+END_SRC emacs-lisp
+#+END_SRC
 
 
 ** Fonts
