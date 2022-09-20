@@ -759,11 +759,19 @@ key bindings in the mode of your current buffer.
 
 
 ** Better Window Navigation
+*** With =windmove=
 #+BEGIN_SRC emacs-lisp
   (global-set-key (kbd "C-s-h") 'windmove-left)
   (global-set-key (kbd "C-s-j") 'windmove-down)
   (global-set-key (kbd "C-s-k") 'windmove-up)
   (global-set-key (kbd "C-s-l") 'windmove-right)
+#+END_SRC
+*** With =ace-window=
+#+BEGIN_SRC emacs-lisp
+    (use-package ace-window
+      :ensure t
+      :config
+      (global-set-key (kbd "C-x o") 'ace-window))
 #+END_SRC
 
 
