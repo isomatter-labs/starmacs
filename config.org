@@ -595,55 +595,50 @@ Bufname is not necessary on GNOME, but may be useful in other DEs."
 *** Evil Mode
 #+BEGIN_SRC emacs-lisp
 
-;; Make ESC quit prompts
-(global-set-key (kbd "<escape>") 'keyboard-escape-quit)
+  ;; Make ESC quit prompts
+  (global-set-key (kbd "<escape>") 'keyboard-escape-quit)
 
-  (use-package general
-    :ensure t
-    :config
-    (general-create-definer rune/leader-keys
-      :keymaps '(normal insert visual emacs)
-      :prefix "SPC"
-      :global-prefix "C-SPC")
+    ;; (use-package general
+    ;;   :ensure t
+    ;;   :config
+    ;;   (general-create-definer rune/leader-keys
+    ;;     :keymaps '(normal insert visual emacs)
+    ;;     :prefix "SPC"
+    ;;     :global-prefix "C-SPC")
 
-    (rune/leader-keys
-      "t"  '(:ignore t :which-key "toggles")
-      "b" '(counsel-switch-buffer :which-key "Switch Buffer")
-      "p" '(projectile-find-file :which-key "Find File")
-      "<tab>" '(projectile-switch-project :which-key "Switch Project")
-      "f" '(treemacs :which-key "Toggle Treemacs")
-      "g" '(why-this-mode) :which-key "Toggle inline blame messages"))
+    ;;   (rune/leader-keys
+    ;;     "t"  '(:ignore t :which-key "toggles")
+    ;;     "b" '(counsel-switch-buffer :which-key "Switch Buffer")
+    ;;     "p" '(projectile-find-file :which-key "Find File")
+    ;;     "<tab>" '(projectile-switch-project :which-key "Switch Project")
+    ;;     "f" '(treemacs :which-key "Toggle Treemacs")
+    ;;     "g" '(why-this-mode) :which-key "Toggle inline blame messages"))
 
-  (use-package evil
-    :ensure t
-    :init
-    (setq evil-want-integration t)
-    (setq evil-want-keybinding nil)
-    (setq evil-want-C-u-scroll t)
-    (setq evil-want-C-i-jump nil)
-    :config
-    (evil-mode 1)
-    (define-key evil-insert-state-map (kbd "C-g") 'evil-normal-state)
-    (define-key evil-insert-state-map (kbd "C-h") 'evil-delete-backward-char-and-join)
+    (use-package evil
+      :ensure t
+      :init
+      (setq evil-want-integration t)
+      (setq evil-want-keybinding nil)
+      (setq evil-want-C-u-scroll t)
+      (setq evil-want-C-i-jump nil)
+      (setq evil-default-state 'emacs)
+      :config
+      (evil-mode 1)
+      ;; Use visual line motions even outside of visual-line-mode buffers
+      (evil-global-set-key 'motion "j" 'evil-next-visual-line)
+      (evil-global-set-key 'motion "k" 'evil-previous-visual-line))
 
-    ;; Use visual line motions even outside of visual-line-mode buffers
-    (evil-global-set-key 'motion "j" 'evil-next-visual-line)
-    (evil-global-set-key 'motion "k" 'evil-previous-visual-line)
+    (use-package evil-collection
+      :ensure t
+      :after evil
+      :config
+      (evil-collection-init))
 
-    (evil-set-initial-state 'messages-buffer-mode 'normal)
-    (evil-set-initial-state 'dashboard-mode 'normal))
-
-  (use-package evil-collection
-    :ensure t
-    :after evil
-    :config
-    (evil-collection-init))
-
-  (use-package evil-goggles
-    :ensure t
-    :config
-    (evil-goggles-use-diff-faces)
-    (evil-goggles-mode))
+    (use-package evil-goggles
+      :ensure t
+      :config
+      (evil-goggles-use-diff-faces)
+      (evil-goggles-mode))
 
 #+END_SRC
 
@@ -702,8 +697,8 @@ Bufname is not necessary on GNOME, but may be useful in other DEs."
 
   (set-face-attribute 'default nil :font "IBM Plex Mono" :height axiom/default-font-size)
   (set-face-attribute 'fixed-pitch nil :font "IBM Plex Mono" :height axiom/default-font-size)
-  (if (member "Deja Vu Sans" (font-family-list))
-    (set-face-attribute 'variable-pitch nil :font "Deja Vu Sans 10" :height axiom/default-variable-font-size :weight 'regular))
+  (if (member "IBM Plex Serif" (font-family-list))
+    (set-face-attribute 'variable-pitch nil :font "IBM Plex Serif" :height axiom/default-variable-font-size :weight 'light))
   (set-face-attribute 'font-lock-comment-face nil :foreground "#5B6268" :slant 'italic :weight 'light :font "IBM Plex Mono")
   (set-face-attribute 'mode-line nil
                         :weight 'extra-bold ;should be _very_ bold
@@ -833,26 +828,43 @@ Used in various places to avoid getting wrong line height when
     (ivy-count-format "")                 ; does not count candidates
     (ivy-initial-inputs-alist nil)        ; no regexp by default
     (ivy-re-builders-alist                ; configure regexp engine.
-      '((t . ivy--regex-ignore-order)))   ; allow input not in order
+     '((t . ivy--regex-ignore-order)))   ; allow input not in order
     :config
     (ivy-mode 1))
 
-(use-package ivy-rich
-  :ensure t
-  :init
-  (ivy-rich-mode 1))
+  (defun posframe-poshandler-window-top-center-offset (info)
+    "Posframe's position handler.
 
-(use-package counsel
-  :ensure t
-  :bind (:map minibuffer-local-map
-         ("C-r" . 'counsel-minibuffer-history)
-         ("M-x" . counsel-M-x)
-         ("C-c k" . counsel-ag)
-         ("C-h a" . counsel-apropos)
-         ("C-x C-f" . counsel-find-file)
-         ("C-x b" . ivy-switch-buffer))
-  :config
-  (counsel-mode 1))
+    Get a position which lets posframe stay onto current window's top center. The structure of INFO can be found in docstring of `posframe-show'."
+    (let* ((window-left (plist-get info :parent-window-left))
+           (window-top (plist-get info :parent-window-top))
+           (window-width (plist-get info :parent-window-width))
+           (posframe-width (plist-get info :posframe-width)))
+      (cons (+ window-left (/ (- window-width posframe-width) 2))
+            (+ window-top 48))))
+
+  (use-package ivy-posframe
+    :ensure t
+    :init
+    (setq ivy-posframe-display-functions-alist '((counsel-M-x . ivy-posframe-display-at-frame-top-center )))
+    (ivy-posframe-mode 1))
+
+  (use-package ivy-rich
+    :ensure t
+    :init
+    (ivy-rich-mode 1))
+
+  (use-package counsel
+    :ensure t
+    :bind (:map minibuffer-local-map
+                ("C-r" . 'counsel-minibuffer-history)
+                ("M-x" . counsel-M-x)
+                ("C-c k" . counsel-ag)
+                ("C-h a" . counsel-apropos)
+                ("C-x C-f" . counsel-find-file)
+                ("C-x b" . ivy-switch-buffer))
+    :config
+    (counsel-mode 1))
 
   (use-package swiper
     :ensure t
@@ -861,6 +873,7 @@ Used in various places to avoid getting wrong line height when
     ("C-r" . swiper-isearch-backward)) ; replace standard search functionality
 #+END_SRC
 
+**
 
 ** Helpful Help Commands
 Helpful adds a lot of very helpful (get it?) information to Emacs' describe-
@@ -911,6 +924,7 @@ It is very useful for figuring out how things work in Emacs.
   (use-package why-this
     :ensure t
     :custom (why-this-idle-delay 0)
+    :hook (org-mode . (lambda () (why-this-mode -1)))
     :config (global-why-this-mode))
 #+END_SRC
 
