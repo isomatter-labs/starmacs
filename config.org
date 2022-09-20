@@ -696,7 +696,7 @@ Bufname is not necessary on GNOME, but may be useful in other DEs."
   (defvar axiom/default-variable-font-size 140)
 
   (set-face-attribute 'default nil :font "IBM Plex Mono" :height axiom/default-font-size)
-  (set-face-attribute 'fixed-pitch nil :font "IBM Plex Mono" :height axiom/default-font-size)
+  (set-face-attribute 'fixed-pitch nil :font "IBM Plex Mono" :slant 'italic :height axiom/default-font-size)
   (if (member "IBM Plex Serif" (font-family-list))
     (set-face-attribute 'variable-pitch nil :font "IBM Plex Serif" :height axiom/default-variable-font-size :weight 'light))
   (set-face-attribute 'font-lock-comment-face nil :foreground "#5B6268" :slant 'italic :weight 'light :font "IBM Plex Mono")
@@ -832,22 +832,22 @@ Used in various places to avoid getting wrong line height when
     :config
     (ivy-mode 1))
 
-  (defun posframe-poshandler-window-top-center-offset (info)
-    "Posframe's position handler.
+  ;; (defun posframe-poshandler-window-top-center-offset (info)
+  ;;   "Posframe's position handler.
 
-    Get a position which lets posframe stay onto current window's top center. The structure of INFO can be found in docstring of `posframe-show'."
-    (let* ((window-left (plist-get info :parent-window-left))
-           (window-top (plist-get info :parent-window-top))
-           (window-width (plist-get info :parent-window-width))
-           (posframe-width (plist-get info :posframe-width)))
-      (cons (+ window-left (/ (- window-width posframe-width) 2))
-            (+ window-top 48))))
+  ;;   Get a position which lets posframe stay onto current window's top center. The structure of INFO can be found in docstring of `posframe-show'."
+  ;;   (let* ((window-left (plist-get info :parent-window-left))
+  ;;          (window-top (plist-get info :parent-window-top))
+  ;;          (window-width (plist-get info :parent-window-width))
+  ;;          (posframe-width (plist-get info :posframe-width)))
+  ;;     (cons (+ window-left (/ (- window-width posframe-width) 2))
+  ;;           (+ window-top 48))))
 
-  (use-package ivy-posframe
-    :ensure t
-    :init
-    (setq ivy-posframe-display-functions-alist '((counsel-M-x . ivy-posframe-display-at-frame-top-center )))
-    (ivy-posframe-mode 1))
+  ;; (use-package ivy-posframe
+  ;;   :ensure t
+  ;;   :init
+  ;;   (setq ivy-posframe-display-functions-alist '((counsel-M-x . ivy-posframe-display-at-frame-top-center )))
+  ;;   (ivy-posframe-mode 1))
 
   (use-package ivy-rich
     :ensure t
