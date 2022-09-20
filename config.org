@@ -898,9 +898,9 @@ It is very useful for figuring out how things work in Emacs.
     (counsel-describe-variable-function #'helpful-variable)
     :bind
     ([remap describe-function] . counsel-describe-function)
-    ([remap describe-command] . helpful-command)
+    ([remap describe-command]  . helpful-command)
     ([remap describe-variable] . counsel-describe-variable)
-    ([remap describe-key] . helpful-key))
+    ([remap describe-key]      . helpful-key))
 #+END_SRC
 
 
@@ -918,6 +918,8 @@ It is very useful for figuring out how things work in Emacs.
     :after magit)
 #+END_SRC
 
+
+** Highlight Git diffs in the gutter
 #+BEGIN_SRC emacs-lisp
       (use-package diff-hl
         :ensure t
