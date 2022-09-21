@@ -577,9 +577,6 @@ Bufname is not necessary on GNOME, but may be useful in other DEs."
         ("C-x t C-t" . treemacs-find-file)
         ("C-x t M-t" . treemacs-find-tag)))
 
-(use-package treemacs-evil
-  :after (treemacs evil)
-  :ensure t)
 
 (use-package treemacs-projectile
   :after (treemacs projectile)
@@ -592,54 +589,98 @@ Bufname is not necessary on GNOME, but may be useful in other DEs."
 #+END_SRC
 
 
-*** Evil Mode
+*** =Meow= Mode
 #+BEGIN_SRC emacs-lisp
-
-  ;; Make ESC quit prompts
-  (global-set-key (kbd "<escape>") 'keyboard-escape-quit)
-
-    ;; (use-package general
-    ;;   :ensure t
-    ;;   :config
-    ;;   (general-create-definer rune/leader-keys
-    ;;     :keymaps '(normal insert visual emacs)
-    ;;     :prefix "SPC"
-    ;;     :global-prefix "C-SPC")
-
-    ;;   (rune/leader-keys
-    ;;     "t"  '(:ignore t :which-key "toggles")
-    ;;     "b" '(counsel-switch-buffer :which-key "Switch Buffer")
-    ;;     "p" '(projectile-find-file :which-key "Find File")
-    ;;     "<tab>" '(projectile-switch-project :which-key "Switch Project")
-    ;;     "f" '(treemacs :which-key "Toggle Treemacs")
-    ;;     "g" '(why-this-mode) :which-key "Toggle inline blame messages"))
-
-    (use-package evil
-      :ensure t
-      :init
-      (setq evil-want-integration t)
-      (setq evil-want-keybinding nil)
-      (setq evil-want-C-u-scroll t)
-      (setq evil-want-C-i-jump nil)
-      (setq evil-default-state 'emacs)
-      :config
-      (evil-mode 1)
-      ;; Use visual line motions even outside of visual-line-mode buffers
-      (evil-global-set-key 'motion "j" 'evil-next-visual-line)
-      (evil-global-set-key 'motion "k" 'evil-previous-visual-line))
-
-    (use-package evil-collection
-      :ensure t
-      :after evil
-      :config
-      (evil-collection-init))
-
-    (use-package evil-goggles
-      :ensure t
-      :config
-      (evil-goggles-use-diff-faces)
-      (evil-goggles-mode))
-
+  ;; (defun meow-setup ()
+  ;; (setq meow-cheatsheet-layout meow-cheatsheet-layout-qwerty)
+  ;; (meow-motion-overwrite-define-key
+  ;;  '("j" . meow-next)
+  ;;  '("k" . meow-prev)
+  ;;  '("<escape>" . ignore))
+  ;; (meow-leader-define-key
+  ;;  ;; SPC j/k will run the original command in MOTION state.
+  ;;  '("j" . "H-j")
+  ;;  '("k" . "H-k")
+  ;;  ;; Use SPC (0-9) for digit arguments.
+  ;;  '("1" . meow-digit-argument)
+  ;;  '("2" . meow-digit-argument)
+  ;;  '("3" . meow-digit-argument)
+  ;;  '("4" . meow-digit-argument)
+  ;;  '("5" . meow-digit-argument)
+  ;;  '("6" . meow-digit-argument)
+  ;;  '("7" . meow-digit-argument)
+  ;;  '("8" . meow-digit-argument)
+  ;;  '("9" . meow-digit-argument)
+  ;;  '("0" . meow-digit-argument)
+  ;;  '("/" . meow-keypad-describe-key)
+  ;;  '("?" . meow-cheatsheet))
+  ;; (meow-normal-define-key
+  ;;  '("0" . meow-expand-0)
+  ;;  '("9" . meow-expand-9)
+  ;;  '("8" . meow-expand-8)
+  ;;  '("7" . meow-expand-7)
+  ;;  '("6" . meow-expand-6)
+  ;;  '("5" . meow-expand-5)
+  ;;  '("4" . meow-expand-4)
+  ;;  '("3" . meow-expand-3)
+  ;;  '("2" . meow-expand-2)
+  ;;  '("1" . meow-expand-1)
+  ;;  '("-" . negative-argument)
+  ;;  '(";" . meow-reverse)
+  ;;  '("," . meow-inner-of-thing)
+  ;;  '("." . meow-bounds-of-thing)
+  ;;  '("[" . meow-beginning-of-thing)
+  ;;  '("]" . meow-end-of-thing)
+  ;;  '("a" . meow-append)
+  ;;  '("A" . meow-open-below)
+  ;;  '("b" . meow-back-word)
+  ;;  '("B" . meow-back-symbol)
+  ;;  '("c" . meow-change)
+  ;;  '("d" . meow-delete)
+  ;;  '("D" . meow-backward-delete)
+  ;;  '("e" . meow-next-word)
+  ;;  '("E" . meow-next-symbol)
+  ;;  '("f" . meow-find)
+  ;;  '("g" . meow-cancel-selection)
+  ;;  '("G" . meow-grab)
+  ;;  '("h" . meow-left)
+  ;;  '("H" . meow-left-expand)
+  ;;  '("i" . meow-insert)
+  ;;  '("I" . meow-open-above)
+  ;;  '("j" . meow-next)
+  ;;  '("J" . meow-next-expand)
+  ;;  '("k" . meow-prev)
+  ;;  '("K" . meow-prev-expand)
+  ;;  '("l" . meow-right)
+  ;;  '("L" . meow-right-expand)
+  ;;  '("m" . meow-join)
+  ;;  '("n" . meow-search)
+  ;;  '("o" . meow-block)
+  ;;  '("O" . meow-to-block)
+  ;;  '("p" . meow-yank)
+  ;;  '("q" . meow-quit)
+  ;;  '("Q" . meow-goto-line)
+  ;;  '("r" . meow-replace)
+  ;;  '("R" . meow-swap-grab)
+  ;;  '("s" . meow-kill)
+  ;;  '("t" . meow-till)
+  ;;  '("u" . meow-undo)
+  ;;  '("U" . meow-undo-in-selection)
+  ;;  '("v" . meow-visit)
+  ;;  '("w" . meow-mark-word)
+  ;;  '("W" . meow-mark-symbol)
+  ;;  '("x" . meow-line)
+  ;;  '("X" . meow-goto-line)
+  ;;  '("y" . meow-save)
+  ;;  '("Y" . meow-sync-grab)
+  ;;  '("z" . meow-pop-selection)
+  ;;  '("'" . repeat)
+  ;;  '("<escape>" . ignore)))
+  ;; (use-package meow
+  ;;   :ensure t
+  ;;   :config
+  ;;   (meow-setup)
+  ;;   (meow-global-mode 1))
 #+END_SRC
 
 
@@ -840,23 +881,6 @@ Used in various places to avoid getting wrong line height when
     :config
     (ivy-mode 1))
 
-  ;; (defun posframe-poshandler-window-top-center-offset (info)
-  ;;   "Posframe's position handler.
-
-  ;;   Get a position which lets posframe stay onto current window's top center. The structure of INFO can be found in docstring of `posframe-show'."
-  ;;   (let* ((window-left (plist-get info :parent-window-left))
-  ;;          (window-top (plist-get info :parent-window-top))
-  ;;          (window-width (plist-get info :parent-window-width))
-  ;;          (posframe-width (plist-get info :posframe-width)))
-  ;;     (cons (+ window-left (/ (- window-width posframe-width) 2))
-  ;;           (+ window-top 48))))
-
-  ;; (use-package ivy-posframe
-  ;;   :ensure t
-  ;;   :init
-  ;;   (setq ivy-posframe-display-functions-alist '((counsel-M-x . ivy-posframe-display-at-frame-top-center )))
-  ;;   (ivy-posframe-mode 1))
-
   (use-package ivy-rich
     :ensure t
     :init
@@ -1037,7 +1061,6 @@ It is very useful for figuring out how things work in Emacs.
 
   (use-package lsp-mode
     :ensure t
-    :after evil
     :commands (lsp lsp-deferred)
     :hook (lsp-mode . axiom/lsp-mode-setup)
           (lsp-mode . lsp-lens-mode)
@@ -1057,9 +1080,7 @@ It is very useful for figuring out how things work in Emacs.
        ;; Disable these as they're duplicated by flake8
        ("pyls.plugins.pycodestyle.enabled" nil t)
        ("pyls.plugins.mccabe.enabled" nil t)
-       ("pyls.plugins.pyflakes.enabled" nil t)))
-    :bind (:map evil-normal-state-map
-                ("gh" . lsp-describe-thing-at-point)))
+       ("pyls.plugins.pyflakes.enabled" nil t))))
 
   (use-package lsp-ui
     :ensure t
@@ -1073,10 +1094,7 @@ It is very useful for figuring out how things work in Emacs.
                   lsp-ui-doc-header nil
                   lsp-ui-doc-include-signature t
                   lsp-ui-doc-use-webkit t)
-    :commands lsp-ui-mode
-    :bind (:map evil-normal-state-map
-                ("gd" . lsp-ui-peek-find-definitions)
-                ("gr" . lsp-ui-peek-find-references)))
+    :commands lsp-ui-mode)
 
   (use-package lsp-treemacs
     :ensure t
