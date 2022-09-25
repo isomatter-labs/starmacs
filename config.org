@@ -3,7 +3,6 @@
 
 
 * Package Management
-
 ** Package Repositories
 #+BEGIN_SRC emacs-lisp
   (require 'package)
@@ -17,7 +16,6 @@
 
   (add-to-list 'load-path "~/.emacs.d/modules") ; add local files
 #+END_SRC
-
 
 ** use-package
 #+BEGIN_SRC emacs-lisp
@@ -37,9 +35,7 @@
     (auto-package-update-maybe))
 #+END_SRC
 
-
 * Quality of Life Improvements
-
 ** Solaire Mode
 #+BEGIN_SRC emacs-lisp
   (defun axiom/real-buffer-p (&optional buffer)
@@ -65,13 +61,11 @@
     (solaire-global-mode 1))
 #+END_SRC
 
-
 ** Keep Buffers Up to Date with Files
 When files on disk change, open buffers should be automatically updated to reflect those changes.
 #+BEGIN_SRC emacs-lisp
  (global-auto-revert-mode t)
 #+END_SRC
-
 
 ** Do Not Create Extra Files
 Don't create =backup~= or =#autosave#= files
@@ -79,7 +73,6 @@ Don't create =backup~= or =#autosave#= files
   (setq make-backup-files nil)
   (setq auto-save-default nil)
 #+END_SRC
-
 
 ** Add path to extra binaries
 #+BEGIN_SRC emacs-lisp
@@ -101,13 +94,11 @@ Don't create =backup~= or =#autosave#= files
   (setq exec-path (append exec-path '("/opt/anaconda3/bin")))
 #+END_SRC
 
-
 ** Replace Selection
 When text is highlighted, typing should delete the highlighted text and insert what is typed.
 #+BEGIN_SRC emacs-lisp
   (delete-selection-mode 1)
 #+END_SRC
-
 
 ** Usage Guides
 =discover.el= mostly just helps with =dired= mode, but it's worth including for new users.
@@ -118,12 +109,10 @@ When text is highlighted, typing should delete the highlighted text and insert w
     (global-discover-mode 1))
 #+END_SRC
 
-
 ** Mouse in Terminal
 #+BEGIN_SRC emacs-lisp
   (xterm-mouse-mode 1)
 #+END_SRC
-
 
 ** Whitespace
 #+BEGIN_SRC emacs-lisp
@@ -143,14 +132,12 @@ When text is highlighted, typing should delete the highlighted text and insert w
   (global-whitespace-mode 1)
 #+END_SRC
 
-
 ** Column Ruler
 I like to display a column ruler at common styleguide limits
 (famously, 80 characters, but also often 100 and 120 characters).
 #+BEGIN_SRC emacs-lisp
   ;; (add-hook 'prog-mode-hook #'display-fill-column-indicator-mode)
 #+END_SRC
-
 
 ** Email
 #+BEGIN_SRC emacs-lisp
@@ -234,7 +221,6 @@ I like to display a column ruler at common styleguide limits
     (add-hook 'mu4e-compose-mode-hook 'company-mode))
 #+END_SRC
 
-
 ** Look
 
 *** Theme
@@ -271,15 +257,15 @@ like we're editing a document in org-mode. We switch back to fixed width
                              (0 (prog1 () (compose-region (match-beginning 1) (match-end 1) "•"))))))
 
   ;; Set faces for heading levels
-  (dolist (face '((org-level-1 . 1.2)
-                  (org-level-2 . 1.1)
-                  (org-level-3 . 1.05)
-                  (org-level-4 . 1.0)
-                  (org-level-5 . 1.1)
-                  (org-level-6 . 1.1)
-                  (org-level-7 . 1.1)
-                  (org-level-8 . 1.1)))
-    (set-face-attribute (car face) nil :font "IBM Plex Serif" :weight 'regular :height (cdr face)))
+  (dolist (face '((org-level-1 . 2.0)
+                  (org-level-2 . 1.5)
+                  (org-level-3 . 1.3)
+                  (org-level-4 . 1.1)
+                  (org-level-5 . 1.05)
+                  (org-level-6 . 1.05)
+                  (org-level-7 . 1.05)
+                  (org-level-8 . 1.05)))
+    (set-face-attribute (car face) nil :font "Magorian" :weight 'regular :height (cdr face)))
 
   ;; Ensure that anything that should be fixed-pitch in Org files appears that way
   (set-face-attribute 'org-block nil :foreground nil :inherit 'fixed-pitch)
@@ -766,7 +752,6 @@ Bufname is not necessary on GNOME, but may be useful in other DEs."
   ;;   (meow-global-mode 1))
 #+END_SRC
 
-
 ** Fonts
 *** =font-installed-p=
 #+BEGIN_SRC emacs-lisp
@@ -819,7 +804,7 @@ Bufname is not necessary on GNOME, but may be useful in other DEs."
   (defvar axiom/default-font-size 140)
   (defvar axiom/default-variable-font-size 140)
 
-  (set-face-attribute 'default nil :font "IBM Plex Mono" :height axiom/default-font-size)
+  (set-face-attribute 'default nil :font "IBM Plex Mono" :slant 'italic :height axiom/default-font-size)
   (set-face-attribute 'fixed-pitch nil :font "IBM Plex Mono" :slant 'italic :height axiom/default-font-size)
   (if (member "IBM Plex Serif" (font-family-list))
     (set-face-attribute 'variable-pitch nil :font "IBM Plex Serif" :height axiom/default-variable-font-size :weight 'light))
@@ -830,7 +815,6 @@ Bufname is not necessary on GNOME, but may be useful in other DEs."
                         :height 1.05)       ;should be a little larger than regular text
 
 #+END_SRC
-
 
 ** SQL Highlighting
 #+BEGIN_SRC emacs-lisp
@@ -851,7 +835,6 @@ Bufname is not necessary on GNOME, but may be useful in other DEs."
 
 #+END_SRC
 
-
 ** Quick Reload
 #+BEGIN_SRC emacs-lisp
   (defun revert-buffer-no-confirm ()
@@ -862,7 +845,6 @@ Bufname is not necessary on GNOME, but may be useful in other DEs."
   (global-set-key (kbd "<f5>") 'revert-buffer-no-confirm)
   (global-set-key (kbd "s-r") 'revert-buffer-no-confirm)
 #+END_SRC
-
 
 ** Which Key
 which-key is a useful UI panel that appears when you start pressing any key
@@ -881,7 +863,6 @@ key bindings in the mode of your current buffer.
     (setq which-key-idle-delay 1))
 #+END_SRC
 
-
 ** Better Window Navigation
 *** With =windmove=
 #+BEGIN_SRC emacs-lisp
@@ -898,9 +879,7 @@ key bindings in the mode of your current buffer.
       (global-set-key (kbd "C-x o") 'ace-window))
 #+END_SRC
 
-
 * Project-Management
-
 ** Projectile
 #+BEGIN_SRC emacs-lisp
   (use-package projectile
@@ -925,7 +904,6 @@ key bindings in the mode of your current buffer.
     :config (counsel-projectile-mode))
 #+END_SRC
 
-
 ** Line Height
 #+BEGIN_SRC emacs-lisp
   (defvar axiom--line-pixel-height (line-pixel-height)
@@ -934,9 +912,7 @@ Used in various places to avoid getting wrong line height when
 `text-scale-mode' is active.")
 #+END_SRC
 
-
 * Searching and Fuzzy-Finding
-
 ** Ivy
 #+BEGIN_SRC emacs-lisp
   (use-package ivy
@@ -1010,9 +986,7 @@ It is very useful for figuring out how things work in Emacs.
     ([remap describe-key]      . helpful-key))
 #+END_SRC
 
-
 * Git/Github
-
 ** Magit
 #+BEGIN_SRC emacs-lisp
   (use-package magit
@@ -1025,7 +999,6 @@ It is very useful for figuring out how things work in Emacs.
     :after magit)
 #+END_SRC
 
-
 ** Highlight Git diffs in the gutter
 #+BEGIN_SRC emacs-lisp
       (use-package diff-hl
@@ -1033,7 +1006,6 @@ It is very useful for figuring out how things work in Emacs.
         :config
         (global-diff-hl-mode))
 #+END_SRC
-
 
 ** Why This?
 =why-this= shows blam information for the currently selected line (or region) along the right side of the current line
@@ -1045,9 +1017,7 @@ It is very useful for figuring out how things work in Emacs.
     :config (global-why-this-mode))
 #+END_SRC
 
-
 * Syntax Checking
-
 ** Flycheck
 #+BEGIN_SRC emacs-lisp
   (use-package flycheck
@@ -1085,9 +1055,7 @@ It is very useful for figuring out how things work in Emacs.
   (add-hook 'flycheck-mode-hook #'axiom/mode-line-update-flycheck)
 #+END_SRC
 
-
 * Auto-Completion
-
 ** Company-mode
 #+BEGIN_SRC emacs-lisp
     (use-package company
@@ -1111,21 +1079,17 @@ It is very useful for figuring out how things work in Emacs.
       :hook (company-mode . company-box-mode))
 #+END_SRC
 
-
 * Tab to Complete
 #+BEGIN_SRC emacs-lisp
 (setq tab-always-indent 'complete)
 #+END_SRC
-
 
 * Open Emacs GUI above terminal
 #+BEGIN_SRC emacs-lisp
   (x-focus-frame nil)
 #+END_SRC
 
-
 * LSP Features
-
 ** DAP-Mode
 #+BEGIN_SRC emacs-lisp
   (use-package posframe :ensure t)
@@ -1186,7 +1150,6 @@ It is very useful for figuring out how things work in Emacs.
   (use-package lsp-ivy :ensure t)
 #+END_SRC
 
-
 ** Tree-Sitter
 #+BEGIN_SRC emacs-lisp
   (use-package tree-sitter :ensure t
@@ -1194,9 +1157,7 @@ It is very useful for figuring out how things work in Emacs.
   (use-package tree-sitter-langs :ensure t)
 #+END_SRC
 
-
 * Language Specific IDE-Like Features
-
 ** Python
 
 *** Auto-PEP8 On Save
@@ -1229,7 +1190,6 @@ It is very useful for figuring out how things work in Emacs.
       (setq comment-start " # ")))
 #+END_SRC
 
-
 ** TypeScript
 #+BEGIN_SRC emacs-lisp
   (use-package typescript-mode
@@ -1239,7 +1199,6 @@ It is very useful for figuring out how things work in Emacs.
     :config
     (setq typescript-indent-level 2))
 #+END_SRC
-
 
 ** Julia
 #+BEGIN_SRC emacs-lisp
@@ -1267,7 +1226,6 @@ It is very useful for figuring out how things work in Emacs.
   ;;       (setq lsp-julia-default-environment "~/.julia/environments/v1.7"))
 
 #+END_SRC
-
 
 ** Scala
 #+BEGIN_SRC emacs-lisp
