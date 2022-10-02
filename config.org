@@ -4,6 +4,7 @@
 
 * Package Management
 ** Package Repositories
+We assume that we will want packages from MELPA, the most popular emacs package registry, as well as ELPA, the official GNU repository, and MELPA Stable (which is exactly what it sounds like).
 #+BEGIN_SRC emacs-lisp
   (require 'package)
   (setq package-archives
