@@ -888,6 +888,7 @@ key bindings in the mode of your current buffer.
     :diminish projectile-mode
     :config (projectile-mode)
     :custom
+    (projectile-completion-system 'ivy)
     (projectile-enable-caching t)
     (projectile-indexing-method 'alien)
     :bind-keymap
@@ -898,6 +899,10 @@ key bindings in the mode of your current buffer.
     (setq projectile-switch-project-action #'projectile-dired)
     :config
     (projectile-global-mode))
+
+  (use-package counsel-projectile
+    :ensure t
+    :config (counsel-projectile-mode))
 #+END_SRC
 
 ** Line Height
@@ -909,32 +914,55 @@ Used in various places to avoid getting wrong line height when
 #+END_SRC
 
 * Searching and Fuzzy-Finding
-** Vertico
+** Ivy
 #+BEGIN_SRC emacs-lisp
+  (use-package ivy
+    :ensure t
+    :diminish
+    :bind (("C-s" . swiper)
+           :map ivy-minibuffer-map
+           ("TAB" . ivy-alt-done)
+           ("C-l" . ivy-alt-done)
+           ("C-j" . ivy-next-line)
+           ("C-k" . ivy-previous-line)
+           :map ivy-switch-buffer-map
+           ("C-k" . ivy-previous-line)
+           ("C-l" . ivy-done)
+           ("C-d" . ivy-switch-buffer-kill)
+           :map ivy-reverse-i-search-map
+           ("C-k" . ivy-previous-line)
+           ("C-d" . ivy-reverse-i-search-kill))
+    :custom
+    (ivy-use-virtual-buffers t)           ; add ‘recentf-mode' and bookmarks to ‘ivy-switch-buffer'.
+    (ivy-count-format "")                 ; does not count candidates
+    (ivy-initial-inputs-alist nil)        ; no regexp by default
+    (ivy-re-builders-alist                ; configure regexp engine.
+     '((t . ivy--regex-ignore-order)))   ; allow input not in order
+    :config
+    (ivy-mode 1))
 
-      (use-package vertico
-        :ensure t
-        :custom
-        (vertico-cycle t)
-        :custom-face
-        (vertico-current ((t (:background "#3a3f5a"))))
-        :init
-        (vertico-mode))
+  (use-package ivy-rich
+    :ensure t
+    :init
+    (ivy-rich-mode 1))
 
-      (use-package consult
-        :ensure t
-        :bind ("C-s" . consult-line))
+  (use-package counsel
+    :ensure t
+    :bind (:map minibuffer-local-map
+                ("C-r" . 'counsel-minibuffer-history)
+                ("M-x" . counsel-M-x)
+                ("C-c k" . counsel-ag)
+                ("C-h a" . counsel-apropos)
+                ("C-x C-f" . counsel-find-file)
+                ("C-x b" . ivy-switch-buffer))
+    :config
+    (counsel-mode 1))
 
-      (use-package marginalia
-      :after vertico
-      :custom
-      (marginalia-annotators '(marginalia-annotators-heavy marginalia-annotators-light nil))
-      :init
-      (marginalia-mode))
-
-      (use-package ivy
-        :ensure t
-        :config (ivy-mode 1))
+  (use-package swiper
+    :ensure t
+    :bind*
+    ("C-s" . swiper-isearch)
+    ("C-r" . swiper-isearch-backward)) ; replace standard search functionality
 #+END_SRC
 
 **
@@ -948,15 +976,15 @@ It is very useful for figuring out how things work in Emacs.
 
 #+BEGIN_SRC emacs-lisp
   (use-package helpful
-  :custom
-  (counsel-describe-function-function #'helpful-callable)
-  (counsel-describe-variable-function #'helpful-variable)
-  :bind
-  ([remap describe-function] . helpful-function)
-  ([remap describe-symbol] . helpful-symbol)
-  ([remap describe-variable] . helpful-variable)
-  ([remap describe-command] . helpful-command)
-  ([remap describe-key] . helpful-key))
+    :ensure t
+    :custom
+    (counsel-describe-function-function #'helpful-callable)
+    (counsel-describe-variable-function #'helpful-variable)
+    :bind
+    ([remap describe-function] . counsel-describe-function)
+    ([remap describe-command]  . helpful-command)
+    ([remap describe-variable] . counsel-describe-variable)
+    ([remap describe-key]      . helpful-key))
 #+END_SRC
 
 * Git/Github
@@ -1119,6 +1147,8 @@ It is very useful for figuring out how things work in Emacs.
   (use-package lsp-treemacs
     :ensure t
     :after lsp)
+
+  (use-package lsp-ivy :ensure t)
 #+END_SRC
 
 ** Tree-Sitter
