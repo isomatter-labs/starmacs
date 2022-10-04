@@ -1,6 +1,6 @@
 #+TITLE: Axiom -- An Emacs Config With as Little as Possible
 #+AUTHOR: Matthew Cooper Healy
-#+STARTUP: content
+#+STARTUP: overview
 
 
 * Package Management
