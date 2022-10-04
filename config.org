@@ -238,6 +238,46 @@ Org Mode is one of the hallmark features of Emacs. It is a rich document editor,
 project planner, task and time tracker, blogging engine, and literate coding
 utility all wrapped up in one package.
 
+**** Custom Numbering
+#+begin_src emacs-lisp
+    (defun writer-mode--num-format (numbering)
+      "Alternative numbering format for org-num.
+       First level: 1 | xxx
+       Second level: 1.1 — xxx
+       Third level: 1.1.1 - xxx
+       etc.
+      "
+      (if (= (length numbering) 1)
+          (propertize (concat (mapconcat
+                               #'number-to-string
+                               numbering ".") " | " )
+                      'face `(:family "IBM Plex Serif"
+                                      :foreground ,(face-foreground 'shadow nil t)))
+        (propertize (concat (mapconcat
+                             #'number-to-string
+                             numbering ".") " — " )
+                    'face `(:family "IBM Plex Serif"
+                                    :foreground ,(face-foreground 'shadow nil t)))
+        (propertize (concat (mapconcat
+                             #'number-to-string
+                             numbering ".") " - ")
+                    'face `(:family "IBM Plex Serif"
+                                    :foreground , (face-foreground 'shadow nil t)))))
+
+    ;; Specific face for headline stars
+    (font-lock-add-keywords 'writer-mode
+                            '(("^*+ " 0 `(:family "Roboto Mono"
+                                                  :height 140
+                                                  :foreground ,(face-foreground 'shadow nil t)) prepend)
+                              ) 'append)
+
+    (setq org-num-skip-unnumbered t)
+    (setq org-num-skip-footnotes t)
+    (setq org-num-max-level 2)
+    (setq org-num-face nil)
+    (setq org-num-format-function 'writer-mode--num-format)
+
+                            #+end_src
 **** Basic Config
 This section contains the basic configuration for org-mode plus the
 configuration for Org agendas and capture templates. There's a lot to unpack in
@@ -249,17 +289,12 @@ explanation.
     :straight t
     :hook
     (org-mode . visual-line-mode)
-    (org-mode . variable-pitch-mode)
+    ;(org-mode . variable-pitch-mode)
+    (org-mode . (lambda () (indent-tabs-mode -1)))
+    (org-mode . org-num-mode)
 
     :config
     (setq
-     ;; Edit settings
-     org-auto-align-tags nil
-     org-tags-column 0
-     org-catch-invisible-edits 'show-and-error
-     org-special-ctrl-a/e t
-     org-insert-heading-respect-content t
-
      ;; Org styling, hide markup etc.
      org-hide-emphasis-markers t
      org-pretty-entities t
@@ -291,20 +326,20 @@ explanation.
 #+end_src
 
 **** Center Org Buffers
-We use visual-fill-column to center org-mode buffers for a more pleasing writing
+Here, visual-fill-column is used to center org-mode buffers for a more pleasing writing
 experience as it centers the contents of the buffer horizontally to seem more
 like you are editing a document. This is really a matter of personal preference
 so you can remove the block below if you don't like the behavior.
 #+begin_src emacs-lisp
-    (defun axiom/org-mode-visual-fill ()
-      (setq visual-fill-column-width 150
-            visual-fill-column-center-text t
-            visual-fill-column-fringes-outside-margins nil)
-      (visual-fill-column-mode 1))
+  (defun axiom/org-mode-visual-fill ()
+    (setq visual-fill-column-width 150
+          visual-fill-column-center-text t
+          visual-fill-column-fringes-outside-margins nil)
+    (visual-fill-column-mode 1))
 
-    (use-package visual-fill-column
-      :ensure t
-      :hook (org-mode . axiom/org-mode-visual-fill))
+  (use-package visual-fill-column
+    :ensure t
+    :hook (org-mode . axiom/org-mode-visual-fill))
 #+end_src
 
 *** Markdown
@@ -325,30 +360,30 @@ so you can remove the block below if you don't like the behavior.
 
 *** Quality of Life
 #+begin_src emacs-lisp
-    (setq inhibit-startup-message t)
+  (setq inhibit-startup-message t)
 
-    (scroll-bar-mode -1)        ; Disable visible scrollbar
-    (tool-bar-mode -1)          ; Disable the toolbar
-    (tooltip-mode -1)           ; Disable tooltips
-    (set-fringe-mode 10)        ; Give some breathing room
+  (scroll-bar-mode -1)        ; Disable visible scrollbar
+  (tool-bar-mode -1)          ; Disable the toolbar
+  (tooltip-mode -1)           ; Disable tooltips
+  (set-fringe-mode 10)        ; Give some breathing room
 
-    (menu-bar-mode -1)          ; Disable the menu bar
+  (menu-bar-mode -1)          ; Disable the menu bar
 
-    (toggle-frame-maximized)    ; Always start maximized
+  (toggle-frame-maximized)    ; Always start maximized
 
-    ;; Set up the visible bell
-    (setq visible-bell t)
+  ;; Set up the visible bell
+  (setq visible-bell t)
 
-    (column-number-mode)
-    (global-display-line-numbers-mode t)
+  (column-number-mode)
+  (global-display-line-numbers-mode t)
 
-    ;; Disable line numbers for some modes
-    (dolist (mode '(org-mode-hook
-                    term-mode-hook
-                    shell-mode-hook
-                    treemacs-mode-hook
-                    eshell-mode-hook))
-      (add-hook mode (lambda () (display-line-numbers-mode 0))))
+  ;; Disable line numbers for some modes
+  (dolist (mode '(org-mode-hook
+                  term-mode-hook
+                  shell-mode-hook
+                  treemacs-mode-hook
+                  eshell-mode-hook))
+    (add-hook mode (lambda () (display-line-numbers-mode 0))))
 #+end_src
 
 *** Scrolling
