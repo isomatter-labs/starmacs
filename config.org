@@ -470,11 +470,14 @@ Set up pixel-scrolling for a nice, modern-feeling experience (currently causing 
 
 *** Defaults
 #+begin_src emacs-lisp
+  (defvar axiom/fixed-pitch-height 130)
+  (defvar axiom/variable-pitch-height 140)
+
   (defun axiom/setup-fonts ()
-    (set-face-attribute 'default nil :font "IBM Plex Mono" :slant 'italic)
-    (set-face-attribute 'fixed-pitch nil :font "IBM Plex Mono" :slant 'italic)
+    (set-face-attribute 'default nil :font "IBM Plex Mono" :slant 'italic :height axiom/fixed-pitch-height)
+    (set-face-attribute 'fixed-pitch nil :font "IBM Plex Mono" :slant 'italic :height axiom/fixed-pitch-height)
     (if (member "IBM Plex Serif" (font-family-list))
-        (set-face-attribute 'variable-pitch nil :font "IBM Plex Serif"))
+        (set-face-attribute 'variable-pitch nil :font "IBM Plex Serif" :height axiom/variable-pitch-height))
     (set-face-attribute 'font-lock-comment-face nil :foreground "#5B6268" :slant 'italic :weight 'light :font "IBM Plex Mono")
     (set-face-attribute 'mode-line nil
                         :weight 'extra-bold ;should be _very_ bold
