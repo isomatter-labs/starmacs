@@ -18,22 +18,27 @@ We assume that we will want packages from MELPA, the most popular emacs package 
   (add-to-list 'load-path "~/.emacs.d/modules") ; add local files
 #+END_SRC
 
-** use-package
+** straight
+*** Bootstrap =straight=
 #+BEGIN_SRC emacs-lisp
-  (unless (package-installed-p 'use-package)
-    (package-refresh-contents)
-      (package-install 'use-package))
+  (defvar bootstrap-version)
+  (let ((bootstrap-file
+         (expand-file-name "straight/repos/straight.el/bootstrap.el" user-emacs-directory))
+        (bootstrap-version 5))
+    (unless (file-exists-p bootstrap-file)
+      (with-current-buffer
+          (url-retrieve-synchronously
+           "https://raw.githubusercontent.com/raxod502/straight.el/develop/install.el"
+           'silent 'inhibit-cookies)
+        (goto-char (point-max))
+        (eval-print-last-sexp)))
+    (load bootstrap-file nil 'nomessage))
+#+END_SRC
 
-  (eval-when-compile
-    (require 'use-package))
-
-  (use-package auto-package-update
-    :ensure t
-    :config
-    (setq auto-package-update-delete-old-versions t)
-    (setq auto-package-update-hide-results t)
-    (setq auto-package-update-interval 30)
-    (auto-package-update-maybe))
+*** Integrate with =use-package=
+#+BEGIN_SRC emacs-lisp
+  (straight-use-package 'use-package)
+  (setq straight-use-package-by-default t)
 #+END_SRC
 
 * Quality of Life Improvements
@@ -220,21 +225,37 @@ I like to display a column ruler at common styleguide limits
 
     ;; mu4e address completion
     (add-hook 'mu4e-compose-mode-hook 'company-mode))
-#+END_SRC
+    #+END_SRC
 
 ** Look
 
 *** Theme
 #+BEGIN_SRC emacs-lisp
+  (defvar axiom/current-theme 'dark)
+
   (use-package doom-themes
     :ensure t
     :config
     (setq doom-themes-enable-bold t
-      doom-themes-enable-italic t)
+          doom-themes-enable-italic t)
     (doom-themes-visual-bell-config)
     (doom-themes-org-config)
     (if (window-system)
         (load-theme 'doom-one t))) ; Only load in GUI to reduce issues with comment-coloring
+
+  (defun axiom/toggle-theme ()
+    (interactive)
+    (cond
+     ((eq axiom/current-theme 'dark) (progn
+                                       (load-theme 'doom-one-light t)
+                                       (setq axiom/current-theme 'light)))
+     ((eq axiom/current-theme 'light) (progn
+                                        (load-theme 'doom-one t)
+                                        (setq axiom/current-theme 'dark)))))
+
+  (global-set-key (kbd "C-M-S-t") 'axiom/toggle-theme)
+
+
 #+END_SRC
 
 
@@ -251,33 +272,32 @@ like we're editing a document in org-mode. We switch back to fixed width
 (monospace) fonts for code blocks and tables so that they display correctly.
 
 #+BEGIN_SRC emacs-lisp
-(defun axiom/org-font-setup ()
-  ;; Replace list hyphen with dot
-  (font-lock-add-keywords 'org-mode
-                          '(("^ *\\([-]\\) "
-                             (0 (prog1 () (compose-region (match-beginning 1) (match-end 1) "•"))))))
+  (defun axiom/org-font-setup ()
+    ;; Replace list hyphen with dot
+    (font-lock-add-keywords 'org-mode
+                            '(("^ *\\([-]\\) "
+                               (0 (prog1 () (compose-region (match-beginning 1) (match-end 1) "•"))))))
 
-  ;; Set faces for heading levels
-  (dolist (face '((org-level-1 . 2.0)
-                  (org-level-2 . 1.5)
-                  (org-level-3 . 1.3)
-                  (org-level-4 . 1.1)
-                  (org-level-5 . 1.05)
-                  (org-level-6 . 1.05)
-                  (org-level-7 . 1.05)
-                  (org-level-8 . 1.05)))
-    (set-face-attribute (car face) nil :font "Magorian" :weight 'regular :height (cdr face)))
+    ;; Set faces for heading levels
+    (dolist (face '((org-level-1 . 2.0)
+                    (org-level-2 . 1.5)
+                    (org-level-3 . 1.3)
+                    (org-level-4 . 1.1)
+                    (org-level-5 . 1.05)
+                    (org-level-6 . 1.05)
+                    (org-level-7 . 1.05)
+                    (org-level-8 . 1.05)))
+      (set-face-attribute (car face) nil :font "Magorian" :weight 'regular :height (cdr face)))
 
-  ;; Ensure that anything that should be fixed-pitch in Org files appears that way
-  (set-face-attribute 'org-block nil :foreground nil :inherit 'fixed-pitch)
-  (set-face-attribute 'org-code nil   :inherit '(shadow fixed-pitch))
-  (set-face-attribute 'org-table nil   :inherit '(shadow fixed-pitch))
-  (set-face-attribute 'org-verbatim nil :inherit '(shadow fixed-pitch))
-  (set-face-attribute 'org-special-keyword nil :inherit '(font-lock-comment-face fixed-pitch))
-  (set-face-attribute 'org-meta-line nil :inherit '(font-lock-comment-face fixed-pitch))
-  (set-face-attribute 'org-checkbox nil :inherit 'fixed-pitch))
+    ;; Ensure that anything that should be fixed-pitch in Org files appears that way
+    (set-face-attribute 'org-block nil :foreground nil :inherit 'fixed-pitch)
+    (set-face-attribute 'org-code nil   :inherit '(shadow fixed-pitch))
+    (set-face-attribute 'org-table nil   :inherit '(shadow fixed-pitch))
+    (set-face-attribute 'org-verbatim nil :inherit '(shadow fixed-pitch))
+    (set-face-attribute 'org-special-keyword nil :inherit '(font-lock-comment-face fixed-pitch))
+    (set-face-attribute 'org-meta-line nil :inherit '(font-lock-comment-face fixed-pitch))
+    (set-face-attribute 'org-checkbox nil :inherit 'fixed-pitch))
 #+END_SRC
-
 
 **** Basic Config
 This section contains the basic configuration for org-mode plus the
@@ -310,99 +330,99 @@ explanation.
     (setq org-habit-graph-column 60)
 
     (setq org-todo-keywords
-      '((sequence "TODO(t)" "NEXT(n)" "|" "DONE(d!)")
-        (sequence "BACKLOG(b)" "PLAN(p)" "READY(r)" "ACTIVE(a)" "REVIEW(v)" "WAIT(w@/!)" "HOLD(h)" "|" "COMPLETED(c)" "CANC(k@)")))
+          '((sequence "TODO(t)" "NEXT(n)" "|" "DONE(d!)")
+            (sequence "BACKLOG(b)" "PLAN(p)" "READY(r)" "ACTIVE(a)" "REVIEW(v)" "WAIT(w@/!)" "HOLD(h)" "|" "COMPLETED(c)" "CANC(k@)")))
 
     (setq org-refile-targets
-      '(("Archive.org" :maxlevel . 1)
-        ("Tasks.org" :maxlevel . 1)))
+          '(("Archive.org" :maxlevel . 1)
+            ("Tasks.org" :maxlevel . 1)))
 
     ;; Save Org buffers after refiling!
     (advice-add 'org-refile :after 'org-save-all-org-buffers)
 
     (setq org-tag-alist
-      '((:startgroup)
-        ; Put mutually exclusive tags here
-        (:endgroup)
-        ("@errand" . ?E)
-        ("@home" . ?H)
-        ("@work" . ?W)
-        ("agenda" . ?a)
-        ("planning" . ?p)
-        ("publish" . ?P)
-        ("batch" . ?b)
-        ("note" . ?n)
-        ("idea" . ?i)))
+          '((:startgroup)
+                                          ; Put mutually exclusive tags here
+            (:endgroup)
+            ("@errand" . ?E)
+            ("@home" . ?H)
+            ("@work" . ?W)
+            ("agenda" . ?a)
+            ("planning" . ?p)
+            ("publish" . ?P)
+            ("batch" . ?b)
+            ("note" . ?n)
+            ("idea" . ?i)))
 
     ;; Configure custom agenda views
     (setq org-agenda-custom-commands
-    '(("d" "Dashboard"
-      ((agenda "" ((org-deadline-warning-days 7)))
-        (todo "NEXT"
-          ((org-agenda-overriding-header "Next Tasks")))
-        (tags-todo "agenda/ACTIVE" ((org-agenda-overriding-header "Active Projects")))))
+          '(("d" "Dashboard"
+             ((agenda "" ((org-deadline-warning-days 7)))
+              (todo "NEXT"
+                    ((org-agenda-overriding-header "Next Tasks")))
+              (tags-todo "agenda/ACTIVE" ((org-agenda-overriding-header "Active Projects")))))
 
-      ("n" "Next Tasks"
-      ((todo "NEXT"
-          ((org-agenda-overriding-header "Next Tasks")))))
+            ("n" "Next Tasks"
+             ((todo "NEXT"
+                    ((org-agenda-overriding-header "Next Tasks")))))
 
-      ("W" "Work Tasks" tags-todo "+work-email")
+            ("W" "Work Tasks" tags-todo "+work-email")
 
-      ;; Low-effort next actions
-      ("e" tags-todo "+TODO=\"NEXT\"+Effort<15&+Effort>0"
-      ((org-agenda-overriding-header "Low Effort Tasks")
-        (org-agenda-max-todos 20)
-        (org-agenda-files org-agenda-files)))
+            ;; Low-effort next actions
+            ("e" tags-todo "+TODO=\"NEXT\"+Effort<15&+Effort>0"
+             ((org-agenda-overriding-header "Low Effort Tasks")
+              (org-agenda-max-todos 20)
+              (org-agenda-files org-agenda-files)))
 
-      ("w" "Workflow Status"
-      ((todo "WAIT"
-              ((org-agenda-overriding-header "Waiting on External")
-              (org-agenda-files org-agenda-files)))
-        (todo "REVIEW"
-              ((org-agenda-overriding-header "In Review")
-              (org-agenda-files org-agenda-files)))
-        (todo "PLAN"
-              ((org-agenda-overriding-header "In Planning")
-              (org-agenda-todo-list-sublevels nil)
-              (org-agenda-files org-agenda-files)))
-        (todo "BACKLOG"
-              ((org-agenda-overriding-header "Project Backlog")
-              (org-agenda-todo-list-sublevels nil)
-              (org-agenda-files org-agenda-files)))
-        (todo "READY"
-              ((org-agenda-overriding-header "Ready for Work")
-              (org-agenda-files org-agenda-files)))
-        (todo "ACTIVE"
-              ((org-agenda-overriding-header "Active Projects")
-              (org-agenda-files org-agenda-files)))
-        (todo "COMPLETED"
-              ((org-agenda-overriding-header "Completed Projects")
-              (org-agenda-files org-agenda-files)))
-        (todo "CANC"
-              ((org-agenda-overriding-header "Cancelled Projects")
-              (org-agenda-files org-agenda-files)))))))
+            ("w" "Workflow Status"
+             ((todo "WAIT"
+                    ((org-agenda-overriding-header "Waiting on External")
+                     (org-agenda-files org-agenda-files)))
+              (todo "REVIEW"
+                    ((org-agenda-overriding-header "In Review")
+                     (org-agenda-files org-agenda-files)))
+              (todo "PLAN"
+                    ((org-agenda-overriding-header "In Planning")
+                     (org-agenda-todo-list-sublevels nil)
+                     (org-agenda-files org-agenda-files)))
+              (todo "BACKLOG"
+                    ((org-agenda-overriding-header "Project Backlog")
+                     (org-agenda-todo-list-sublevels nil)
+                     (org-agenda-files org-agenda-files)))
+              (todo "READY"
+                    ((org-agenda-overriding-header "Ready for Work")
+                     (org-agenda-files org-agenda-files)))
+              (todo "ACTIVE"
+                    ((org-agenda-overriding-header "Active Projects")
+                     (org-agenda-files org-agenda-files)))
+              (todo "COMPLETED"
+                    ((org-agenda-overriding-header "Completed Projects")
+                     (org-agenda-files org-agenda-files)))
+              (todo "CANC"
+                    ((org-agenda-overriding-header "Cancelled Projects")
+                     (org-agenda-files org-agenda-files)))))))
 
     (setq org-capture-templates
-      `(("t" "Tasks / Projects")
-        ("tt" "Task" entry (file+olp "~/Development/org-files/tasks.org" "Inbox")
-            "* TODO %?\n  %U\n  %a\n  %i" :empty-lines 1)
+          `(("t" "Tasks / Projects")
+            ("tt" "Task" entry (file+olp "~/Development/org-files/tasks.org" "Inbox")
+             "* TODO %?\n  %U\n  %a\n  %i" :empty-lines 1)
 
-        ("j" "Journal Entries")
-        ("jj" "Journal" entry
-            (file+olp+datetree "~/Development/org-files/journal.org")
-            "\n* %<%I:%M %p> - Journal :journal:\n\n%?\n\n"
-            ;; ,(dw/read-file-as-string "~/Notes/Templates/Daily.org")
-            :clock-in :clock-resume
-            :empty-lines 1)
-        ("jm" "Meeting" entry
-            (file+olp+datetree "~/Development/org-files/journal.org")
-            "* %<%I:%M %p> - %a :meetings:\n\n%?\n\n"
-            :clock-in :clock-resume
-            :empty-lines 1)
+            ("j" "Journal Entries")
+            ("jj" "Journal" entry
+             (file+olp+datetree "~/Development/org-files/journal.org")
+             "\n* %<%I:%M %p> - Journal :journal:\n\n%?\n\n"
+             ;; ,(dw/read-file-as-string "~/Notes/Templates/Daily.org")
+             :clock-in :clock-resume
+             :empty-lines 1)
+            ("jm" "Meeting" entry
+             (file+olp+datetree "~/Development/org-files/journal.org")
+             "* %<%I:%M %p> - %a :meetings:\n\n%?\n\n"
+             :clock-in :clock-resume
+             :empty-lines 1)
 
-        ("w" "Workflows")
-        ("we" "Checking Email" entry (file+olp+datetree "~/Development/org-files/journal.org")
-            "* Checking Email :email:\n\n%?" :clock-in :clock-resume :empty-lines 1)))
+            ("w" "Workflows")
+            ("we" "Checking Email" entry (file+olp+datetree "~/Development/org-files/journal.org")
+             "* Checking Email :email:\n\n%?" :clock-in :clock-resume :empty-lines 1)))
 
 
     (define-key global-map (kbd "C-c j")
@@ -410,7 +430,6 @@ explanation.
 
     (axiom/org-font-setup))
 #+END_SRC
-
 
 **** Nicer Heading Bullets
 org-bullets replaces the heading stars in org-mode buffers with nicer looking
@@ -425,7 +444,6 @@ which we may cover in a later video.
     :custom
     (org-bullets-bullet-list '("◉" "○" "●" "○" "●" "○" "●")))
 #+END_SRC
-
 
 **** Center Org Buffers
 We use visual-fill-column to center org-mode buffers for a more pleasing writing
@@ -465,15 +483,13 @@ second to contain the name of the language as it is known by Org Babel.
   (add-to-list 'org-structure-template-alist '("py" . "src python"))
 #+END_SRC
 
-
 *** Markdown
 #+BEGIN_SRC emacs-lisp
   (use-package markdown-mode
-  :ensure t
-  :mode ("README\\.md\\'" . gfm-mode)
-  :init (setq markdown-command "multimarkdown"))
+    :ensure t
+    :mode ("README\\.md\\'" . gfm-mode)
+    :init (setq markdown-command "multimarkdown"))
 #+END_SRC
-
 
 *** Modeline
 #+BEGIN_SRC emacs-lisp
@@ -483,7 +499,6 @@ second to contain the name of the language as it is known by Org Babel.
     :custom ((doom-modeline-height 15)))
 #+END_SRC
 
-
 *** Command Log Mode
 command-log-mode is useful for displaying a panel showing each key binding you use in a panel on the right side of the frame. Great for live streams and screencasts!
 #+BEGIN_SRC emacs-lisp
@@ -491,49 +506,54 @@ command-log-mode is useful for displaying a panel showing each key binding you u
     :ensure t)
 #+END_SRC
 
-
-
 *** Quality of Life
 #+BEGIN_SRC emacs-lisp
-(setq inhibit-startup-message t)
+  (setq inhibit-startup-message t)
 
-(scroll-bar-mode -1)        ; Disable visible scrollbar
-(tool-bar-mode -1)          ; Disable the toolbar
-(tooltip-mode -1)           ; Disable tooltips
-(set-fringe-mode 10)        ; Give some breathing room
+  (scroll-bar-mode -1)        ; Disable visible scrollbar
+  (tool-bar-mode -1)          ; Disable the toolbar
+  (tooltip-mode -1)           ; Disable tooltips
+  (set-fringe-mode 10)        ; Give some breathing room
 
-(menu-bar-mode -1)          ; Disable the menu bar
+  (menu-bar-mode -1)          ; Disable the menu bar
 
-;; Set up the visible bell
-(setq visible-bell t)
+  (toggle-frame-maximized)    ; Always start maximized
 
-(column-number-mode)
-(global-display-line-numbers-mode t)
+  ;; Set up the visible bell
+  (setq visible-bell t)
 
-;; Disable line numbers for some modes
-(dolist (mode '(org-mode-hook
-                term-mode-hook
-                shell-mode-hook
-                treemacs-mode-hook
-                eshell-mode-hook))
-  (add-hook mode (lambda () (display-line-numbers-mode 0))))
+  (column-number-mode)
+  (global-display-line-numbers-mode t)
+
+  ;; Disable line numbers for some modes
+  (dolist (mode '(org-mode-hook
+                  term-mode-hook
+                  shell-mode-hook
+                  treemacs-mode-hook
+                  eshell-mode-hook))
+    (add-hook mode (lambda () (display-line-numbers-mode 0))))
 #+END_SRC
 
+*** Scrolling
+Set up pixel-scrolling for a nice, modern-feeling experience
+#+BEGIN_SRC emacs-lisp
+  (pixel-scroll-mode 1)
+#+END_SRC
 
 *** Titlebar
 #+BEGIN_SRC emacs-lisp
   (defcustom axiom--title-show-bufname t
-  "Whether to include bufname to titlebar.
-Bufname is not necessary on GNOME, but may be useful in other DEs."
-  :type 'boolean
-  :group 'local-config)
+    "Whether to include bufname to titlebar.
+  Bufname is not necessary on GNOME, but may be useful in other DEs."
+    :type 'boolean
+    :group 'local-config)
 
-(setq-default frame-title-format
-              '(:eval (let ((match (string-match "[ *]" (buffer-name))))
-                        (if (or (and match (= match 0))
-                                (not axiom--title-show-bufname))
-                            "Emacs"
-                          "%b — Emacs"))))
+  (setq-default frame-title-format
+                '(:eval (let ((match (string-match "[ *]" (buffer-name))))
+                          (if (or (and match (= match 0))
+                                  (not axiom--title-show-bufname))
+                              "Emacs"
+                            "%b — Emacs"))))
 #+END_SRC
 
 
@@ -576,25 +596,25 @@ Bufname is not necessary on GNOME, but may be useful in other DEs."
 
 *** Dashboard
 #+BEGIN_SRC emacs-lisp
-      (defun no-linum ()
-        (display-line-numbers-mode -1))
+  (defun no-linum ()
+    (display-line-numbers-mode -1))
 
-      (use-package dashboard
-        :ensure t
-        :config
-        (setq dashboard-banner-logo-title "Welcome to Emacs, A hackable text editor for the 21st Century!")
-        (setq initial-buffer-choice (lambda () (get-buffer "*dashboard*"))) ; for emacs daemon
-        (setq dashboard-items '((projects . 5)
-                                (recents . 5)
-                                (agenda . 5)))
-        (dashboard-modify-heading-icons '((recents . "file-text")))
-        (setq dashboard-set-navigator t)
-        (setq dashboard-set-file-icons t)
-        (setq dashboard-startup-banner "~/.emacs.d/img/emacs.png") ; set to path to image file to customize
-        (setq dashboard-set-footer nil)
-        (dashboard-setup-startup-hook)
-        (setq dashboard-center-content t)
-        (add-hook 'dashboard-mode-hook 'no-linum)) ; turn off line numbers for dashboard
+  (use-package dashboard
+    :ensure t
+    :config
+    (setq dashboard-banner-logo-title "Welcome to Emacs, A hackable text editor for the 21st Century!")
+    (setq initial-buffer-choice (lambda () (get-buffer "*dashboard*"))) ; for emacs daemon
+    (setq dashboard-items '((projects . 5)
+                            (recents . 5)
+                            (agenda . 5)))
+    (dashboard-modify-heading-icons '((recents . "file-text")))
+    (setq dashboard-set-navigator t)
+    (setq dashboard-set-file-icons t)
+    (setq dashboard-startup-banner "~/.emacs.d/img/emacs.png") ; set to path to image file to customize
+    (setq dashboard-set-footer nil)
+    (dashboard-setup-startup-hook)
+    (setq dashboard-center-content t)
+    (add-hook 'dashboard-mode-hook 'no-linum)) ; turn off line numbers for dashboard
 #+END_SRC
 
 
@@ -611,50 +631,50 @@ Bufname is not necessary on GNOME, but may be useful in other DEs."
 *** Treemacs
 #+BEGIN_SRC emacs-lisp
   (use-package treemacs
-  :ensure t
-  :defer t
-  :init
-  (with-eval-after-load 'winum
-    (define-key winum-keymap (kbd "M-0") #'treemacs-select-window))
-  :config
-  (progn
-    ;; The default width and height of the icons is 22 pixels. If you are
-    ;; using a Hi-DPI display, uncomment this to double the icon size.
-    ;;(treemacs-resize-icons 44)
+    :ensure t
+    :defer t
+    :init
+    (with-eval-after-load 'winum
+      (define-key winum-keymap (kbd "M-0") #'treemacs-select-window))
+    :config
+    (progn
+      ;; The default width and height of the icons is 22 pixels. If you are
+      ;; using a Hi-DPI display, uncomment this to double the icon size.
+      ;;(treemacs-resize-icons 44)
 
-    (treemacs-follow-mode t)
-    (treemacs-filewatch-mode t)
-    (treemacs-fringe-indicator-mode 'always)
-    (when treemacs-python-executable
-      (treemacs-git-commit-diff-mode t))
+      (treemacs-follow-mode t)
+      (treemacs-filewatch-mode t)
+      (treemacs-fringe-indicator-mode 'always)
+      (when treemacs-python-executable
+        (treemacs-git-commit-diff-mode t))
 
-    (pcase (cons (not (null (executable-find "git")))
-                 (not (null treemacs-python-executable)))
-      (`(t . t)
-       (treemacs-git-mode 'deferred))
-      (`(t . _)
-       (treemacs-git-mode 'simple)))
+      (pcase (cons (not (null (executable-find "git")))
+                   (not (null treemacs-python-executable)))
+        (`(t . t)
+         (treemacs-git-mode 'deferred))
+        (`(t . _)
+         (treemacs-git-mode 'simple)))
 
-    (treemacs-hide-gitignored-files-mode nil))
-  :bind
-  (:map global-map
-        ("M-0"       . treemacs-select-window)
-        ("C-x t 1"   . treemacs-delete-other-windows)
-        ("s-b"       . treemacs)
-        ("s-\\"       . treemacs)
-        ("C-x t d"   . treemacs-select-directory)
-        ("C-x t B"   . treemacs-bookmark)
-        ("C-x t C-t" . treemacs-find-file)
-        ("C-x t M-t" . treemacs-find-tag)))
+      (treemacs-hide-gitignored-files-mode nil))
+    :bind
+    (:map global-map
+          ("M-0"       . treemacs-select-window)
+          ("C-x t 1"   . treemacs-delete-other-windows)
+          ("s-b"       . treemacs)
+          ("s-\\"       . treemacs)
+          ("C-x t d"   . treemacs-select-directory)
+          ("C-x t B"   . treemacs-bookmark)
+          ("C-x t C-t" . treemacs-find-file)
+          ("C-x t M-t" . treemacs-find-tag)))
 
 
-(use-package treemacs-projectile
-  :after (treemacs projectile)
-  :ensure t)
+  (use-package treemacs-projectile
+    :after (treemacs projectile)
+    :ensure t)
 
-(use-package treemacs-magit
-  :after (treemacs magit)
-  :ensure t)
+  (use-package treemacs-magit
+    :after (treemacs magit)
+    :ensure t)
 
 #+END_SRC
 
@@ -805,15 +825,18 @@ Bufname is not necessary on GNOME, but may be useful in other DEs."
   (defvar axiom/default-font-size 140)
   (defvar axiom/default-variable-font-size 140)
 
-  (set-face-attribute 'default nil :font "IBM Plex Mono" :slant 'italic :height axiom/default-font-size)
-  (set-face-attribute 'fixed-pitch nil :font "IBM Plex Mono" :slant 'italic :height axiom/default-font-size)
-  (if (member "IBM Plex Serif" (font-family-list))
-    (set-face-attribute 'variable-pitch nil :font "IBM Plex Serif" :height axiom/default-variable-font-size :weight 'light))
-  (set-face-attribute 'font-lock-comment-face nil :foreground "#5B6268" :slant 'italic :weight 'light :font "IBM Plex Mono")
-  (set-face-attribute 'mode-line nil
+  (defun axiom/setup-fonts ()
+    (set-face-attribute 'default nil :font "IBM Plex Mono" :slant 'italic :height axiom/default-font-size)
+    (set-face-attribute 'fixed-pitch nil :font "IBM Plex Mono" :slant 'italic :height axiom/default-font-size)
+    (if (member "IBM Plex Serif" (font-family-list))
+        (set-face-attribute 'variable-pitch nil :font "IBM Plex Serif" :height axiom/default-variable-font-size :weight 'light))
+    (set-face-attribute 'font-lock-comment-face nil :foreground "#5B6268" :slant 'italic :weight 'light :font "IBM Plex Mono")
+    (set-face-attribute 'mode-line nil
                         :weight 'extra-bold ;should be _very_ bold
                         :font "IBM Plex Mono"     ;same font
-                        :height 1.05)       ;should be a little larger than regular text
+                        :height 1.05))       ;should be a little larger than regular text
+
+  (axiom/setup-fonts)
 
 #+END_SRC
 
