@@ -769,9 +769,9 @@ It is very useful for figuring out how things work in Emacs.
     (setq lsp-keymap-prefix "C-c l")  ;; Or 'C-l', 's-l'
     :config
     (setq lsp-idle-delay 0.5
-          lsp-enable-symbol-highlighting t
-          lsp-enable-snippet nil  ;; Not supported by company capf, which is the recommended company backend
-          lsp-pyls-plugins-flake8-enabled t)
+     lsp-enable-symbol-highlighting t
+     lsp-enable-snippet nil  ;; Not supported by company capf, which is the recommended company backend
+     lsp-pyls-plugins-flake8-enabled t)
     (lsp-register-custom-settings
      '(("pyls.plugins.pyls_mypy.enabled" t t)
        ("pyls.plugins.pyls_mypy.live_mode" nil t)
