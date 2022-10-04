@@ -652,8 +652,8 @@ Set up pixel-scrolling for a nice, modern-feeling experience
   (defun axiom/setup-fonts ()
     (set-face-attribute 'default nil :font "IBM Plex Mono" :slant 'italic)
     (set-face-attribute 'fixed-pitch nil :font "IBM Plex Mono" :slant 'italic)
-    (if (member "CMU Serif" (font-family-list))
-        (set-face-attribute 'variable-pitch nil :font "CMU Serif" :height 1.0))
+    (if (member "IBM Plex Serif" (font-family-list))
+        (set-face-attribute 'variable-pitch nil :font "IBM Plex Serif"))
     (set-face-attribute 'font-lock-comment-face nil :foreground "#5B6268" :slant 'italic :weight 'light :font "IBM Plex Mono")
     (set-face-attribute 'mode-line nil
                         :weight 'extra-bold ;should be _very_ bold
@@ -697,7 +697,7 @@ Set up pixel-scrolling for a nice, modern-feeling experience
 ** Which Key
 which-key is a useful UI panel that appears when you start pressing any key
 binding in Emacs to offer you all possible completions for the prefix.
-For example, if you press C-c (hold control and press the letter c), a panel
+For example, if you press =C-c= (hold control and press the letter c), a panel
 will appear at the bottom of the frame displaying all of the bindings under that
 prefix and which command they run. This is very useful for learning the possible
 key bindings in the mode of your current buffer.
