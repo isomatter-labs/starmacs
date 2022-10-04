@@ -1,5 +1,6 @@
 #+TITLE: Emacs Config
 #+AUTHOR: Matthew Cooper Healy
+#+STARTUP: content
 
 
 * Package Management
@@ -40,6 +41,7 @@ We assume that we will want packages from MELPA, the most popular emacs package 
   (straight-use-package 'use-package)
   (setq straight-use-package-by-default t)
 #+end_src
+
 
 * Quality of Life Improvements
 ** Solaire Mode
@@ -258,7 +260,6 @@ I like to display a column ruler at common styleguide limits
   (global-set-key (kbd "C-M-S-t") 'axiom/toggle-theme)
 #+end_src
 
-
 *** Org Mode
 Org Mode is one of the hallmark features of Emacs. It is a rich document editor,
 project planner, task and time tracker, blogging engine, and literate coding
@@ -406,12 +407,10 @@ Set up pixel-scrolling for a nice, modern-feeling experience
                             "%b — Emacs"))))
 #+end_src
 
-
 *** Cursor
 #+begin_src emacs-lisp
   (setq-default cursor-type '(bar . 1))
 #+end_src
-
 
 *** Truncate, Don't Wrap
 #+begin_src emacs-lisp
@@ -436,13 +435,11 @@ Set up pixel-scrolling for a nice, modern-feeling experience
      #b00000000])
 #+end_src
 
-
 *** Focus Line
 #+begin_src emacs-lisp
   (if (window-system)
       (global-hl-line-mode 1))
 #+end_src
-
 
 *** Dashboard
 #+begin_src emacs-lisp
@@ -467,7 +464,6 @@ Set up pixel-scrolling for a nice, modern-feeling experience
     (add-hook 'dashboard-mode-hook 'no-linum)) ; turn off line numbers for dashboard
 #+end_src
 
-
 *** Rainbow Delimiters
 #+begin_src emacs-lisp
   (use-package rainbow-delimiters
@@ -476,7 +472,6 @@ Set up pixel-scrolling for a nice, modern-feeling experience
     (prog-mode . rainbow-delimiters-mode)
     (org-mode . rainbow-delimiters-mode))
 #+end_src
-
 
 *** Treemacs
 #+begin_src emacs-lisp
@@ -527,7 +522,6 @@ Set up pixel-scrolling for a nice, modern-feeling experience
     :ensure t)
 
 #+end_src
-
 
 *** =Meow= Mode
 #+begin_src emacs-lisp
@@ -658,7 +652,6 @@ Set up pixel-scrolling for a nice, modern-feeling experience
       (cache-fonts)))
 #+end_src
 
-
 *** All the Icons
 #+begin_src emacs-lisp
   (use-package all-the-icons
@@ -668,7 +661,6 @@ Set up pixel-scrolling for a nice, modern-feeling experience
                (window-system))
       (all-the-icons-install-fonts t)))
 #+end_src
-
 
 *** Defaults
 #+begin_src emacs-lisp
@@ -1052,7 +1044,6 @@ It is very useful for figuring out how things work in Emacs.
        ("pyls.plugins.pyflakes.enabled" nil t)))
     :hook (python-mode . lsp-deferred))
 #+end_src
-
 
 *** PEP8-compliant comments
 #+begin_src emacs-lisp
