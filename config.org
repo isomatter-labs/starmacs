@@ -42,7 +42,6 @@ We assume that we will want packages from MELPA, the most popular emacs package 
   (setq straight-use-package-by-default t)
 #+end_src
 
-
 * Quality of Life Improvements
 ** Solaire Mode
 #+begin_src emacs-lisp
