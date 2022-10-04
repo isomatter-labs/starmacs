@@ -1,4 +1,4 @@
-#+TITLE: Emacs Config
+#+TITLE: Axiom -- An Emacs Config With as Little as Possible
 #+AUTHOR: Matthew Cooper Healy
 #+STARTUP: content
 
@@ -19,7 +19,7 @@ We assume that we will want packages from MELPA, the most popular emacs package 
   (add-to-list 'load-path "~/.emacs.d/modules") ; add local files
 #+end_src
 
-** straight
+** =straight.el=
 *** Bootstrap =straight=
 #+begin_src emacs-lisp
   (defvar bootstrap-version)
@@ -43,31 +43,6 @@ We assume that we will want packages from MELPA, the most popular emacs package 
 #+end_src
 
 * Quality of Life Improvements
-** Solaire Mode
-#+begin_src emacs-lisp
-  (defun axiom/real-buffer-p (&optional buffer)
-    "Determines whether BUFFER is real."
-    (not (or (string-match-p
-              (regexp-opt '("*Treemacs"
-                            "*vterm*"
-                            " *Minibuf"
-                            " *Echo Area"
-                            "*Process List*"
-                            "*Ediff"
-                            " *LV*"
-                            "*Ilist*"))
-              (buffer-name buffer))
-             (minibufferp))))
-
-  (use-package solaire-mode
-    :ensure t
-    :commands (solaire-global-mode)
-    :custom
-    (solaire-mode-real-buffer-fn #'axiom/real-buffer-p)
-    :init
-    (solaire-global-mode 1))
-#+end_src
-
 ** Keep Buffers Up to Date with Files
 When files on disk change, open buffers should be automatically updated to reflect those changes.
 #+begin_src emacs-lisp
@@ -229,7 +204,6 @@ I like to display a column ruler at common styleguide limits
     #+end_src
 
 ** Look
-
 *** Theme
 #+begin_src emacs-lisp
   (defvar axiom/current-theme 'dark)
@@ -349,13 +323,6 @@ so you can remove the block below if you don't like the behavior.
     :custom ((doom-modeline-height 15)))
 #+end_src
 
-*** Command Log Mode
-command-log-mode is useful for displaying a panel showing each key binding you use in a panel on the right side of the frame. Great for live streams and screencasts!
-#+begin_src emacs-lisp
-  (use-package command-log-mode
-    :ensure t)
-#+end_src
-
 *** Quality of Life
 #+begin_src emacs-lisp
     (setq inhibit-startup-message t)
@@ -385,25 +352,9 @@ command-log-mode is useful for displaying a panel showing each key binding you u
 #+end_src
 
 *** Scrolling
-Set up pixel-scrolling for a nice, modern-feeling experience
+Set up pixel-scrolling for a nice, modern-feeling experience (currently causing lag on long files)
 #+begin_src emacs-lisp
-  (pixel-scroll-mode 1)
-#+end_src
-
-*** Titlebar
-#+begin_src emacs-lisp
-  (defcustom axiom--title-show-bufname t
-    "Whether to include bufname to titlebar.
-  Bufname is not necessary on GNOME, but may be useful in other DEs."
-    :type 'boolean
-    :group 'local-config)
-
-  (setq-default frame-title-format
-                '(:eval (let ((match (string-match "[ *]" (buffer-name))))
-                          (if (or (and match (= match 0))
-                                  (not axiom--title-show-bufname))
-                              "Emacs"
-                            "%b — Emacs"))))
+  ;(pixel-scroll-mode 1)
 #+end_src
 
 *** Cursor
@@ -470,150 +421,6 @@ Set up pixel-scrolling for a nice, modern-feeling experience
     :hook
     (prog-mode . rainbow-delimiters-mode)
     (org-mode . rainbow-delimiters-mode))
-#+end_src
-
-*** Treemacs
-#+begin_src emacs-lisp
-  (use-package treemacs
-    :ensure t
-    :defer t
-    :init
-    (with-eval-after-load 'winum
-      (define-key winum-keymap (kbd "M-0") #'treemacs-select-window))
-    :config
-    (progn
-      ;; The default width and height of the icons is 22 pixels. If you are
-      ;; using a Hi-DPI display, uncomment this to double the icon size.
-      ;;(treemacs-resize-icons 44)
-
-      (treemacs-follow-mode t)
-      (treemacs-filewatch-mode t)
-      (treemacs-fringe-indicator-mode 'always)
-      (when treemacs-python-executable
-        (treemacs-git-commit-diff-mode t))
-
-      (pcase (cons (not (null (executable-find "git")))
-                   (not (null treemacs-python-executable)))
-        (`(t . t)
-         (treemacs-git-mode 'deferred))
-        (`(t . _)
-         (treemacs-git-mode 'simple)))
-
-      (treemacs-hide-gitignored-files-mode nil))
-    :bind
-    (:map global-map
-          ("M-0"       . treemacs-select-window)
-          ("C-x t 1"   . treemacs-delete-other-windows)
-          ("s-b"       . treemacs)
-          ("s-\\"       . treemacs)
-          ("C-x t d"   . treemacs-select-directory)
-          ("C-x t B"   . treemacs-bookmark)
-          ("C-x t C-t" . treemacs-find-file)
-          ("C-x t M-t" . treemacs-find-tag)))
-
-
-  (use-package treemacs-projectile
-    :after (treemacs projectile)
-    :ensure t)
-
-  (use-package treemacs-magit
-    :after (treemacs magit)
-    :ensure t)
-
-#+end_src
-
-*** =Meow= Mode
-#+begin_src emacs-lisp
-  ;; (defun meow-setup ()
-  ;; (setq meow-cheatsheet-layout meow-cheatsheet-layout-qwerty)
-  ;; (meow-motion-overwrite-define-key
-  ;;  '("j" . meow-next)
-  ;;  '("k" . meow-prev)
-  ;;  '("<escape>" . ignore))
-  ;; (meow-leader-define-key
-  ;;  ;; SPC j/k will run the original command in MOTION state.
-  ;;  '("j" . "H-j")
-  ;;  '("k" . "H-k")
-  ;;  ;; Use SPC (0-9) for digit arguments.
-  ;;  '("1" . meow-digit-argument)
-  ;;  '("2" . meow-digit-argument)
-  ;;  '("3" . meow-digit-argument)
-  ;;  '("4" . meow-digit-argument)
-  ;;  '("5" . meow-digit-argument)
-  ;;  '("6" . meow-digit-argument)
-  ;;  '("7" . meow-digit-argument)
-  ;;  '("8" . meow-digit-argument)
-  ;;  '("9" . meow-digit-argument)
-  ;;  '("0" . meow-digit-argument)
-  ;;  '("/" . meow-keypad-describe-key)
-  ;;  '("?" . meow-cheatsheet))
-  ;; (meow-normal-define-key
-  ;;  '("0" . meow-expand-0)
-  ;;  '("9" . meow-expand-9)
-  ;;  '("8" . meow-expand-8)
-  ;;  '("7" . meow-expand-7)
-  ;;  '("6" . meow-expand-6)
-  ;;  '("5" . meow-expand-5)
-  ;;  '("4" . meow-expand-4)
-  ;;  '("3" . meow-expand-3)
-  ;;  '("2" . meow-expand-2)
-  ;;  '("1" . meow-expand-1)
-  ;;  '("-" . negative-argument)
-  ;;  '(";" . meow-reverse)
-  ;;  '("," . meow-inner-of-thing)
-  ;;  '("." . meow-bounds-of-thing)
-  ;;  '("[" . meow-beginning-of-thing)
-  ;;  '("]" . meow-end-of-thing)
-  ;;  '("a" . meow-append)
-  ;;  '("A" . meow-open-below)
-  ;;  '("b" . meow-back-word)
-  ;;  '("B" . meow-back-symbol)
-  ;;  '("c" . meow-change)
-  ;;  '("d" . meow-delete)
-  ;;  '("D" . meow-backward-delete)
-  ;;  '("e" . meow-next-word)
-  ;;  '("E" . meow-next-symbol)
-  ;;  '("f" . meow-find)
-  ;;  '("g" . meow-cancel-selection)
-  ;;  '("G" . meow-grab)
-  ;;  '("h" . meow-left)
-  ;;  '("H" . meow-left-expand)
-  ;;  '("i" . meow-insert)
-  ;;  '("I" . meow-open-above)
-  ;;  '("j" . meow-next)
-  ;;  '("J" . meow-next-expand)
-  ;;  '("k" . meow-prev)
-  ;;  '("K" . meow-prev-expand)
-  ;;  '("l" . meow-right)
-  ;;  '("L" . meow-right-expand)
-  ;;  '("m" . meow-join)
-  ;;  '("n" . meow-search)
-  ;;  '("o" . meow-block)
-  ;;  '("O" . meow-to-block)
-  ;;  '("p" . meow-yank)
-  ;;  '("q" . meow-quit)
-  ;;  '("Q" . meow-goto-line)
-  ;;  '("r" . meow-replace)
-  ;;  '("R" . meow-swap-grab)
-  ;;  '("s" . meow-kill)
-  ;;  '("t" . meow-till)
-  ;;  '("u" . meow-undo)
-  ;;  '("U" . meow-undo-in-selection)
-  ;;  '("v" . meow-visit)
-  ;;  '("w" . meow-mark-word)
-  ;;  '("W" . meow-mark-symbol)
-  ;;  '("x" . meow-line)
-  ;;  '("X" . meow-goto-line)
-  ;;  '("y" . meow-save)
-  ;;  '("Y" . meow-sync-grab)
-  ;;  '("z" . meow-pop-selection)
-  ;;  '("'" . repeat)
-  ;;  '("<escape>" . ignore)))
-  ;; (use-package meow
-  ;;   :ensure t
-  ;;   :config
-  ;;   (meow-setup)
-  ;;   (meow-global-mode 1))
 #+end_src
 
 ** Fonts
@@ -726,13 +533,6 @@ key bindings in the mode of your current buffer.
 #+end_src
 
 ** Better Window Navigation
-*** With =windmove=
-#+begin_src emacs-lisp
-  (global-set-key (kbd "C-s-h") 'windmove-left)
-  (global-set-key (kbd "C-s-j") 'windmove-down)
-  (global-set-key (kbd "C-s-k") 'windmove-up)
-  (global-set-key (kbd "C-s-l") 'windmove-right)
-#+end_src
 *** With =ace-window=
 #+begin_src emacs-lisp
     (use-package ace-window
@@ -764,14 +564,6 @@ key bindings in the mode of your current buffer.
   (use-package counsel-projectile
     :ensure t
     :config (counsel-projectile-mode))
-#+end_src
-
-** Line Height
-#+begin_src emacs-lisp
-  (defvar axiom--line-pixel-height (line-pixel-height)
-  "Line height in pixels.
-Used in various places to avoid getting wrong line height when
-`text-scale-mode' is active.")
 #+end_src
 
 * Searching and Fuzzy-Finding
@@ -852,9 +644,7 @@ It is very useful for figuring out how things work in Emacs.
 ** Magit
 #+begin_src emacs-lisp
   (use-package magit
-    :ensure t
-    :config
-    (global-set-key (kbd "C-c b") 'magit-blame)) ; Add shortcut for blame
+    :ensure t)
 
   (use-package forge
     :ensure t
@@ -875,8 +665,10 @@ It is very useful for figuring out how things work in Emacs.
   (use-package why-this
     :ensure t
     :custom (why-this-idle-delay 0)
-    :hook (org-mode . (lambda () (why-this-mode -1)))
-    :config (global-why-this-mode))
+    :hook (org-mode . (lambda () (why-this-mode -1))) ;blaming is kind of annoying in files meant to be documentation
+    :bind
+    ("C-c b" . why-this-mode)
+    ("C-c w" . why-this))
 #+end_src
 
 * Syntax Checking
@@ -954,7 +746,9 @@ It is very useful for figuring out how things work in Emacs.
 * LSP Features
 ** DAP-Mode
 #+begin_src emacs-lisp
-  (use-package posframe :ensure t)
+  (use-package posframe
+    :ensure t)
+
   (use-package dap-mode
     :ensure t
     :hook
@@ -1016,6 +810,7 @@ It is very useful for figuring out how things work in Emacs.
 #+begin_src emacs-lisp
   (use-package tree-sitter :ensure t
   :hook (prog-mode . tree-sitter-mode))
+
   (use-package tree-sitter-langs :ensure t)
 #+end_src
 
