@@ -992,5 +992,13 @@ It is very useful for figuring out how things work in Emacs.
     :straight auctex
     :ensure auctex
     :config
-    (setq TeX-auto-save t))
+    (setq TeX-auto-save t)
+    (setq-default TeX-engine 'xetex)
+    (setq-default TeX-PDF-mode t))
+
+  (use-package preview-latex
+    :defer t
+    :straight auctex
+    :ensure auctex)
+
 #+end_src
