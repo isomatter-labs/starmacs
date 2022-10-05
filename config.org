@@ -943,3 +943,13 @@ It is very useful for figuring out how things work in Emacs.
     :ensure t
     :hook (scala-mode . lsp-deferred))
 #+end_src
+
+** Tex
+#+begin_src emacs-lisp
+  (use-package tex
+    :defer t
+    :straight auctex
+    :ensure auctex
+    :config
+    (setq TeX-auto-save t))
+#+end_src
