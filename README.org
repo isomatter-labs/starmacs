@@ -13,7 +13,7 @@ but is more akin to Prelude, although much more amateur.
 
 ** Design Decisions
 *** One Big File
-Axiom's config lives in a single file: config.org.
+Axiom's config lives in a single file: =README.org=.
 This is entirely in an effort to make things easier to grok for new users.
 This way, there is only one file to be perused, and users need not be bothered to learn how packages work.
 
