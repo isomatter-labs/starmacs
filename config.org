@@ -1,5 +1,6 @@
 #+TITLE: Axiom -- An Emacs Config With as Little as Possible
 #+AUTHOR: Matthew Cooper Healy
+#+EMAIL: m.cooper.healy@gmail.com
 #+STARTUP: overview
 
 
@@ -237,45 +238,42 @@ I like to display a column ruler at common styleguide limits
 Org Mode is one of the hallmark features of Emacs. It is a rich document editor,
 project planner, task and time tracker, blogging engine, and literate coding
 utility all wrapped up in one package.
-
 **** Custom Numbering
 #+begin_src emacs-lisp
-    (defun writer-mode--num-format (numbering)
-      "Alternative numbering format for org-num.
-       First level: 1 | xxx
-       Second level: 1.1 — xxx
-       Third level: 1.1.1 - xxx
-       etc.
-      "
-      (if (= (length numbering) 1)
-          (propertize (concat (mapconcat
-                               #'number-to-string
-                               numbering ".") " | " )
-                      'face `(:family "IBM Plex Serif"
-                                      :foreground ,(face-foreground 'shadow nil t)))
+  (defun writer-mode--num-format (numbering)
+    "Alternative numbering format for org-num.
+     First level: 1 | xxx
+     Second level: 1.1 — xxx
+     Third level: 1.1.1 - xxx
+     etc.
+    "
+    (if (= (length numbering) 1)
         (propertize (concat (mapconcat
                              #'number-to-string
-                             numbering ".") " — " )
-                    'face `(:family "IBM Plex Serif"
+                             numbering ".") " | " )
+                    'face `(:family "CMU Serif"
                                     :foreground ,(face-foreground 'shadow nil t)))
-        (propertize (concat (mapconcat
-                             #'number-to-string
-                             numbering ".") " - ")
-                    'face `(:family "IBM Plex Serif"
-                                    :foreground , (face-foreground 'shadow nil t)))))
+      (propertize (concat (mapconcat
+                           #'number-to-string
+                           numbering ".") " — " )
+                  'face `(:family "CMU Serif"
+                                  :foreground ,(face-foreground 'shadow nil t)))))
 
-    ;; Specific face for headline stars
-    (font-lock-add-keywords 'writer-mode
-                            '(("^*+ " 0 `(:family "Roboto Mono"
-                                                  :height 140
-                                                  :foreground ,(face-foreground 'shadow nil t)) prepend)
-                              ) 'append)
+  (font-lock-add-keywords 'org-mode
+             '(("^*+ " 0 `(:family "CMU Serif"
+                           :height 140
+                           :foreground ,(face-foreground 'shadow nil t)) prepend)
+               ) 'append)
 
-    (setq org-num-skip-unnumbered t)
-    (setq org-num-skip-footnotes t)
-    (setq org-num-max-level 2)
-    (setq org-num-face nil)
-    (setq org-num-format-function 'writer-mode--num-format)
+  (setq org-num-skip-unnumbered t)
+  (setq org-num-skip-footnotes t)
+  (setq org-num-max-level 3)
+  (setq org-num-face nil)
+
+
+  (setq org-modern-hide-stars nil)
+  (setq org-modern-star nil)
+  (setq org-num-format-function 'writer-mode--num-format)
 
                             #+end_src
 **** Basic Config
@@ -289,7 +287,7 @@ explanation.
     :straight t
     :hook
     (org-mode . visual-line-mode)
-    ;(org-mode . variable-pitch-mode)
+    (org-mode . variable-pitch-mode)
     (org-mode . (lambda () (indent-tabs-mode -1)))
     (org-mode . org-num-mode)
 
@@ -309,6 +307,20 @@ explanation.
        " ┄┄┄┄┄ " "┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄")
      org-agenda-current-time-string
      "⭠ now ─────────────────────────────────────────────────")
+
+
+    (dolist (face '((org-level-1 . 1.2)
+                    (org-level-2 . 1.1)
+                    (org-level-3 . 1.3)
+                    (org-level-4 . 1.1)
+                    (org-level-5 . 1.05)
+                    (org-level-6 . 1.05)
+                    (org-level-7 . 1.05)
+                    (org-level-8 . 1.05)))
+      (set-face-attribute (car face) nil :font "CMU Serif" :weight 'regular :height (cdr face)))
+
+    (set-face-attribute 'org-document-title nil :inherit '(shadow variable-pitch) :height 1.2)
+    (set-face-attribute 'org-document-info nil :inherit '(shadow variable-pitch) :height 1.1)
 
     (set-face-attribute 'org-block nil :foreground nil :inherit 'fixed-pitch)
     (set-face-attribute 'org-code nil   :inherit '(shadow fixed-pitch))
@@ -505,14 +517,14 @@ Set up pixel-scrolling for a nice, modern-feeling experience (currently causing 
 
 *** Defaults
 #+begin_src emacs-lisp
-  (defvar axiom/fixed-pitch-height 130)
-  (defvar axiom/variable-pitch-height 140)
+  (defvar axiom/fixed-pitch-height 140)
+  (defvar axiom/variable-pitch-height 160)
 
   (defun axiom/setup-fonts ()
     (set-face-attribute 'default nil :font "IBM Plex Mono" :slant 'italic :height axiom/fixed-pitch-height)
     (set-face-attribute 'fixed-pitch nil :font "IBM Plex Mono" :slant 'italic :height axiom/fixed-pitch-height)
-    (if (member "IBM Plex Serif" (font-family-list))
-        (set-face-attribute 'variable-pitch nil :font "IBM Plex Serif" :height axiom/variable-pitch-height))
+    (if (member "CMU Serif" (font-family-list))
+        (set-face-attribute 'variable-pitch nil :font "CMU Serif" :height axiom/variable-pitch-height))
     (set-face-attribute 'font-lock-comment-face nil :foreground "#5B6268" :slant 'italic :weight 'light :font "IBM Plex Mono")
     (set-face-attribute 'mode-line nil
                         :weight 'extra-bold ;should be _very_ bold
