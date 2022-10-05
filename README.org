@@ -301,10 +301,10 @@ utility all wrapped up in one package.
                                   :foreground ,(face-foreground 'shadow nil t)))))
 
   (font-lock-add-keywords 'org-mode
-             '(("^*+ " 0 `(:family "CMU Serif"
-                           :height 140
-                           :foreground ,(face-foreground 'shadow nil t)) prepend)
-               ) 'append)
+                          '(("^*+ " 0 `(:family "CMU Serif"
+                                                :height 140
+                                                :foreground ,(face-foreground 'shadow nil t)) prepend)
+                            ) 'append)
 
   (setq org-num-skip-unnumbered t)
   (setq org-num-skip-footnotes t)
@@ -324,49 +324,50 @@ here so I'd recommend watching the videos for Part 5 and Part 6 for a full
 explanation.
 
 #+begin_src emacs-lisp
-  (use-package org
-    :straight t
-    :hook
-    (org-mode . visual-line-mode)
-    (org-mode . variable-pitch-mode)
-    (org-mode . (lambda () (indent-tabs-mode -1)))
-    (org-mode . org-num-mode)
+   (use-package org
+     :demand t
+     :straight t
+     :hook
+     (org-mode . visual-line-mode)
+     (org-mode . variable-pitch-mode)
+     (org-mode . (lambda () (indent-tabs-mode -1)))
+     (org-mode . org-num-mode)
 
-    :config
-    (setq
-     ;; Org styling, hide markup etc.
-     org-hide-emphasis-markers t
-     org-pretty-entities t
-     org-ellipsis "…"
+     :config
+     (setq
+      ;; Org styling, hide markup etc.
+      org-hide-emphasis-markers t
+      org-pretty-entities t
+      org-ellipsis "…"
 
-     ;; Agenda styling
-     org-agenda-tags-column 0
-     org-agenda-block-separator ?─
-     org-agenda-time-grid
-     '((daily today require-timed)
-       (800 1000 1200 1400 1600 1800 2000)
-       " ┄┄┄┄┄ " "┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄")
-     org-agenda-current-time-string
-     "⭠ now ─────────────────────────────────────────────────")
+      ;; Agenda styling
+      org-agenda-tags-column 0
+      org-agenda-block-separator ?─
+      org-agenda-time-grid
+      '((daily today require-timed)
+        (800 1000 1200 1400 1600 1800 2000)
+        " ┄┄┄┄┄ " "┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄")
+      org-agenda-current-time-string
+      "⭠ now ─────────────────────────────────────────────────")
 
 
-    (dolist (face '((org-level-1 . 1.20)
-                    (org-level-2 . 1.15)
-                    (org-level-3 . 1.10)
-                    (org-level-4 . 1.05)
-                    (org-level-5 . 1.05)
-                    (org-level-6 . 1.05)
-                    (org-level-7 . 1.05)
-                    (org-level-8 . 1.05)))
-      (set-face-attribute (car face) nil :font "CMU Serif" :weight 'regular :height (cdr face)))
+     (dolist (face '((org-level-1 . 1.20)
+                     (org-level-2 . 1.15)
+                     (org-level-3 . 1.10)
+                     (org-level-4 . 1.05)
+                     (org-level-5 . 1.05)
+                     (org-level-6 . 1.05)
+                     (org-level-7 . 1.05)
+                     (org-level-8 . 1.05)))
+       (set-face-attribute (car face) nil :font "CMU Serif" :weight 'regular :height (cdr face)))
 
-    (set-face-attribute 'org-document-title nil :inherit '(shadow variable-pitch) :height 1.2)
-    (set-face-attribute 'org-document-info nil :inherit '(shadow variable-pitch) :height 1.1)
+     (set-face-attribute 'org-document-title nil :inherit '(shadow variable-pitch) :height 1.2)
+     (set-face-attribute 'org-document-info nil :inherit '(shadow variable-pitch) :height 1.1)
 
-    (set-face-attribute 'org-block nil :foreground nil :inherit 'fixed-pitch)
-    (set-face-attribute 'org-code nil   :inherit '(shadow fixed-pitch))
-    (set-face-attribute 'org-table nil   :inherit '(shadow fixed-pitch))
-    (set-face-attribute 'org-verbatim nil :inherit '(shadow fixed-pitch)))
+     (set-face-attribute 'org-block nil :foreground nil :inherit 'fixed-pitch)
+     (set-face-attribute 'org-code nil   :inherit '(shadow fixed-pitch))
+     (set-face-attribute 'org-table nil   :inherit '(shadow fixed-pitch))
+     (set-face-attribute 'org-verbatim nil :inherit '(shadow fixed-pitch)))
  #+end_src
 
 **** Org-Modern
@@ -420,7 +421,7 @@ so you can remove the block below if you don't like the behavior.
   (tooltip-mode -1)           ; Disable tooltips
   (set-fringe-mode 10)        ; Give some breathing room
 
-  (menu-bar-mode -1)          ; Disable the menu bar
+  ;(menu-bar-mode -1)          ; Disable the menu bar
 
   (toggle-frame-maximized)    ; Always start maximized
 
@@ -960,11 +961,15 @@ It is very useful for figuring out how things work in Emacs.
 
 ** Scala
 #+begin_src emacs-lisp
-    ;; Enable scala-mode for highlighting, indentation and motion commands
+  ;; Enable scala-mode for highlighting, indentation and motion commands
   (use-package scala-mode
     :ensure t
+    :hook (scala-mode . company-mode)
     :interpreter
-      ("scala" . scala-mode))
+    ("scala" . scala-mode)
+    :config
+    :config
+    (setq lsp-completion-provider :capf))
 
   ;; Enable sbt mode for executing sbt commands
   (use-package sbt-mode
@@ -977,8 +982,8 @@ It is very useful for figuring out how things work in Emacs.
      'minibuffer-complete-word
      'self-insert-command
      minibuffer-local-completion-map)
-     ;; sbt-supershell kills sbt-mode:  https://github.com/hvesalai/emacs-sbt-mode/issues/152
-     (setq sbt:program-options '("-Dsbt.supershell=false")))
+    ;; sbt-supershell kills sbt-mode:  https://github.com/hvesalai/emacs-sbt-mode/issues/152
+    (setq sbt:program-options '("-Dsbt.supershell=false")))
 
   (use-package lsp-metals
     :ensure t
