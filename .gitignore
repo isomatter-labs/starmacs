@@ -4,7 +4,7 @@ transient
 elpa
 magithub
 auto-save-list
-config.el
+README.el
 treemacs-atom-theme.el
 bookmarks
 .last-package-update-day
