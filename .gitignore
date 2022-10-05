@@ -13,3 +13,7 @@ bookmarks
 .lsp-session-*
 forge-database.sqlite
 quelpa
+.dap-breakpoints
+history
+straight/
+url/
