@@ -1,0 +1,996 @@
+#+TITLE: Axiom -- An Emacs Config With as Little as Possible
+#+AUTHOR: Matthew Cooper Healy
+#+EMAIL: m.cooper.healy@gmail.com
+#+STARTUP: overview
+
+
+* What is Axiom?
+Axiom is yet another set of defaults for emacs, with one (and only one) purpose:
+it attempts to get out of your way, and add as little magic as possible.
+
+Axiom is not a full distribution, like Doom or Spacemacs,
+but is more akin to Prelude, although much more amateur.
+
+** Design Decisions
+*** One Big File
+Axiom's config lives in a single file: config.org.
+This is entirely in an effort to make things easier to grok for new users.
+This way, there is only one file to be perused, and users need not be bothered to learn how packages work.
+
+The use of an org file rather than an elisp file is to improve discoverability.
+Users can simply expand and collapse sections to painlessly explore the configuration.
+
+** Included Packages
+Axiom intends to be a set of sane defaults for emacs, and nothing more.
+As such, dependency on packages is minimized as much as is practical.
+
+Ideally, Axiom is mostly an aesthetic overhaul,
+with the only major functional changes being the inclusion of Ivy, magit and eglot.
+
+This is intended to allow a new emacs user to learn emacs (and not a custom layer sitting on it)
+without sacrificing the kinds of features present in their old editor.
+LSP is only becoming more relevant, and magit is the only thing close to the kind of git-integration
+that is becoming expected in the modern world of editors.
+
+Ivy is chosen as a way to improve the average interface to emacs,
+helping to ease the transition without adding features that could become a crutch.
+
+** Extras
+Settings for some languages have been pre-configured (primarily Python) this is unabashedly because they are languages I use often, and Axiom is developed primarily for my own use.
+
+** Things You May Prefer
+Axiom is not necessarily for everyone; you may prefer one of the following:
+
+[[https://spacemacs.org][Spacemacs]]
+[[https://github.com/hlissner/doom-emacs][Doom Emacs]]
+[[https://github.com/bbatsov/prelude][Prelude]]
+
+* Package Management
+** Package Repositories
+We assume that we will want packages from MELPA, the most popular emacs package registry, as well as ELPA, the official GNU repository, and MELPA Stable (which is exactly what it sounds like).
+#+begin_src emacs-lisp
+  (require 'package)
+  (setq package-archives
+        '(("MELPA Stable" . "https://stable.melpa.org/packages/")
+          ("GNU ELPA"     . "https://elpa.gnu.org/packages/")
+          ("MELPA"        . "https://melpa.org/packages/"))
+        package-archive-priorities
+        '(("GNU ELPA"     . 10)
+          ("MELPA"        . 0)))
+
+  (add-to-list 'load-path "~/.emacs.d/modules") ; add local files
+#+end_src
+
+** =straight.el=
+*** Bootstrap =straight=
+#+begin_src emacs-lisp
+  (defvar bootstrap-version)
+  (let ((bootstrap-file
+         (expand-file-name "straight/repos/straight.el/bootstrap.el" user-emacs-directory))
+        (bootstrap-version 5))
+    (unless (file-exists-p bootstrap-file)
+      (with-current-buffer
+          (url-retrieve-synchronously
+           "https://raw.githubusercontent.com/raxod502/straight.el/develop/install.el"
+           'silent 'inhibit-cookies)
+        (goto-char (point-max))
+        (eval-print-last-sexp)))
+    (load bootstrap-file nil 'nomessage))
+    #+end_src
+
+*** Integrate with =use-package=
+#+begin_src emacs-lisp
+  (straight-use-package 'use-package)
+  (setq straight-use-package-by-default t)
+#+end_src
+
+* Quality of Life Improvements
+** Keep Buffers Up to Date with Files
+When files on disk change, open buffers should be automatically updated to reflect those changes.
+#+begin_src emacs-lisp
+  (global-auto-revert-mode t)
+#+end_src
+
+** Do Not Create Extra Files
+Don't create =backup~= or =#autosave#= files
+#+begin_src emacs-lisp
+  (setq make-backup-files nil)
+  (setq auto-save-default nil)
+#+end_src
+
+** Add path to extra binaries
+#+begin_src emacs-lisp
+  (defun set-exec-path-from-shell-PATH ()
+    "Set up Emacs' `exec-path' and PATH environment variable to match
+  that used by the user's shell.
+
+  This is particularly useful under Mac OS X and macOS, where GUI
+  apps are not started from a shell."
+    (interactive)
+    (let ((path-from-shell
+           (replace-regexp-in-string "[ \t\n]*$" ""
+                                     (shell-command-to-string "$SHELL --login -c 'echo $PATH'"))))
+      (setenv "PATH" path-from-shell)
+      (setq exec-path (split-string path-from-shell path-separator))))
+
+  (set-exec-path-from-shell-PATH)
+  (setenv "PATH" (concat (getenv "PATH") ":/opt/anaconda3/bin"))
+  (setq exec-path (append exec-path '("/opt/anaconda3/bin")))
+#+end_src
+
+** Replace Selection
+When text is highlighted, typing should delete the highlighted text and insert what is typed.
+#+begin_src emacs-lisp
+  (delete-selection-mode 1)
+#+end_src
+
+** Usage Guides
+=discover.el= mostly just helps with =dired= mode, but it's worth including for new users.
+#+begin_src emacs-lisp
+  (use-package discover
+    :ensure t
+    :config
+    (global-discover-mode 1))
+#+end_src
+
+** Mouse in Terminal
+#+begin_src emacs-lisp
+  (xterm-mouse-mode 1)
+#+end_src
+
+** Whitespace
+#+begin_src emacs-lisp
+  (add-hook 'prog-mode-hook (lambda () (setq show-trailing-whitespace t)))
+  (add-hook 'before-save-hook 'delete-trailing-whitespace)
+  ;; whitespace-space-regexp will only work with selective highlighting, not with space-mark
+                                          ;(setq whitespace-space-regexp "\\( \\{2,\\}\\)")
+  (setq whitespace-style (quote (face tabs newline tab-mark newline-mark)))
+  (custom-set-faces
+   '(whitespace-tab((t (:foreground "#E06C75")))) ; make tabs _very_ noticable
+   '(whitespace-space((t (:foreground "#525252"))))
+   '(whitespace-newline((t (:foreground "#525252")))))
+  (setq whitespace-display-mappings
+        '((space-mark 32 [183] [46])
+          (newline-mark 10 [172 10])
+          (tab-mark 9 [187 9] [92 9])))
+  (global-whitespace-mode 1)
+#+end_src
+
+** Column Ruler
+I like to display a column ruler at common styleguide limits
+(famously, 80 characters, but also often 100 and 120 characters).
+#+begin_src emacs-lisp
+  ;; (add-hook 'prog-mode-hook #'display-fill-column-indicator-mode)
+#+end_src
+
+** Email
+#+begin_src emacs-lisp
+  ;; load mu4e from the installation path.
+  ;; yours might differ check with the Emacs installation
+  ;; (use-package mu4e
+  ;;   :load-path  "/usr/local/share/emacs/site-lisp/mu/mu4e/"
+  ;;   :config
+
+  ;;   ;; for sending mails
+  ;;   (require 'smtpmail)
+
+  ;;   (setq mu4e-mu-binary (executable-find "mu"))
+  ;;   (setq mu4e-maildir "~/.maildir")
+  ;;   (setq mu4e-get-mail-command (concat (executable-find "mbsync") " -a"))
+  ;;   (setq mu4e-update-interval 300)
+  ;;   (setq mu4e-attachment-dir "~/Desktop")
+  ;;   (setq mu4e-change-filenames-when-moving t)
+  ;;   (setq mu4e-user-mail-address-list '("m.cooepr.healy@gmail.com"))
+
+  ;;   ;; check your ~/.maildir to see how the subdirectories are called
+  ;;   (setq   mu4e-maildir-shortcuts
+  ;;           '(("/gmail/INBOX" . ?g)
+  ;;             ("/gmail/[Gmail]/Sent Mail" . ?G)))
+
+  ;;   ;; the following is to show shortcuts in the main view.
+  ;;   ;; (add-to-list 'mu4e-bookmarks
+  ;;   ;;              (make-mu4e-bookmark
+  ;;   ;;               :name "Inbox - Gmail"
+  ;;   ;;               :query "maildir:/gmail/INBOX"
+  ;;   ;;               :key ?g))
+
+  ;;   ;; gpg encryptiom & decryption:
+  ;;   (require 'epa-file)
+  ;;   (epa-file-enable)
+  ;;   (setq epa-pinentry-mode 'loopback)
+  ;;   (auth-source-forget-all-cached)
+
+  ;;   ;; don't keep message compose buffers around after sending:
+  ;;   (setq message-kill-buffer-on-exit t)
+
+  ;;   ;; send function:
+  ;;   (setq send-mail-function 'sendmail-send-it
+  ;;         message-send-mail-function 'sendmail-send-it)
+
+  ;;   ;; send program:
+  ;;   (setq sendmail-program (executable-find "msmtp"))
+
+  ;;   ;; select the right sender email from the context.
+  ;;   (setq message-sendmail-envelope-from 'header)
+
+  ;;   ;; chose from account before sending
+  ;;   ;; this is a custom function that works for me.
+  ;;   ;; well I stole it somewhere long ago.
+  ;;   ;; I suggest using it to make matters easy
+  ;;   ;; of course adjust the email adresses and account descriptions
+  ;;   (defun timu/set-msmtp-account ()
+  ;;     (if (message-mail-p)
+  ;;         (save-excursion
+  ;;           (let*
+  ;;               ((from (save-restriction
+  ;;                        (message-narrow-to-headers)
+  ;;                        (message-fetch-field "from")))
+  ;;                (account
+  ;;                 (cond
+  ;;                  ((string-match "m.cooper.healy@gmail.com" from) "gmail"))))
+  ;;             (setq message-sendmail-extra-arguments (list '"-a" account))))))
+
+  ;;   (add-hook 'message-send-mail-hook 'timu/set-msmtp-account)
+
+  ;;   ;; mu4e cc & bcc
+  ;;   ;; this is custom as well
+  ;;   (add-hook 'mu4e-compose-mode-hook
+  ;;             (defun timu/add-cc-and-bcc ()
+  ;;               "My Function to automatically add Cc & Bcc: headers.
+  ;;       This is in the mu4e compose mode."
+  ;;               (save-excursion (message-add-header "Cc:\n"))
+  ;;               (save-excursion (message-add-header "Bcc:\n"))))
+
+  ;;   ;; mu4e address completion
+  ;;   (add-hook 'mu4e-compose-mode-hook 'company-mode))
+    #+end_src
+
+** Look
+*** Theme
+#+begin_src emacs-lisp
+  (defvar axiom/current-theme 'dark)
+
+  (use-package doom-themes
+    :ensure t
+    :config
+    (setq doom-themes-enable-bold t
+          doom-themes-enable-italic t)
+    (doom-themes-visual-bell-config)
+    (doom-themes-org-config)
+    (if (window-system)
+        (load-theme 'doom-one t))) ; Only load in GUI to reduce issues with comment-coloring
+
+  (defun axiom/toggle-theme ()
+    (interactive)
+    (cond
+     ((eq axiom/current-theme 'dark) (progn
+                                       (load-theme 'doom-one-light t)
+                                       (setq axiom/current-theme 'light)
+                                       (axiom/setup-fonts)))
+     ((eq axiom/current-theme 'light) (progn
+                                        (load-theme 'doom-one t)
+                                        (setq axiom/current-theme 'dark)
+                                        (axiom/setup-fonts)))))
+
+  (global-set-key (kbd "C-M-S-t") 'axiom/toggle-theme)
+#+end_src
+
+*** Org Mode
+Org Mode is one of the hallmark features of Emacs. It is a rich document editor,
+project planner, task and time tracker, blogging engine, and literate coding
+utility all wrapped up in one package.
+**** Custom Numbering
+#+begin_src emacs-lisp
+  (defun writer-mode--num-format (numbering)
+    "Alternative numbering format for org-num.
+     First level: 1 | xxx
+     Second level: 1.1 — xxx
+     Third level: 1.1.1 - xxx
+     etc.
+    "
+    (if (= (length numbering) 1)
+        (propertize (concat (mapconcat
+                             #'number-to-string
+                             numbering ".") " | " )
+                    'face `(:family "CMU Serif"
+                                    :foreground ,(face-foreground 'shadow nil t)))
+      (propertize (concat (mapconcat
+                           #'number-to-string
+                           numbering ".") " — " )
+                  'face `(:family "CMU Serif"
+                                  :foreground ,(face-foreground 'shadow nil t)))))
+
+  (font-lock-add-keywords 'org-mode
+             '(("^*+ " 0 `(:family "CMU Serif"
+                           :height 140
+                           :foreground ,(face-foreground 'shadow nil t)) prepend)
+               ) 'append)
+
+  (setq org-num-skip-unnumbered t)
+  (setq org-num-skip-footnotes t)
+  (setq org-num-max-level 3)
+  (setq org-num-face nil)
+
+
+  (setq org-modern-hide-stars nil)
+  (setq org-modern-star nil)
+  (setq org-num-format-function 'writer-mode--num-format)
+
+                            #+end_src
+**** Basic Config
+This section contains the basic configuration for org-mode plus the
+configuration for Org agendas and capture templates. There's a lot to unpack in
+here so I'd recommend watching the videos for Part 5 and Part 6 for a full
+explanation.
+
+#+begin_src emacs-lisp
+  (use-package org
+    :straight t
+    :hook
+    (org-mode . visual-line-mode)
+    (org-mode . variable-pitch-mode)
+    (org-mode . (lambda () (indent-tabs-mode -1)))
+    (org-mode . org-num-mode)
+
+    :config
+    (setq
+     ;; Org styling, hide markup etc.
+     org-hide-emphasis-markers t
+     org-pretty-entities t
+     org-ellipsis "…"
+
+     ;; Agenda styling
+     org-agenda-tags-column 0
+     org-agenda-block-separator ?─
+     org-agenda-time-grid
+     '((daily today require-timed)
+       (800 1000 1200 1400 1600 1800 2000)
+       " ┄┄┄┄┄ " "┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄")
+     org-agenda-current-time-string
+     "⭠ now ─────────────────────────────────────────────────")
+
+
+    (dolist (face '((org-level-1 . 1.20)
+                    (org-level-2 . 1.15)
+                    (org-level-3 . 1.10)
+                    (org-level-4 . 1.05)
+                    (org-level-5 . 1.05)
+                    (org-level-6 . 1.05)
+                    (org-level-7 . 1.05)
+                    (org-level-8 . 1.05)))
+      (set-face-attribute (car face) nil :font "CMU Serif" :weight 'regular :height (cdr face)))
+
+    (set-face-attribute 'org-document-title nil :inherit '(shadow variable-pitch) :height 1.2)
+    (set-face-attribute 'org-document-info nil :inherit '(shadow variable-pitch) :height 1.1)
+
+    (set-face-attribute 'org-block nil :foreground nil :inherit 'fixed-pitch)
+    (set-face-attribute 'org-code nil   :inherit '(shadow fixed-pitch))
+    (set-face-attribute 'org-table nil   :inherit '(shadow fixed-pitch))
+    (set-face-attribute 'org-verbatim nil :inherit '(shadow fixed-pitch)))
+ #+end_src
+
+**** Org-Modern
+#+begin_src emacs-lisp
+  (use-package org-modern
+    :ensure t
+    :hook
+    (org-mode . org-modern-mode)
+    (org-agenda-finalize . org-modern-agenda))
+#+end_src
+
+**** Center Org Buffers
+Here, visual-fill-column is used to center org-mode buffers for a more pleasing writing
+experience as it centers the contents of the buffer horizontally to seem more
+like you are editing a document. This is really a matter of personal preference
+so you can remove the block below if you don't like the behavior.
+#+begin_src emacs-lisp
+  (defun axiom/org-mode-visual-fill ()
+    (setq visual-fill-column-width 150
+          visual-fill-column-center-text t
+          visual-fill-column-fringes-outside-margins nil)
+    (visual-fill-column-mode 1))
+
+  (use-package visual-fill-column
+    :ensure t
+    :hook (org-mode . axiom/org-mode-visual-fill))
+#+end_src
+
+*** Markdown
+#+begin_src emacs-lisp
+  (use-package markdown-mode
+    :ensure t
+    :mode ("README\\.md\\'" . gfm-mode)
+    :init (setq markdown-command "multimarkdown"))
+#+end_src
+
+*** Modeline
+#+begin_src emacs-lisp
+  (use-package doom-modeline
+    :ensure t
+    :init (doom-modeline-mode 1)
+    :custom ((doom-modeline-height 15)))
+#+end_src
+
+*** Quality of Life
+#+begin_src emacs-lisp
+  (setq inhibit-startup-message t)
+
+  (scroll-bar-mode -1)        ; Disable visible scrollbar
+  (tool-bar-mode -1)          ; Disable the toolbar
+  (tooltip-mode -1)           ; Disable tooltips
+  (set-fringe-mode 10)        ; Give some breathing room
+
+  (menu-bar-mode -1)          ; Disable the menu bar
+
+  (toggle-frame-maximized)    ; Always start maximized
+
+  ;; Set up the visible bell
+  (setq visible-bell t)
+
+  (column-number-mode)
+  (global-display-line-numbers-mode t)
+
+  ;; Disable line numbers for some modes
+  (dolist (mode '(org-mode-hook
+                  term-mode-hook
+                  shell-mode-hook
+                  treemacs-mode-hook
+                  eshell-mode-hook))
+    (add-hook mode (lambda () (display-line-numbers-mode 0))))
+#+end_src
+
+*** Scrolling
+Set up pixel-scrolling for a nice, modern-feeling experience (currently causing lag on long files)
+#+begin_src emacs-lisp
+  ;(pixel-scroll-mode 1)
+#+end_src
+
+*** Cursor
+#+begin_src emacs-lisp
+  (setq-default cursor-type '(bar . 1))
+#+end_src
+
+*** Truncate, Don't Wrap
+#+begin_src emacs-lisp
+  (set-default 'truncate-lines t)
+  (define-fringe-bitmap 'right-arrow
+    [#b00000000
+     #b00011000
+     #b00111100
+     #b01111110
+     #b01111110
+     #b00111100
+     #b00011000
+     #b00000000])
+  (define-fringe-bitmap 'left-arrow
+    [#b00000000
+     #b00011000
+     #b00111100
+     #b01111110
+     #b01111110
+     #b00111100
+     #b00011000
+     #b00000000])
+#+end_src
+
+*** Focus Line
+#+begin_src emacs-lisp
+  (if (window-system)
+      (global-hl-line-mode 1))
+#+end_src
+
+*** Dashboard
+#+begin_src emacs-lisp
+  (defun no-linum ()
+    (display-line-numbers-mode -1))
+
+  (use-package dashboard
+    :ensure t
+    :config
+    (setq dashboard-banner-logo-title "Welcome to Emacs, A hackable text editor for the 21st Century!")
+    (setq initial-buffer-choice (lambda () (get-buffer "*dashboard*"))) ; for emacs daemon
+    (setq dashboard-items '((projects . 5)
+                            (recents . 5)
+                            (agenda . 5)))
+    (dashboard-modify-heading-icons '((recents . "file-text")))
+    (setq dashboard-set-navigator t)
+    (setq dashboard-set-file-icons t)
+    (setq dashboard-startup-banner "~/.emacs.d/img/emacs.png") ; set to path to image file to customize
+    (setq dashboard-set-footer nil)
+    (dashboard-setup-startup-hook)
+    (setq dashboard-center-content t)
+    (add-hook 'dashboard-mode-hook 'no-linum)) ; turn off line numbers for dashboard
+#+end_src
+
+*** Rainbow Delimiters
+#+begin_src emacs-lisp
+  (use-package rainbow-delimiters
+    :ensure t
+    :hook
+    (prog-mode . rainbow-delimiters-mode)
+    (org-mode . rainbow-delimiters-mode))
+#+end_src
+
+** Fonts
+*** =font-installed-p=
+#+begin_src emacs-lisp
+  (defun axiom/font-installed-p (font-name)
+    (find-font (font-spec :name font-name)))
+#+end_src
+
+*** Installing
+#+begin_src emacs-lisp
+  (defun install-plex ()
+    (when (and (window-system) ( not (string-equal system-type "windows-nt")))
+      (progn
+        (message "Installing IBM Plex -- You might want to grab a cup of something...")
+        (call-process "/bin/bash" nil nil nil "-c" "wget 'https://github.com/IBM/plex/releases/download/v6.0.2/OpenType.zip' -O ~/.emacs.d/fonts/plex.zip")
+        (call-process "/bin/bash" nil nil nil "-c" "unzip ~/.emacs.d/fonts/plex.zip -d ~/.local/share/fonts")
+        (call-process "/bin/bash" nil nil nil "-c" "rm ~/.emacs.d/fonts/plex.zip")
+        (message "Installed IBM Plex"))))
+
+  (defun cache-fonts ()
+    (unless
+        (string-equal system-type "windows-nt")
+      (progn
+        (message "Running fc-cache -f")
+        (call-process "/bin/bash" nil nil nil "-c" "fc-cache -f")
+        (message "Fonts installed"))))
+
+  (unless (window-system)
+    (progn
+      (unless (file-directory-p "~/.local/share/fonts")
+        (make-directory "~/.local/share/fonts" :parents))
+      (unless (member "IBM Plex Mono" (font-family-list))
+        (install-plex))
+      (cache-fonts)))
+#+end_src
+
+*** All the Icons
+#+begin_src emacs-lisp
+  (use-package all-the-icons
+    :ensure t
+    :config
+    (when (and (not (axiom/font-installed-p "all-the-icons"))
+               (window-system))
+      (all-the-icons-install-fonts t)))
+#+end_src
+
+*** Defaults
+#+begin_src emacs-lisp
+  (defvar axiom/fixed-pitch-height 140)
+  (defvar axiom/variable-pitch-height 160)
+
+  (defun axiom/setup-fonts ()
+    (set-face-attribute 'default nil :font "IBM Plex Mono" :slant 'italic :height axiom/fixed-pitch-height)
+    (set-face-attribute 'fixed-pitch nil :font "IBM Plex Mono" :slant 'italic :height axiom/fixed-pitch-height)
+    (if (member "CMU Serif" (font-family-list))
+        (set-face-attribute 'variable-pitch nil :font "CMU Serif" :height axiom/variable-pitch-height))
+    (set-face-attribute 'font-lock-comment-face nil :foreground "#5B6268" :slant 'italic :weight 'light :font "IBM Plex Mono")
+    (set-face-attribute 'mode-line nil
+                        :weight 'extra-bold ;should be _very_ bold
+                        :font "IBM Plex Mono"     ;same font
+                        :height 1.05))       ;should be a little larger than regular text
+
+  (axiom/setup-fonts)
+
+#+end_src
+
+** SQL Highlighting
+#+begin_src emacs-lisp
+  (add-to-list 'auto-mode-alist '("\\.sqli\\'" . sql-mode))
+  (use-package mmm-mode
+    :ensure t
+    :custom
+    (mmm-global-mode 'maybe)
+    :config
+    (set-face-background 'mmm-default-submode-face nil)
+    (mmm-add-classes
+      '((embedded-sql
+        :submode sql-mode
+        :face mmm-code-submode-face
+        :front "\\(--SQL\\)"
+        :back "\\(--SQL-END\\)")))
+    (mmm-add-mode-ext-class 'prog-mode nil 'embedded-sql))
+
+#+end_src
+
+** Quick Reload
+#+begin_src emacs-lisp
+  (defun revert-buffer-no-confirm ()
+    "Revert the current buffer without asking permission"
+    (interactive)
+    (revert-buffer :ignore-auto :noconfirm))
+
+  (global-set-key (kbd "<f5>") 'revert-buffer-no-confirm)
+  (global-set-key (kbd "s-r") 'revert-buffer-no-confirm)
+#+end_src
+
+** Which Key
+which-key is a useful UI panel that appears when you start pressing any key
+binding in Emacs to offer you all possible completions for the prefix.
+For example, if you press =C-c= (hold control and press the letter c), a panel
+will appear at the bottom of the frame displaying all of the bindings under that
+prefix and which command they run. This is very useful for learning the possible
+key bindings in the mode of your current buffer.
+
+#+begin_src emacs-lisp
+  (use-package which-key
+    :ensure t
+    :init (which-key-mode)
+    :diminish which-key-mode
+    :config
+    (setq which-key-idle-delay 1))
+#+end_src
+
+** Better Window Navigation
+*** With =ace-window=
+#+begin_src emacs-lisp
+    (use-package ace-window
+      :ensure t
+      :config
+      (global-set-key (kbd "C-x o") 'ace-window))
+#+end_src
+
+* Project-Management
+** Projectile
+#+begin_src emacs-lisp
+  (use-package projectile
+    :ensure t
+    :diminish projectile-mode
+    :config (projectile-mode)
+    :custom
+    (projectile-completion-system 'ivy)
+    (projectile-enable-caching t)
+    (projectile-indexing-method 'alien)
+    :bind-keymap
+    ("C-c p" . projectile-command-map)
+    :init
+    (when (file-directory-p "~/Development")
+      (setq projectile-project-search-path '("~/Development")))
+    (setq projectile-switch-project-action #'projectile-dired)
+    :config
+    (projectile-global-mode))
+
+  (use-package counsel-projectile
+    :ensure t
+    :config (counsel-projectile-mode))
+#+end_src
+
+* Searching and Fuzzy-Finding
+** Ivy
+#+begin_src emacs-lisp
+  (use-package ivy
+    :ensure t
+    :diminish
+    :bind (("C-s" . swiper)
+           :map ivy-minibuffer-map
+           ("TAB" . ivy-alt-done)
+           ("C-l" . ivy-alt-done)
+           ("C-j" . ivy-next-line)
+           ("C-k" . ivy-previous-line)
+           :map ivy-switch-buffer-map
+           ("C-k" . ivy-previous-line)
+           ("C-l" . ivy-done)
+           ("C-d" . ivy-switch-buffer-kill)
+           :map ivy-reverse-i-search-map
+           ("C-k" . ivy-previous-line)
+           ("C-d" . ivy-reverse-i-search-kill))
+    :custom
+    (ivy-use-virtual-buffers t)           ; add ‘recentf-mode' and bookmarks to ‘ivy-switch-buffer'.
+    (ivy-count-format "")                 ; does not count candidates
+    (ivy-initial-inputs-alist nil)        ; no regexp by default
+    (ivy-re-builders-alist                ; configure regexp engine.
+     '((t . ivy--regex-ignore-order)))   ; allow input not in order
+    :config
+    (ivy-mode 1))
+
+  (use-package ivy-rich
+    :ensure t
+    :init
+    (ivy-rich-mode 1))
+
+  (use-package counsel
+    :ensure t
+    :bind (:map minibuffer-local-map
+                ("C-r" . 'counsel-minibuffer-history)
+                ("M-x" . counsel-M-x)
+                ("C-c k" . counsel-ag)
+                ("C-h a" . counsel-apropos)
+                ("C-x C-f" . counsel-find-file)
+                ("C-x b" . ivy-switch-buffer))
+    :config
+    (counsel-mode 1))
+
+  (use-package swiper
+    :ensure t
+    :bind*
+    ("C-s" . swiper-isearch)
+    ("C-r" . swiper-isearch-backward)) ; replace standard search functionality
+#+end_src
+
+**
+
+** Helpful Help Commands
+Helpful adds a lot of very helpful (get it?) information to Emacs' describe-
+command  buffers. For example, if you use describe-function, you will not only
+get the documentation about the function, you will also see the source code of
+the function and where it gets used in other places in the Emacs configuration.
+It is very useful for figuring out how things work in Emacs.
+
+#+begin_src emacs-lisp
+  (use-package helpful
+    :ensure t
+    :custom
+    (counsel-describe-function-function #'helpful-callable)
+    (counsel-describe-variable-function #'helpful-variable)
+    :bind
+    ([remap describe-function] . counsel-describe-function)
+    ([remap describe-command]  . helpful-command)
+    ([remap describe-variable] . counsel-describe-variable)
+    ([remap describe-key]      . helpful-key))
+#+end_src
+
+* Git/Github
+** Magit
+#+begin_src emacs-lisp
+  (use-package magit
+    :ensure t)
+
+  (use-package forge
+    :ensure t
+    :after magit)
+#+end_src
+
+** Highlight Git diffs in the gutter
+#+begin_src emacs-lisp
+      (use-package diff-hl
+        :ensure t
+        :config
+        (global-diff-hl-mode))
+#+end_src
+
+** Why This?
+=why-this= shows blam information for the currently selected line (or region) along the right side of the current line
+#+begin_src emacs-lisp
+  (use-package why-this
+    :ensure t
+    :custom (why-this-idle-delay 0)
+    :hook (org-mode . (lambda () (why-this-mode -1))) ;blaming is kind of annoying in files meant to be documentation
+    :bind
+    ("C-c b" . why-this-mode)
+    ("C-c w" . why-this))
+#+end_src
+
+* Syntax Checking
+** Flycheck
+#+begin_src emacs-lisp
+  (use-package flycheck
+      :ensure t
+      :custom (flycheck-check-syntax-automatically '(save mode-enabled))
+      :init (global-flycheck-mode))
+
+  (defvar-local axiom--mode-line-flycheck "")
+
+  (defun axiom/mode-line-update-flycheck (&rest _)
+    (setq axiom--mode-line-flycheck
+          (if (bound-and-true-p flycheck-mode)
+              (concat
+               "  "
+               (pcase flycheck-last-status-change
+                 (`not-checked (propertize "-/-" 'help-echo "Flycheck: not checked"))
+                 (`no-checker (propertize "-" 'help-echo "Flycheck: no checker"))
+                 (`running (propertize "*/*" 'help-echo "Flycheck: checking"))
+                 (`errored (propertize "!" 'help-echo "Flycheck: error"))
+                 (`finished
+                  (let-alist (flycheck-count-errors flycheck-current-errors)
+                    (propertize (format "%s/%s" (or .error 0) (or .warning 0))
+                                'help-echo (if (or .error .warning)
+                                               (concat "Flycheck: "
+                                                       (when .error (format "%d errors%s" .error (if .warning ", " "")))
+                                                       (when .warning (format "%d warnings" .warning))
+                                                       "\nmouse-1: list errors")
+                                             "Flycheck: no errors or warnings")
+                                'local-map 'flycheck-error-list-mode-line-map)))
+                 (`interrupted (propertize "x" 'help-echo "Flycheck: interrupted"))
+                 (`suspicious (propertize "?" 'help-echo "Flycheck: suspicious"))))
+            "")))
+
+  (add-hook 'flycheck-status-changed-functions #'axiom/mode-line-update-flycheck)
+  (add-hook 'flycheck-mode-hook #'axiom/mode-line-update-flycheck)
+#+end_src
+
+* Auto-Completion
+** Company-mode
+#+begin_src emacs-lisp
+    (use-package company
+      :ensure t
+      :after lsp
+      :hook (lsp-mode . company-mode)
+      :bind (:map company-active-map
+            ("<tab>" . company-complete-selection)
+            ("C-j" . company-select-next)
+            ("C-k" . company-select-previous))
+            (:map lsp-mode-map
+            ("<tab>" . company-indent-or-complete-common))
+      :custom
+      (company-minimum-prefix-length 1)
+      (company-idle-delay 0.0)
+      (company-tooltip-align-annotations t)
+      (company-show-quick-access t))
+
+    (use-package company-box
+      :ensure t
+      :hook (company-mode . company-box-mode))
+#+end_src
+
+* Tab to Complete
+#+begin_src emacs-lisp
+(setq tab-always-indent 'complete)
+#+end_src
+
+* Open Emacs GUI above terminal
+#+begin_src emacs-lisp
+  (x-focus-frame nil)
+#+end_src
+
+* LSP Features
+** DAP-Mode
+#+begin_src emacs-lisp
+  (use-package posframe
+    :ensure t)
+
+  (use-package dap-mode
+    :ensure t
+    :hook
+    (lsp-mode . dap-mode)
+    (lsp-mode . dap-ui-mode))
+#+end_src
+
+** LSP-Mode
+#+begin_src emacs-lisp
+  (use-package lsp-mode
+    :ensure t
+    :commands (lsp lsp-deferred)
+    :hook (lsp-mode . lsp-lens-mode)
+    :init
+    (setq lsp-keymap-prefix "C-c l")  ;; Or 'C-l', 's-l'
+    :config
+    (setq lsp-idle-delay 0.5
+     lsp-enable-symbol-highlighting t
+     lsp-enable-snippet nil  ;; Not supported by company capf, which is the recommended company backend
+     lsp-pyls-plugins-flake8-enabled t)
+    (lsp-register-custom-settings
+     '(("pyls.plugins.pyls_mypy.enabled" t t)
+       ("pyls.plugins.pyls_mypy.live_mode" nil t)
+       ("pyls.plugins.pyls_black.enabled" t t)
+       ("pyls.plugins.pyls_isort.enabled" t t)
+
+       ;; Disable these as they're duplicated by flake8
+       ("pyls.plugins.pycodestyle.enabled" nil t)
+       ("pyls.plugins.mccabe.enabled" nil t)
+       ("pyls.plugins.pyflakes.enabled" nil t))))
+
+  (use-package lsp-ui
+    :ensure t
+    :hook (lsp-mode . lsp-ui-mode)
+    :config (setq lsp-ui-sideline-delay 0.5
+                  lsp-ui-sideline-ignore-duplicates t)
+    :commands lsp-ui-mode)
+
+  (use-package lsp-ivy :ensure t)
+#+end_src
+
+** Tree-Sitter
+#+begin_src emacs-lisp
+  (use-package tree-sitter :ensure t
+  :hook (prog-mode . tree-sitter-mode))
+
+  (use-package tree-sitter-langs :ensure t)
+#+end_src
+
+* Language Specific IDE-Like Features
+** Python
+
+*** Auto-PEP8 On Save
+#+begin_src emacs-lisp
+  (use-package py-autopep8
+    :ensure t
+    :config
+    (setq lsp-idle-delay 0
+          lsp-enable-symbol-highlighting t
+          lsp-enable-snippet nil  ;; Not supported by company capf, which is the recommended company backend
+          lsp-pyls-plugins-flake8-enabled t)
+    (lsp-register-custom-settings
+     '(("pyls.plugins.pyls_mypy.enabled" t t)
+       ("pyls.plugins.pyls_mypy.live_mode" nil t)
+       ("pyls.plugins.pyls_black.enabled" t t)
+       ("pyls.plugins.pyls_isort.enabled" t t)
+
+       ;; Disable these as they're duplicated by flake8
+       ("pyls.plugins.pycodestyle.enabled" nil t)
+       ("pyls.plugins.mccabe.enabled" nil t)
+       ("pyls.plugins.pyflakes.enabled" nil t)))
+    :hook (python-mode . lsp-deferred))
+#+end_src
+
+*** PEP8-compliant comments
+#+begin_src emacs-lisp
+  (add-hook 'python-mode-hook
+    (lambda ()
+      (setq comment-start " # ")))
+#+end_src
+
+** TypeScript
+#+begin_src emacs-lisp
+  (use-package typescript-mode
+    :ensure t
+    :mode "\\.ts\\'"
+    :hook (typescript-mode . lsp-deferred)
+    :config
+    (setq typescript-indent-level 2))
+#+end_src
+
+** Julia
+#+begin_src emacs-lisp
+  (use-package vterm
+    :ensure t)
+
+  (use-package julia-mode
+    :ensure t
+    :interpreter ("julia" . julia-mode))
+
+  (use-package julia-snail
+    :ensure t
+    :hook
+        (julia-mode . julia-snail-mode))
+
+  ;; (quelpa '(lsp-julia :fetcher github
+  ;;                   :repo "gdkrmr/lsp-julia"
+  ;;                   :files (:defaults "languageserver")))
+
+  ;; (use-package lsp-julia
+  ;;   :ensure t
+  ;;   :hook
+  ;;       (julia-mode . lsp-deferred)
+  ;;   :config
+  ;;       (setq lsp-julia-default-environment "~/.julia/environments/v1.7"))
+
+#+end_src
+
+** Scala
+#+begin_src emacs-lisp
+    ;; Enable scala-mode for highlighting, indentation and motion commands
+  (use-package scala-mode
+    :ensure t
+    :interpreter
+      ("scala" . scala-mode))
+
+  ;; Enable sbt mode for executing sbt commands
+  (use-package sbt-mode
+    :ensure t
+    :commands sbt-start sbt-command
+    :config
+    ;; WORKAROUND: https://github.com/ensime/emacs-sbt-mode/issues/31
+    ;; allows using SPACE when in the minibuffer
+    (substitute-key-definition
+     'minibuffer-complete-word
+     'self-insert-command
+     minibuffer-local-completion-map)
+     ;; sbt-supershell kills sbt-mode:  https://github.com/hvesalai/emacs-sbt-mode/issues/152
+     (setq sbt:program-options '("-Dsbt.supershell=false")))
+
+  (use-package lsp-metals
+    :ensure t
+    :hook (scala-mode . lsp-deferred))
+#+end_src
+
+** Tex
+#+begin_src emacs-lisp
+  (use-package tex
+    :defer t
+    :straight auctex
+    :ensure auctex
+    :config
+    (setq TeX-auto-save t))
+#+end_src
