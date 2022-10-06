@@ -322,6 +322,7 @@ utility all wrapped up in one package.
   (setq org-num-format-function 'writer-mode--num-format)
 
                             #+end_src
+
 **** Basic Config
 This section contains the basic configuration for org-mode plus the
 configuration for Org agendas and capture templates. There's a lot to unpack in
@@ -389,6 +390,7 @@ Here, visual-fill-column is used to center org-mode buffers for a more pleasing 
 experience as it centers the contents of the buffer horizontally to seem more
 like you are editing a document. This is really a matter of personal preference
 so you can remove the block below if you don't like the behavior.
+
 #+begin_src emacs-lisp
   (defun axiom/org-mode-visual-fill ()
     (setq visual-fill-column-width 150
