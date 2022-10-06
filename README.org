@@ -289,10 +289,9 @@ utility all wrapped up in one package.
      Third level: 1.1.1 - xxx
      etc.
     "
-    ;; (setq axiom/title-font (if (member "Magorian" (font-family-list))
-    ;;                      "Magorian"
-    ;;                    "Baskerville"))
-    (setq axiom/title-font "Baskerville")
+    (setq axiom/title-font (if (member "Magorian" (font-family-list))
+                         "Magorian"
+                       "Baskerville"))
 
     (if (= (length numbering) 1)
         (propertize (concat (mapconcat
