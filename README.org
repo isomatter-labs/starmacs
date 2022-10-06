@@ -279,6 +279,7 @@ I like to display a column ruler at common styleguide limits
 Org Mode is one of the hallmark features of Emacs. It is a rich document editor,
 project planner, task and time tracker, blogging engine, and literate coding
 utility all wrapped up in one package.
+
 **** Custom Numbering
 #+begin_src emacs-lisp
   (defun writer-mode--num-format (numbering)
