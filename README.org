@@ -288,16 +288,20 @@ utility all wrapped up in one package.
      Third level: 1.1.1 - xxx
      etc.
     "
+    (setq axiom/title-font (if (member "Magorian" (font-family-list))
+                         "Magorian"
+                       "Baskerville"))
+
     (if (= (length numbering) 1)
         (propertize (concat (mapconcat
                              #'number-to-string
                              numbering ".") " | " )
-                    'face `(:family "Magorian"
+                    'face `(:family axiom/title-font
                                     :foreground ,(face-foreground 'shadow nil t)))
       (propertize (concat (mapconcat
                            #'number-to-string
                            numbering ".") " — " )
-                  'face `(:family "Magorian"
+                  'face `(:family axiom/title-font
                                   :foreground ,(face-foreground 'shadow nil t)))))
 
   (font-lock-add-keywords 'org-mode
