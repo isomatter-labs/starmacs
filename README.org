@@ -292,16 +292,16 @@ utility all wrapped up in one package.
         (propertize (concat (mapconcat
                              #'number-to-string
                              numbering ".") " | " )
-                    'face `(:family "CMU Serif"
+                    'face `(:family "Magorian"
                                     :foreground ,(face-foreground 'shadow nil t)))
       (propertize (concat (mapconcat
                            #'number-to-string
                            numbering ".") " — " )
-                  'face `(:family "CMU Serif"
+                  'face `(:family "Magorian"
                                   :foreground ,(face-foreground 'shadow nil t)))))
 
   (font-lock-add-keywords 'org-mode
-                          '(("^*+ " 0 `(:family "CMU Serif"
+                          '(("^*+ " 0 `(:family "Magorian"
                                                 :height 140
                                                 :foreground ,(face-foreground 'shadow nil t)) prepend)
                             ) 'append)
@@ -359,7 +359,7 @@ explanation.
                      (org-level-6 . 1.05)
                      (org-level-7 . 1.05)
                      (org-level-8 . 1.05)))
-       (set-face-attribute (car face) nil :font "CMU Serif" :weight 'regular :height (cdr face)))
+       (set-face-attribute (car face) nil :font "Magorian" :weight 'regular :height (cdr face)))
 
      (set-face-attribute 'org-document-title nil :inherit '(shadow variable-pitch) :height 1.2)
      (set-face-attribute 'org-document-info nil :inherit '(shadow variable-pitch) :height 1.1)
@@ -565,8 +565,8 @@ Set up pixel-scrolling for a nice, modern-feeling experience (currently causing 
   (defun axiom/setup-fonts ()
     (set-face-attribute 'default nil :font "IBM Plex Mono" :slant 'italic :height axiom/fixed-pitch-height)
     (set-face-attribute 'fixed-pitch nil :font "IBM Plex Mono" :slant 'italic :height axiom/fixed-pitch-height)
-    (if (member "CMU Serif" (font-family-list))
-        (set-face-attribute 'variable-pitch nil :font "CMU Serif" :height axiom/variable-pitch-height))
+    (if (member "Crimson Text" (font-family-list))
+        (set-face-attribute 'variable-pitch nil :font "Crimson Text" :height axiom/variable-pitch-height))
     (set-face-attribute 'font-lock-comment-face nil :foreground "#5B6268" :slant 'italic :weight 'light :font "IBM Plex Mono")
     (set-face-attribute 'mode-line nil
                         :weight 'extra-bold ;should be _very_ bold
