@@ -288,9 +288,10 @@ utility all wrapped up in one package.
      Third level: 1.1.1 - xxx
      etc.
     "
-    (setq axiom/title-font (if (member "Magorian" (font-family-list))
-                         "Magorian"
-                       "Baskerville"))
+    ;; (setq axiom/title-font (if (member "Magorian" (font-family-list))
+    ;;                      "Magorian"
+    ;;                    "Baskerville"))
+    (setq axiom/title-font "Baskerville")
 
     (if (= (length numbering) 1)
         (propertize (concat (mapconcat
@@ -365,8 +366,8 @@ explanation.
                      (org-level-8 . 1.05)))
        (set-face-attribute (car face) nil :font "Magorian" :weight 'regular :height (cdr face)))
 
-     (set-face-attribute 'org-document-title nil :inherit '(shadow variable-pitch) :height 1.2)
-     (set-face-attribute 'org-document-info nil :inherit '(shadow variable-pitch) :height 1.1)
+     (set-face-attribute 'org-document-title nil :inherit '(shadow axiom/title-font) :height 1.2)
+     (set-face-attribute 'org-document-info nil :inherit '(shadow axiom/title-font) :height 1.1)
 
      (set-face-attribute 'org-block nil :foreground nil :inherit 'fixed-pitch)
      (set-face-attribute 'org-code nil   :inherit '(shadow fixed-pitch))
@@ -567,10 +568,21 @@ Set up pixel-scrolling for a nice, modern-feeling experience (currently causing 
   (defvar axiom/variable-pitch-height 160)
 
   (defun axiom/setup-fonts ()
-    (set-face-attribute 'default nil :font "IBM Plex Mono" :slant 'italic :height axiom/fixed-pitch-height)
-    (set-face-attribute 'fixed-pitch nil :font "IBM Plex Mono" :slant 'italic :height axiom/fixed-pitch-height)
-    (if (member "Crimson Text" (font-family-list))
-        (set-face-attribute 'variable-pitch nil :font "Crimson Text" :height axiom/variable-pitch-height))
+    (setq axiom/fixed-pitch-font (if (member "IBM Plex Mono" (font-family-list))
+                                     "IBM Plex Mono"
+                                   "Courier New"))
+    (setq axiom/fixed-pitch-slant (if (member "IBM Plex Mono" (font-family-list))
+                                     'italic
+                                   'normal))
+
+    (setq axiom/variable-pitch-font (if (member "Crimson Text" (font-family-list))
+                                        "Crimson Text"
+                                      "Times New Roman"))
+
+    (set-face-attribute 'default nil :font axiom/fixed-pitch-font :slant axiom/fixed-pitch-slant :height axiom/fixed-pitch-height)
+    (set-face-attribute 'fixed-pitch nil :font axiom/fixed-pitch-font :slant axiom/fixed-pitch-slant :height axiom/fixed-pitch-height)
+
+    (set-face-attribute 'variable-pitch nil :font axiom/variable-pitch-font :height axiom/variable-pitch-height)
     (set-face-attribute 'font-lock-comment-face nil :foreground "#5B6268" :slant 'italic :weight 'light :font "IBM Plex Mono")
     (set-face-attribute 'mode-line nil
                         :weight 'extra-bold ;should be _very_ bold
