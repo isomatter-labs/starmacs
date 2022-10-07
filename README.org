@@ -275,134 +275,6 @@ I like to display a column ruler at common styleguide limits
   (global-set-key (kbd "C-M-S-t") 'axiom/toggle-theme)
 #+end_src
 
-*** Org Mode
-Org Mode is one of the hallmark features of Emacs. It is a rich document editor,
-project planner, task and time tracker, blogging engine, and literate coding
-utility all wrapped up in one package.
-
-**** Custom Numbering
-#+begin_src emacs-lisp
-  (defun writer-mode--num-format (numbering)
-    "Alternative numbering format for org-num.
-     First level: 1 | xxx
-     Second level: 1.1 — xxx
-     Third level: 1.1.1 - xxx
-     etc.
-    "
-    (setq axiom/title-font (if (member "Magorian" (font-family-list))
-                         "Magorian"
-                       "Baskerville"))
-
-    (if (= (length numbering) 1)
-        (propertize (concat (mapconcat
-                             #'number-to-string
-                             numbering ".") " | " )
-                    'face `(:family axiom/title-font
-                                    :foreground ,(face-foreground 'shadow nil t)))
-      (propertize (concat (mapconcat
-                           #'number-to-string
-                           numbering ".") " — " )
-                  'face `(:family axiom/title-font
-                                  :foreground ,(face-foreground 'shadow nil t)))))
-
-  (font-lock-add-keywords 'org-mode
-                          '(("^*+ " 0 `(:family "Magorian"
-                                                :height 140
-                                                :foreground ,(face-foreground 'shadow nil t)) prepend)
-                            ) 'append)
-
-  (setq org-num-skip-unnumbered t)
-  (setq org-num-skip-footnotes t)
-  (setq org-num-max-level 3)
-  (setq org-num-face nil)
-
-
-  (setq org-modern-hide-stars nil)
-  (setq org-modern-star nil)
-  (setq org-num-format-function 'writer-mode--num-format)
-
-                            #+end_src
-
-**** Basic Config
-This section contains the basic configuration for org-mode plus the
-configuration for Org agendas and capture templates. There's a lot to unpack in
-here so I'd recommend watching the videos for Part 5 and Part 6 for a full
-explanation.
-
-#+begin_src emacs-lisp
-   (use-package org
-     :demand t
-     :straight t
-     :hook
-     (org-mode . visual-line-mode)
-     (org-mode . variable-pitch-mode)
-     (org-mode . (lambda () (indent-tabs-mode -1)))
-     (org-mode . org-num-mode)
-
-     :config
-     (setq
-      ;; Org styling, hide markup etc.
-      org-hide-emphasis-markers t
-      org-pretty-entities t
-      org-ellipsis "…"
-
-      ;; Agenda styling
-      org-agenda-tags-column 0
-      org-agenda-block-separator ?─
-      org-agenda-time-grid
-      '((daily today require-timed)
-        (800 1000 1200 1400 1600 1800 2000)
-        " ┄┄┄┄┄ " "┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄")
-      org-agenda-current-time-string
-      "⭠ now ─────────────────────────────────────────────────")
-
-
-     (dolist (face '((org-level-1 . 1.20)
-                     (org-level-2 . 1.15)
-                     (org-level-3 . 1.10)
-                     (org-level-4 . 1.05)
-                     (org-level-5 . 1.05)
-                     (org-level-6 . 1.05)
-                     (org-level-7 . 1.05)
-                     (org-level-8 . 1.05)))
-       (set-face-attribute (car face) nil :font "Magorian" :weight 'regular :height (cdr face)))
-
-     (set-face-attribute 'org-document-title nil :inherit '(shadow axiom/title-font) :height 1.2)
-     (set-face-attribute 'org-document-info nil :inherit '(shadow axiom/title-font) :height 1.1)
-
-     (set-face-attribute 'org-block nil :foreground nil :inherit 'fixed-pitch)
-     (set-face-attribute 'org-code nil   :inherit '(shadow fixed-pitch))
-     (set-face-attribute 'org-table nil   :inherit '(shadow fixed-pitch))
-     (set-face-attribute 'org-verbatim nil :inherit '(shadow fixed-pitch)))
- #+end_src
-
-**** Org-Modern
-#+begin_src emacs-lisp
-  (use-package org-modern
-    :ensure t
-    :hook
-    (org-mode . org-modern-mode)
-    (org-agenda-finalize . org-modern-agenda))
-#+end_src
-
-**** Center Org Buffers
-Here, visual-fill-column is used to center org-mode buffers for a more pleasing writing
-experience as it centers the contents of the buffer horizontally to seem more
-like you are editing a document. This is really a matter of personal preference
-so you can remove the block below if you don't like the behavior.
-
-#+begin_src emacs-lisp
-  (defun axiom/org-mode-visual-fill ()
-    (setq visual-fill-column-width 150
-          visual-fill-column-center-text t
-          visual-fill-column-fringes-outside-margins nil)
-    (visual-fill-column-mode 1))
-
-  (use-package visual-fill-column
-    :ensure t
-    :hook (org-mode . axiom/org-mode-visual-fill))
-#+end_src
-
 *** Markdown
 #+begin_src emacs-lisp
   (use-package markdown-mode
@@ -649,6 +521,153 @@ key bindings in the mode of your current buffer.
       :ensure t
       :config
       (global-set-key (kbd "C-x o") 'ace-window))
+#+end_src
+
+* Org Mode
+Org Mode is one of the hallmark features of Emacs. It is a rich document editor,
+project planner, task and time tracker, blogging engine, and literate coding
+utility all wrapped up in one package.
+
+**** Custom Numbering
+#+begin_src emacs-lisp
+  (defun writer-mode--num-format (numbering)
+    "Alternative numbering format for org-num.
+     First level: 1 | xxx
+     Second level: 1.1 — xxx
+     Third level: 1.1.1 - xxx
+     etc.
+    "
+    (setq axiom/title-font (if (member "Magorian" (font-family-list))
+                         "Magorian"
+                       "Baskerville"))
+
+    (if (= (length numbering) 1)
+        (propertize (concat (mapconcat
+                             #'number-to-string
+                             numbering ".") " | " )
+                    'face `(:family axiom/title-font
+                                    :foreground ,(face-foreground 'shadow nil t)))
+      (propertize (concat (mapconcat
+                           #'number-to-string
+                           numbering ".") " — " )
+                  'face `(:family axiom/title-font
+                                  :foreground ,(face-foreground 'shadow nil t)))))
+
+  (font-lock-add-keywords 'org-mode
+                          '(("^*+ " 0 `(:family "Magorian"
+                                                :height 140
+                                                :foreground ,(face-foreground 'shadow nil t)) prepend)
+                            ) 'append)
+
+  (setq org-num-skip-unnumbered t)
+  (setq org-num-skip-footnotes t)
+  (setq org-num-max-level 3)
+  (setq org-num-face nil)
+
+
+  (setq org-modern-hide-stars nil)
+  (setq org-modern-star nil)
+  (setq org-num-format-function 'writer-mode--num-format)
+
+                            #+end_src
+
+**** Basic Config
+This section contains the basic configuration for org-mode plus the
+configuration for Org agendas and capture templates. There's a lot to unpack in
+here so I'd recommend watching the videos for Part 5 and Part 6 for a full
+explanation.
+
+#+begin_src emacs-lisp
+  (use-package org
+    :demand t
+    :straight t
+    :hook
+    (org-mode . visual-line-mode)
+    (org-mode . variable-pitch-mode)
+    (org-mode . (lambda () (indent-tabs-mode -1)))
+    (org-mode . org-num-mode)
+
+    :config
+    (setq
+     ;; Org styling, hide markup etc.
+     org-hide-emphasis-markers t
+     org-pretty-entities t
+     org-ellipsis "…"
+
+     ;; Agenda styling
+     org-agenda-tags-column 0
+     org-agenda-block-separator ?─
+     org-agenda-time-grid
+     '((daily today require-timed)
+       (800 1000 1200 1400 1600 1800 2000)
+       " ┄┄┄┄┄ " "┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄")
+     org-agenda-current-time-string
+     "⭠ now ─────────────────────────────────────────────────")
+
+
+    (dolist (face '((org-level-1 . 1.20)
+                    (org-level-2 . 1.15)
+                    (org-level-3 . 1.10)
+                    (org-level-4 . 1.05)
+                    (org-level-5 . 1.05)
+                    (org-level-6 . 1.05)
+                    (org-level-7 . 1.05)
+                    (org-level-8 . 1.05)))
+      (set-face-attribute (car face) nil :font "Magorian" :weight 'regular :height (cdr face)))
+
+    (set-face-attribute 'org-document-title nil :inherit '(shadow axiom/title-font) :height 1.2)
+    (set-face-attribute 'org-document-info nil :inherit '(shadow axiom/title-font) :height 1.1)
+
+    (set-face-attribute 'org-block nil :foreground nil :inherit 'fixed-pitch)
+    (set-face-attribute 'org-code nil   :inherit '(shadow fixed-pitch))
+    (set-face-attribute 'org-table nil   :inherit '(shadow fixed-pitch))
+    (set-face-attribute 'org-verbatim nil :inherit '(shadow fixed-pitch)))
+ #+end_src
+
+**** Org-Modern
+#+begin_src emacs-lisp
+  (use-package org-modern
+    :ensure t
+    :hook
+    (org-mode . org-modern-mode)
+    (org-agenda-finalize . org-modern-agenda))
+#+end_src
+
+**** Center Org Buffers
+Here, visual-fill-column is used to center org-mode buffers for a more pleasing writing
+experience as it centers the contents of the buffer horizontally to seem more
+like you are editing a document. This is really a matter of personal preference
+so you can remove the block below if you don't like the behavior.
+
+#+begin_src emacs-lisp
+  (defun axiom/org-mode-visual-fill ()
+    (setq visual-fill-column-width 150
+          visual-fill-column-center-text t
+          visual-fill-column-fringes-outside-margins nil)
+    (visual-fill-column-mode 1))
+
+  (use-package visual-fill-column
+    :ensure t
+    :hook (org-mode . axiom/org-mode-visual-fill))
+#+end_src
+
+**** Org-Roam
+#+begin_src emacs-lisp
+  (use-package org-roam
+  :ensure t
+  :init
+  (setq org-roam-v2-ack t)
+  :custom
+  (org-roam-directory "~/Zettelkasten")
+  (org-roam-completion-everywhere t)
+  :bind (("C-c n l" . org-roam-buffer-toggle)
+         ("C-c n f" . org-roam-node-find)
+         ("C-c n i" . org-roam-node-insert)
+         :map org-mode-map
+         ("C-M-i"    . completion-at-point))
+  :config
+  (require 'org-fold) ; Required to ensure the library loads for reasons I cannot yet fathom
+  (org-roam-setup))
 #+end_src
 
 * Project-Management
