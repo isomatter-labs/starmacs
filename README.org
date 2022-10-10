@@ -449,9 +449,14 @@ Set up pixel-scrolling for a nice, modern-feeling experience (currently causing 
                                      'italic
                                    'normal))
 
-    (setq axiom/variable-pitch-font (if (member "Crimson Text" (font-family-list))
-                                        "Crimson Text"
+    (setq axiom/variable-pitch-font (if (member "Crimson Pro" (font-family-list))
+                                        "Crimson Pro"
                                       "Times New Roman"))
+
+
+    (setq axiom/org-code-font (if (member "DSE Typewriter" (font-family-list))
+                                  "DSE Typewriter"
+                                "Courier New"))
 
     (set-face-attribute 'default nil :font axiom/fixed-pitch-font :slant axiom/fixed-pitch-slant :height axiom/fixed-pitch-height)
     (set-face-attribute 'fixed-pitch nil :font axiom/fixed-pitch-font :slant axiom/fixed-pitch-slant :height axiom/fixed-pitch-height)
@@ -663,6 +668,7 @@ so you can remove the block below if you don't like the behavior.
   :bind (("C-c n l" . org-roam-buffer-toggle)
          ("C-c n f" . org-roam-node-find)
          ("C-c n i" . org-roam-node-insert)
+         ("C-c n c" . org-roam-capture)
          :map org-mode-map
          ("C-M-i"    . completion-at-point))
   :config
