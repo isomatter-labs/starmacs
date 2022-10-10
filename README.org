@@ -623,9 +623,9 @@ explanation.
     (set-face-attribute 'org-document-title nil :inherit '(shadow axiom/title-font) :height 1.2)
     (set-face-attribute 'org-document-info nil :inherit '(shadow axiom/title-font) :height 1.1)
 
-    (set-face-attribute 'org-block nil :foreground nil :inherit 'fixed-pitch)
-    (set-face-attribute 'org-code nil   :inherit '(shadow fixed-pitch))
-    (set-face-attribute 'org-table nil   :inherit '(shadow fixed-pitch))
+    (set-face-attribute 'org-block nil :foreground nil :font axiom/org-code-font :inherit '(axiom/org-code-font))
+    (set-face-attribute 'org-code nil   :inherit '(shadow axiom/org-code-font))g
+    (set-face-attribute 'org-table nil   :inherit '(shadow axiom/org-code-font))
     (set-face-attribute 'org-verbatim nil :inherit '(shadow fixed-pitch)))
  #+end_src
 
