@@ -100,22 +100,9 @@ Don't create =backup~= or =#autosave#= files
 
 ** Add path to extra binaries
 #+begin_src emacs-lisp
-  (defun set-exec-path-from-shell-PATH ()
-    "Set up Emacs' `exec-path' and PATH environment variable to match
-  that used by the user's shell.
-
-  This is particularly useful under Mac OS X and macOS, where GUI
-  apps are not started from a shell."
-    (interactive)
-    (let ((path-from-shell
-           (replace-regexp-in-string "[ \t\n]*$" ""
-                                     (shell-command-to-string "$SHELL --login -c 'echo $PATH'"))))
-      (setenv "PATH" path-from-shell)
-      (setq exec-path (split-string path-from-shell path-separator))))
-
-  (set-exec-path-from-shell-PATH)
-  (setenv "PATH" (concat (getenv "PATH") ":/opt/anaconda3/bin"))
-  (setq exec-path (append exec-path '("/opt/anaconda3/bin")))
+(use-package exec-path-from-shell
+    :config
+    (exec-path-from-shell-initialize))
 #+end_src
 
 ** Replace Selection
@@ -453,13 +440,8 @@ Set up pixel-scrolling for a nice, modern-feeling experience (currently causing 
                                         "Crimson Pro"
                                       "Times New Roman"))
 
-
-    (setq axiom/org-code-font (if (member "DSE Typewriter" (font-family-list))
-                                  "DSE Typewriter"
-                                "Courier New"))
-
-    (set-face-attribute 'default nil :font axiom/fixed-pitch-font :slant axiom/fixed-pitch-slant :height axiom/fixed-pitch-height)
-    (set-face-attribute 'fixed-pitch nil :font axiom/fixed-pitch-font :slant axiom/fixed-pitch-slant :height axiom/fixed-pitch-height)
+    (set-face-attribute 'default nil :font axiom/fixed-pitch-font :height axiom/fixed-pitch-height)
+    (set-face-attribute 'fixed-pitch nil :font axiom/fixed-pitch-font :height axiom/fixed-pitch-height)
 
     (set-face-attribute 'variable-pitch nil :font axiom/variable-pitch-font :height axiom/variable-pitch-height)
     (set-face-attribute 'font-lock-comment-face nil :foreground "#5B6268" :slant 'italic :weight 'light :font "IBM Plex Mono")
@@ -623,9 +605,9 @@ explanation.
     (set-face-attribute 'org-document-title nil :inherit '(shadow axiom/title-font) :height 1.2)
     (set-face-attribute 'org-document-info nil :inherit '(shadow axiom/title-font) :height 1.1)
 
-    (set-face-attribute 'org-block nil :foreground nil :font axiom/org-code-font :inherit '(axiom/org-code-font))
-    (set-face-attribute 'org-code nil   :inherit '(shadow axiom/org-code-font))g
-    (set-face-attribute 'org-table nil   :inherit '(shadow axiom/org-code-font))
+    (set-face-attribute 'org-block nil :foreground nil :inherit 'fixed-pitch :slant 'italic)
+    (set-face-attribute 'org-code nil   :inherit '(shadow fixed-pitch))
+    (set-face-attribute 'org-table nil   :inherit '(shadow fixed-pitch))
     (set-face-attribute 'org-verbatim nil :inherit '(shadow fixed-pitch)))
  #+end_src
 
@@ -849,8 +831,6 @@ It is very useful for figuring out how things work in Emacs.
 #+begin_src emacs-lisp
     (use-package company
       :ensure t
-      :after lsp
-      :hook (lsp-mode . company-mode)
       :bind (:map company-active-map
             ("<tab>" . company-complete-selection)
             ("C-j" . company-select-next)
@@ -879,92 +859,36 @@ It is very useful for figuring out how things work in Emacs.
 #+end_src
 
 * LSP Features
-** DAP-Mode
-=dap-mode= is the debugging interface that is bundled with =lsp-mode=, and thus requires it.
-It is built using Microsoft's =DAP= protocol, in much the same way the =LSP= protocol is built upon.
-
-#+begin_src emacs-lisp
-  (use-package posframe
-    :ensure t)
-
-  (use-package dap-mode
-    :ensure t
-    :hook
-    (lsp-mode . dap-mode)
-    (lsp-mode . dap-ui-mode))
-#+end_src
-
-** LSP-Mode
-#+begin_src emacs-lisp
-    (use-package lsp-mode
-      :ensure t
-      :commands (lsp lsp-deferred)
-      :hook (lsp-mode . lsp-lens-mode)
-      :init
-      (setq lsp-keymap-prefix "C-c l")
-      :config
-      (setq lsp-idle-delay 0.5
-       lsp-enable-symbol-highlighting t
-       lsp-enable-snippet nil
-       lsp-pyls-plugins-flake8-enabled t))
-
-    (use-package lsp-ui
-      :ensure t
-      :hook (lsp-mode . lsp-ui-mode)
-      :config (setq lsp-ui-sideline-delay 0.5
-                    lsp-ui-sideline-ignore-duplicates t
-                    lsp-ui-doc-enable t)
-      :commands lsp-ui-mode)
-#+end_src
-
 ** Eglot
 =eglot= is a more minimal alternative to =lsp-mode=, and one that requires less configuration
 to work as-expected.
 
 #+begin_src emacs-lisp
-  ;; (use-package eglot
-  ;;   :commands eglot
-  ;;   :hook (prog-mode . eglot))
-#+end_src
+  (use-package eglot
+    :commands eglot
+    :hook
+    (scala-mode . eglot-ensure)
+    (typescript-mode . eglot-ensure)
+    (python-mode . eglot-ensure)
+    :config
+    (add-to-list 'eglot-server-programs '(scala-mode . ("metals" "--stdio"))))
+        #+end_src
 
 ** Tree-Sitter
 #+begin_src emacs-lisp
   (use-package tree-sitter :ensure t
-  :hook (prog-mode . tree-sitter-mode))
+    :hook (prog-mode . tree-sitter-mode))
 
   (use-package tree-sitter-langs :ensure t)
 #+end_src
 
 * Language Specific IDE-Like Features
 ** Python
-
-*** Auto-PEP8 On Save
-#+begin_src emacs-lisp
-  (use-package py-autopep8
-    :ensure t
-    :config
-    (setq lsp-idle-delay 0
-          lsp-enable-symbol-highlighting t
-          lsp-enable-snippet nil  ;; Not supported by company capf, which is the recommended company backend
-          lsp-pyls-plugins-flake8-enabled t)
-    (lsp-register-custom-settings
-     '(("pyls.plugins.pyls_mypy.enabled" t t)
-       ("pyls.plugins.pyls_mypy.live_mode" nil t)
-       ("pyls.plugins.pyls_black.enabled" t t)
-       ("pyls.plugins.pyls_isort.enabled" t t)
-
-       ;; Disable these as they're duplicated by flake8
-       ("pyls.plugins.pycodestyle.enabled" nil t)
-       ("pyls.plugins.mccabe.enabled" nil t)
-       ("pyls.plugins.pyflakes.enabled" nil t)))
-    :hook (python-mode . lsp-deferred))
-#+end_src
-
 *** PEP8-compliant comments
 #+begin_src emacs-lisp
   (add-hook 'python-mode-hook
-    (lambda ()
-      (setq comment-start " # ")))
+            (lambda ()
+              (setq comment-start " # ")))
 #+end_src
 
 ** TypeScript
@@ -972,7 +896,6 @@ to work as-expected.
   (use-package typescript-mode
     :ensure t
     :mode "\\.ts\\'"
-    :hook (typescript-mode . lsp-deferred)
     :config
     (setq typescript-indent-level 2))
 #+end_src
@@ -989,19 +912,7 @@ to work as-expected.
   (use-package julia-snail
     :ensure t
     :hook
-        (julia-mode . julia-snail-mode))
-
-  ;; (quelpa '(lsp-julia :fetcher github
-  ;;                   :repo "gdkrmr/lsp-julia"
-  ;;                   :files (:defaults "languageserver")))
-
-  ;; (use-package lsp-julia
-  ;;   :ensure t
-  ;;   :hook
-  ;;       (julia-mode . lsp-deferred)
-  ;;   :config
-  ;;       (setq lsp-julia-default-environment "~/.julia/environments/v1.7"))
-
+    (julia-mode . julia-snail-mode))
 #+end_src
 
 ** Scala
@@ -1011,28 +922,19 @@ to work as-expected.
     :ensure t
     :hook (scala-mode . company-mode)
     :interpreter
-    ("scala" . scala-mode)
-    :config
-    :config
-    (setq lsp-completion-provider :capf))
+    ("scala" . scala-mode))
 
   ;; Enable sbt mode for executing sbt commands
   (use-package sbt-mode
     :ensure t
     :commands sbt-start sbt-command
     :config
-    ;; WORKAROUND: https://github.com/ensime/emacs-sbt-mode/issues/31
-    ;; allows using SPACE when in the minibuffer
     (substitute-key-definition
      'minibuffer-complete-word
      'self-insert-command
      minibuffer-local-completion-map)
     ;; sbt-supershell kills sbt-mode:  https://github.com/hvesalai/emacs-sbt-mode/issues/152
     (setq sbt:program-options '("-Dsbt.supershell=false")))
-
-  (use-package lsp-metals
-    :ensure t
-    :hook (scala-mode . lsp-deferred))
 #+end_src
 
 ** Tex
