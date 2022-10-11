@@ -880,6 +880,9 @@ It is very useful for figuring out how things work in Emacs.
 
 * LSP Features
 ** DAP-Mode
+=dap-mode= is the debugging interface that is bundled with =lsp-mode=, and thus requires it.
+It is built using Microsoft's =DAP= protocol, in much the same way the =LSP= protocol is built upon.
+
 #+begin_src emacs-lisp
   (use-package posframe
     :ensure t)
@@ -893,36 +896,35 @@ It is very useful for figuring out how things work in Emacs.
 
 ** LSP-Mode
 #+begin_src emacs-lisp
-  (use-package lsp-mode
-    :ensure t
-    :commands (lsp lsp-deferred)
-    :hook (lsp-mode . lsp-lens-mode)
-    :init
-    (setq lsp-keymap-prefix "C-c l")  ;; Or 'C-l', 's-l'
-    :config
-    (setq lsp-idle-delay 0.5
-     lsp-enable-symbol-highlighting t
-     lsp-enable-snippet nil  ;; Not supported by company capf, which is the recommended company backend
-     lsp-pyls-plugins-flake8-enabled t)
-    (lsp-register-custom-settings
-     '(("pyls.plugins.pyls_mypy.enabled" t t)
-       ("pyls.plugins.pyls_mypy.live_mode" nil t)
-       ("pyls.plugins.pyls_black.enabled" t t)
-       ("pyls.plugins.pyls_isort.enabled" t t)
+    (use-package lsp-mode
+      :ensure t
+      :commands (lsp lsp-deferred)
+      :hook (lsp-mode . lsp-lens-mode)
+      :init
+      (setq lsp-keymap-prefix "C-c l")
+      :config
+      (setq lsp-idle-delay 0.5
+       lsp-enable-symbol-highlighting t
+       lsp-enable-snippet nil
+       lsp-pyls-plugins-flake8-enabled t))
 
-       ;; Disable these as they're duplicated by flake8
-       ("pyls.plugins.pycodestyle.enabled" nil t)
-       ("pyls.plugins.mccabe.enabled" nil t)
-       ("pyls.plugins.pyflakes.enabled" nil t))))
+    (use-package lsp-ui
+      :ensure t
+      :hook (lsp-mode . lsp-ui-mode)
+      :config (setq lsp-ui-sideline-delay 0.5
+                    lsp-ui-sideline-ignore-duplicates t
+                    lsp-ui-doc-enable t)
+      :commands lsp-ui-mode)
+#+end_src
 
-  (use-package lsp-ui
-    :ensure t
-    :hook (lsp-mode . lsp-ui-mode)
-    :config (setq lsp-ui-sideline-delay 0.5
-                  lsp-ui-sideline-ignore-duplicates t)
-    :commands lsp-ui-mode)
+** Eglot
+=eglot= is a more minimal alternative to =lsp-mode=, and one that requires less configuration
+to work as-expected.
 
-  (use-package lsp-ivy :ensure t)
+#+begin_src emacs-lisp
+  ;; (use-package eglot
+  ;;   :commands eglot
+  ;;   :hook (prog-mode . eglot))
 #+end_src
 
 ** Tree-Sitter
