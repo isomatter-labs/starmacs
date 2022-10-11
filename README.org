@@ -770,10 +770,10 @@ It is very useful for figuring out how things work in Emacs.
 
 ** Highlight Git diffs in the gutter
 #+begin_src emacs-lisp
-      (use-package diff-hl
-        :ensure t
-        :config
-        (global-diff-hl-mode))
+  (use-package git-gutter
+    :ensure t
+    :config
+    (global-git-gutter-mode 't))
 #+end_src
 
 ** Why This?
