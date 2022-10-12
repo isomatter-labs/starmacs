@@ -1005,7 +1005,8 @@ to work as-expected.
 ** Tree-Sitter
 #+begin_src emacs-lisp
   (use-package tree-sitter :ensure t
-    :hook (prog-mode . tree-sitter-mode))
+    :config
+    (global-tree-sitter-mode t))
 
   (use-package tree-sitter-langs :ensure t)
 #+end_src
