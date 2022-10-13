@@ -438,8 +438,8 @@ Set up pixel-scrolling for a nice, modern-feeling experience (currently causing 
     (setq axiom/comment-face axiom/fixed-pitch-font)
 
     (setq axiom/org-mode-code-font (if (member "DM Mono" (font-family-list))
-                                     "DM Mono"
-                                   axiom/fixed-pitch-font))
+                                       "DM Mono"
+                                     axiom/fixed-pitch-font))
 
 
     (set-face-attribute 'default nil :font axiom/fixed-pitch-font :height axiom/fixed-pitch-height)
@@ -452,33 +452,33 @@ Set up pixel-scrolling for a nice, modern-feeling experience (currently causing 
                         :height 1.1))       ;should be a little larger than regular text
 
   (axiom/setup-fonts)
-#+end_src
+    #+end_src
 
 *** Ligatures
 #+begin_src emacs-lisp
-(use-package ligature
-  :config
-  ;; Enable the "www" ligature in every possible major mode
-  (ligature-set-ligatures 't '("www"))
-  ;; Enable traditional ligature support in eww-mode, if the
-  ;; `variable-pitch' face supports it
-  (ligature-set-ligatures 'eww-mode '("ff" "fi" "ffi"))
-  (ligature-set-ligatures 'prog-mode '("|||>" "<|||" "<==>" "<!--" "####" "~~>" "***" "||=" "||>"
-                                       ":::" "::=" "=:=" "===" "==>" "=!=" "=>>" "=<<" "=/=" "!=="
-                                       "!!." ">=>" ">>=" ">>>" ">>-" ">->" "->>" "-->" "---" "-<<"
-                                       "<~~" "<~>" "<*>" "<||" "<|>" "<$>" "<==" "<=>" "<=<" "<->"
-                                       "<--" "<-<" "<<=" "<<-" "<<<" "<+>" "</>" "###" "#_(" "..<"
-                                       "..." "+++" "/==" "///" "_|_" "www" "&&" "^=" "~~" "~@" "~="
-                                       "~>" "~-" "**" "*>" "*/" "||" "|}" "|]" "|=" "|>" "|-" "{|"
-                                       "[|" "]#" "::" ":=" ":>" ":<" "$>" "==" "=>" "!=" "!!" ">:"
-                                       ">=" ">>" ">-" "-~" "-|" "->" "--" "-<" "<~" "<*" "<|" "<:"
-                                       "<$" "<=" "<>" "<-" "<<" "<+" "</" "#{" "#[" "#:" "#=" "#!"
-                                       "##" "#(" "#?" "#_" "%%" ".=" ".-" ".." ".?" "+>" "++" "?:"
-                                       "?=" "?." "??" ";;" "/*" "/=" "/>" "//" "__" "~~" "(*" "*)"
-                                       "\\\\" "://"))
-  ;; Enables ligature checks globally in all buffers. You can also do it
-  ;; per mode with `ligature-mode'.
-  (global-ligature-mode t))
+  (use-package ligature
+    :config
+    ;; Enable the "www" ligature in every possible major mode
+    (ligature-set-ligatures 't '("www"))
+    ;; Enable traditional ligature support in eww-mode, if the
+    ;; `variable-pitch' face supports it
+    (ligature-set-ligatures 'eww-mode '("ff" "fi" "ffi"))
+    (ligature-set-ligatures 'prog-mode '("|||>" "<|||" "<==>" "<!--" "####" "~~>" "***" "||=" "||>"
+                                         ":::" "::=" "=:=" "===" "==>" "=!=" "=>>" "=<<" "=/=" "!=="
+                                         "!!." ">=>" ">>=" ">>>" ">>-" ">->" "->>" "-->" "---" "-<<"
+                                         "<~~" "<~>" "<*>" "<||" "<|>" "<$>" "<==" "<=>" "<=<" "<->"
+                                         "<--" "<-<" "<<=" "<<-" "<<<" "<+>" "</>" "###" "#_(" "..<"
+                                         "..." "+++" "/==" "///" "_|_" "www" "&&" "^=" "~~" "~@" "~="
+                                         "~>" "~-" "**" "*>" "*/" "||" "|}" "|]" "|=" "|>" "|-" "{|"
+                                         "[|" "]#" "::" ":=" ":>" ":<" "$>" "==" "=>" "!=" "!!" ">:"
+                                         ">=" ">>" ">-" "-~" "-|" "->" "--" "-<" "<~" "<*" "<|" "<:"
+                                         "<$" "<=" "<>" "<-" "<<" "<+" "</" "#{" "#[" "#:" "#=" "#!"
+                                         "##" "#(" "#?" "#_" "%%" ".=" ".-" ".." ".?" "+>" "++" "?:"
+                                         "?=" "?." "??" ";;" "/*" "/=" "/>" "//" "__" "~~" "(*" "*)"
+                                         "\\\\" "://"))
+    ;; Enables ligature checks globally in all buffers. You can also do it
+    ;; per mode with `ligature-mode'.
+    (global-ligature-mode t))
 #+end_src
 
 ** SQL Highlighting
@@ -491,7 +491,7 @@ Set up pixel-scrolling for a nice, modern-feeling experience (currently causing 
     :config
     (set-face-background 'mmm-default-submode-face nil)
     (mmm-add-classes
-      '((embedded-sql
+     '((embedded-sql
         :submode sql-mode
         :face mmm-code-submode-face
         :front "\\(--SQL\\)"
@@ -531,10 +531,10 @@ key bindings in the mode of your current buffer.
 ** Better Window Navigation
 *** With =ace-window=
 #+begin_src emacs-lisp
-    (use-package ace-window
-      :ensure t
-      :config
-      (global-set-key (kbd "C-x o") 'ace-window))
+  (use-package ace-window
+    :ensure t
+    :config
+    (global-set-key (kbd "C-x o") 'ace-window))
 #+end_src
 
 * Org Mode
@@ -552,8 +552,8 @@ utility all wrapped up in one package.
      etc.
     "
     (setq axiom/title-font (if (member "Magorian" (font-family-list))
-                         "Magorian"
-                       "Baskerville"))
+                               "Magorian"
+                             "Baskerville"))
 
     (if (= (length numbering) 1)
         (propertize (concat (mapconcat
@@ -583,7 +583,7 @@ utility all wrapped up in one package.
   (setq org-modern-star nil)
   (setq org-num-format-function 'writer-mode--num-format)
 
-                            #+end_src
+#+end_src
 
 **** Basic Config
 This section contains the basic configuration for org-mode plus the
@@ -636,7 +636,7 @@ explanation.
     (set-face-attribute 'org-code nil   :font axiom/org-mode-code-font :inherit '(shadow fixed-pitch))
     (set-face-attribute 'org-table nil   :font axiom/org-mode-code-font :inherit '(shadow fixed-pitch))
     (set-face-attribute 'org-verbatim nil :font axiom/org-mode-code-font :inherit '(shadow fixed-pitch)))
- #+end_src
+#+end_src
 
 **** Org-Modern
 #+begin_src emacs-lisp
@@ -668,21 +668,21 @@ so you can remove the block below if you don't like the behavior.
 **** Org-Roam
 #+begin_src emacs-lisp
   (use-package org-roam
-  :ensure t
-  :init
-  (setq org-roam-v2-ack t)
-  :custom
-  (org-roam-directory "~/Zettelkasten")
-  (org-roam-completion-everywhere t)
-  :bind (("C-c n l" . org-roam-buffer-toggle)
-         ("C-c n f" . org-roam-node-find)
-         ("C-c n i" . org-roam-node-insert)
-         ("C-c n c" . org-roam-capture)
-         :map org-mode-map
-         ("C-M-i"    . completion-at-point))
-  :config
-  (require 'org-fold) ; Required to ensure the library loads for reasons I cannot yet fathom
-  (org-roam-setup))
+    :ensure t
+    :init
+    (setq org-roam-v2-ack t)
+    :custom
+    (org-roam-directory "~/Zettelkasten")
+    (org-roam-completion-everywhere t)
+    :bind (("C-c n l" . org-roam-buffer-toggle)
+           ("C-c n f" . org-roam-node-find)
+           ("C-c n i" . org-roam-node-insert)
+           ("C-c n c" . org-roam-capture)
+           :map org-mode-map
+           ("C-M-i"    . completion-at-point))
+    :config
+    (require 'org-fold) ; Required to ensure the library loads for reasons I cannot yet fathom
+    (org-roam-setup))
 #+end_src
 
 * Project-Management
@@ -715,11 +715,11 @@ so you can remove the block below if you don't like the behavior.
   (use-package vertico
     :ensure t
     :bind (:map vertico-map
-           ("C-j" . vertico-next)
-           ("C-k" . vertico-previous)
-           ("C-f" . vertico-exit)
-           :map minibuffer-local-map
-           ("M-h" . backward-kill-word))
+                ("C-j" . vertico-next)
+                ("C-k" . vertico-previous)
+                ("C-f" . vertico-exit)
+                :map minibuffer-local-map
+                ("M-h" . backward-kill-word))
     :custom
     (vertico-cycle t)
     :init
@@ -740,7 +740,7 @@ so you can remove the block below if you don't like the behavior.
 
 ** Consult
 #+begin_src emacs-lisp
-    ;; Example configuration for Consult
+  ;; Example configuration for Consult
   (use-package consult
     ;; Replace bindings. Lazily loaded due by `use-package'.
     :bind (;; C-c bindings (mode-specific-map)
@@ -856,16 +856,16 @@ so you can remove the block below if you don't like the behavior.
     ;; (setq consult-project-function (lambda (_) (vc-root-dir)))
     ;;;; 4. locate-dominating-file
     ;; (setq consult-project-function (lambda (_) (locate-dominating-file "." ".git")))
-  )
+    )
 #+end_src
 
 ** Orderless
 #+begin_src emacs-lisp
   (use-package orderless
-  :ensure t
-  :custom
-  (completion-styles '(orderless basic))
-  (completion-category-overrides '((file (styles basic partial-completion)))))
+    :ensure t
+    :custom
+    (completion-styles '(orderless basic))
+    (completion-category-overrides '((file (styles basic partial-completion)))))
 #+end_src
 
 ** Helpful Help Commands
@@ -923,9 +923,9 @@ It is very useful for figuring out how things work in Emacs.
 ** Flycheck
 #+begin_src emacs-lisp
   (use-package flycheck
-      :ensure t
-      :custom (flycheck-check-syntax-automatically '(save mode-enabled))
-      :init (global-flycheck-mode))
+    :ensure t
+    :custom (flycheck-check-syntax-automatically '(save mode-enabled))
+    :init (global-flycheck-mode))
 
   (defvar-local axiom--mode-line-flycheck "")
 
@@ -960,21 +960,20 @@ It is very useful for figuring out how things work in Emacs.
 * Auto-Completion
 ** Company-mode
 #+begin_src emacs-lisp
-    (use-package company
-      :ensure t
-      :bind (:map company-active-map
-            ("<tab>" . company-complete-selection)
-            ("C-j" . company-select-next)
-            ("C-k" . company-select-previous))
-      :custom
-      (company-minimum-prefix-length 1)
-      (company-idle-delay 0.0)
-      (company-tooltip-align-annotations t)
-      (company-show-quick-access t))
+  (use-package company
+    :ensure t
+    :bind (:map company-active-map
+                ("C-j"   . company-select-next)
+                ("C-k"   . company-select-previous))
+    :custom
+    (company-minimum-prefix-length 1)
+    (company-idle-delay 0.0)
+    (company-tooltip-align-annotations t)
+    (company-show-quick-access t))
 
-    (use-package company-box
-      :ensure t
-      :hook (company-mode . company-box-mode))
+  (use-package company-box
+    :ensure t
+    :hook (company-mode . company-box-mode))
 #+end_src
 
 * Tab to Complete
@@ -1000,6 +999,9 @@ to work as-expected.
     (typescript-mode . eglot-ensure)
     (python-mode . eglot-ensure)
     :config
+    (setq company-backends
+        (cons 'company-capf
+              (remove 'company-capf company-backends))) ; move company-capf to front to ensure company is getting completions
     (add-to-list 'eglot-server-programs '(scala-mode . ("metals" "--stdio"))))
         #+end_src
 
