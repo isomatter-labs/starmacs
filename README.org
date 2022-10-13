@@ -619,20 +619,20 @@ explanation.
      "⭠ now ─────────────────────────────────────────────────")
 
 
-    (dolist (face '((org-level-1 . 1.20)
-                    (org-level-2 . 1.15)
+    (dolist (face '((org-level-1 . 1.30)
+                    (org-level-2 . 1.20)
                     (org-level-3 . 1.10)
                     (org-level-4 . 1.05)
                     (org-level-5 . 1.05)
                     (org-level-6 . 1.05)
                     (org-level-7 . 1.05)
                     (org-level-8 . 1.05)))
-      (set-face-attribute (car face) nil :font "Magorian" :weight 'regular :height (cdr face)))
+      (set-face-attribute (car face) nil :font axiom/title-font :weight 'regular :height (cdr face)))
 
-    (set-face-attribute 'org-document-title nil :inherit '(shadow axiom/title-font) :height 1.2)
-    (set-face-attribute 'org-document-info nil :inherit '(shadow axiom/title-font) :height 1.1)
+    (set-face-attribute 'org-document-title nil :inherit '(shadow axiom/title-font) :height 1.50)
+    (set-face-attribute 'org-document-info nil :inherit '(shadow axiom/title-font) :height 1.20)
 
-    (set-face-attribute 'org-block nil :foreground nil :font axiom/org-mode-code-font :inherit 'fixed-pitch :slant 'italic)
+    (set-face-attribute 'org-block nil :foreground nil :font axiom/org-mode-code-font :height 120 :inherit 'fixed-pitch :slant 'italic)
     (set-face-attribute 'org-code nil   :font axiom/org-mode-code-font :inherit '(shadow fixed-pitch))
     (set-face-attribute 'org-table nil   :font axiom/org-mode-code-font :inherit '(shadow fixed-pitch))
     (set-face-attribute 'org-verbatim nil :font axiom/org-mode-code-font :inherit '(shadow fixed-pitch)))
@@ -995,21 +995,28 @@ It is very useful for figuring out how things work in Emacs.
 #+end_src
 
 * LSP Features
-** Eglot
-=eglot= is a more minimal alternative to =lsp-mode=, and one that requires less configuration
-to work as-expected.
-
+** DAP-Mode
 #+begin_src emacs-lisp
-  (use-package eglot
-    :commands eglot
-    :hook
-    (scala-mode . eglot-ensure)
-    (typescript-mode . eglot-ensure)
-    (python-mode . eglot-ensure)
-    :config
-    (setq company-backends
-        (cons 'company-capf
-              (remove 'company-capf company-backends)))) ; move company-capf to front to ensure company is getting completions
+  (use-package dap-mode
+    )
+#+end_src
+
+** LSP-Mode
+#+begin_src emacs-lisp
+  (use-package lsp-mode
+  ;; Optional - enable lsp-mode automatically in scala files
+  :hook (scala-mode . lsp)
+  :config (setq lsp-prefer-flymake nil))
+#+end_src
+*** LSP-UI
+#+begin_src emacs-lisp
+  (use-package lsp-ui)
+#+end_src
+
+*** Company-LSP
+#+begin_src emacs-lisp
+  ;; Add company-lsp backend for metals
+  (use-package company-lsp)
         #+end_src
 
 ** Tree-Sitter
@@ -1059,21 +1066,30 @@ to work as-expected.
   ;; Enable scala-mode for highlighting, indentation and motion commands
   (use-package scala-mode
     :ensure t
+    :mode "\\.s\\(cala\\|bt\\)$"
     :hook (scala-mode . company-mode)
     :interpreter
     ("scala" . scala-mode))
 
-  ;; Enable sbt mode for executing sbt commands
   (use-package sbt-mode
-    :ensure t
     :commands sbt-start sbt-command
     :config
+    ;; WORKAROUND: https://github.com/ensime/emacs-sbt-mode/issues/31
+    ;; allows using SPACE when in the minibuffer
     (substitute-key-definition
      'minibuffer-complete-word
      'self-insert-command
-     minibuffer-local-completion-map)
-    ;; sbt-supershell kills sbt-mode:  https://github.com/hvesalai/emacs-sbt-mode/issues/152
-    (setq sbt:program-options '("-Dsbt.supershell=false")))
+     minibuffer-local-completion-map))
+
+
+  (use-package lsp-metals
+    :ensure t
+    :custom
+    ;; Metals claims to support range formatting by default but it supports range
+    ;; formatting of multiline strings only. You might want to disable it so that
+    ;; emacs can use indentation provided by scala-mode.
+    (lsp-metals-server-args '("-J-Dmetals.allow-multiline-string-formatting=off"))
+    :hook (scala-mode . lsp))
 #+end_src
 
 ** Tex
