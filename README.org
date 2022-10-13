@@ -963,6 +963,7 @@ It is very useful for figuring out how things work in Emacs.
 #+begin_src emacs-lisp
   (use-package company
     :ensure t
+    :hook ((prog-mode) . (lambda () (company-mode)))
     :bind (:map company-mode-map
                 ("<tab>" . 'company-indent-or-complete-common)
                 :map company-active-map
@@ -976,7 +977,6 @@ It is very useful for figuring out how things work in Emacs.
 
     (company-show-quick-access t)
     :config
-    (global-company-mode)
     (company-tng-configure-default))
 
   (use-package company-box
