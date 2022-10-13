@@ -424,7 +424,7 @@ Set up pixel-scrolling for a nice, modern-feeling experience (currently causing 
 #+begin_src emacs-lisp
   (defvar axiom/fixed-pitch-height 130)
   (defvar axiom/variable-pitch-height 160)
-  (setq line-spaceing 0.1)
+  (setq line-spacing 0.1)
 
   (defun axiom/setup-fonts ()
     (setq axiom/fixed-pitch-font (if (member "JuliaMono" (font-family-list))
