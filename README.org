@@ -542,49 +542,6 @@ Org Mode is one of the hallmark features of Emacs. It is a rich document editor,
 project planner, task and time tracker, blogging engine, and literate coding
 utility all wrapped up in one package.
 
-**** Custom Numbering
-#+begin_src emacs-lisp
-  (defun writer-mode--num-format (numbering)
-    "Alternative numbering format for org-num.
-     First level: 1 | xxx
-     Second level: 1.1 — xxx
-     Third level: 1.1.1 - xxx
-     etc.
-    "
-    (setq axiom/title-font (if (member "Magorian" (font-family-list))
-                               "Magorian"
-                             "Baskerville"))
-
-    (if (= (length numbering) 1)
-        (propertize (concat (mapconcat
-                             #'number-to-string
-                             numbering ".") " | " )
-                    'face `(:family axiom/title-font
-                                    :foreground ,(face-foreground 'shadow nil t)))
-      (propertize (concat (mapconcat
-                           #'number-to-string
-                           numbering ".") " — " )
-                  'face `(:family axiom/title-font
-                                  :foreground ,(face-foreground 'shadow nil t)))))
-
-  (font-lock-add-keywords 'org-mode
-                          '(("^*+ " 0 `(:family "Magorian"
-                                                :height 140
-                                                :foreground ,(face-foreground 'shadow nil t)) prepend)
-                            ) 'append)
-
-  (setq org-num-skip-unnumbered t)
-  (setq org-num-skip-footnotes t)
-  (setq org-num-max-level 3)
-  (setq org-num-face nil)
-
-
-  (setq org-modern-hide-stars nil)
-  (setq org-modern-star nil)
-  (setq org-num-format-function 'writer-mode--num-format)
-
-#+end_src
-
 **** Basic Config
 This section contains the basic configuration for org-mode plus the
 configuration for Org agendas and capture templates. There's a lot to unpack in
@@ -593,7 +550,6 @@ explanation.
 
 #+begin_src emacs-lisp
   (use-package org
-    :demand t
     :straight t
     :hook
     (org-mode . visual-line-mode)
@@ -636,6 +592,49 @@ explanation.
     (set-face-attribute 'org-code nil   :font axiom/org-mode-code-font :inherit '(shadow fixed-pitch))
     (set-face-attribute 'org-table nil   :font axiom/org-mode-code-font :inherit '(shadow fixed-pitch))
     (set-face-attribute 'org-verbatim nil :font axiom/org-mode-code-font :inherit '(shadow fixed-pitch)))
+#+end_src
+
+**** Custom Numbering
+#+begin_src emacs-lisp
+  (defun writer-mode--num-format (numbering)
+    "Alternative numbering format for org-num.
+     First level: 1 | xxx
+     Second level: 1.1 — xxx
+     Third level: 1.1.1 - xxx
+     etc.
+    "
+    (setq axiom/title-font (if (member "Magorian" (font-family-list))
+                               "Magorian"
+                             "Baskerville"))
+
+    (if (= (length numbering) 1)
+        (propertize (concat (mapconcat
+                             #'number-to-string
+                             numbering ".") " | " )
+                    'face `(:family axiom/title-font
+                                    :foreground ,(face-foreground 'shadow nil t)))
+      (propertize (concat (mapconcat
+                           #'number-to-string
+                           numbering ".") " — " )
+                  'face `(:family axiom/title-font
+                                  :foreground ,(face-foreground 'shadow nil t)))))
+
+  (font-lock-add-keywords 'org-mode
+                          '(("^*+ " 0 `(:family "Magorian"
+                                                :height 140
+                                                :foreground ,(face-foreground 'shadow nil t)) prepend)
+                            ) 'append)
+
+  (setq org-num-skip-unnumbered t)
+  (setq org-num-skip-footnotes t)
+  (setq org-num-max-level 3)
+  (setq org-num-face nil)
+
+
+  (setq org-modern-hide-stars nil)
+  (setq org-modern-star nil)
+  (setq org-num-format-function 'writer-mode--num-format)
+
 #+end_src
 
 **** Org-Modern
