@@ -632,7 +632,7 @@ explanation.
     (set-face-attribute 'org-document-title nil :inherit '(shadow axiom/title-font) :height 1.50)
     (set-face-attribute 'org-document-info nil :inherit '(shadow axiom/title-font) :height 1.20)
 
-    (set-face-attribute 'org-block nil :foreground nil :font axiom/org-mode-code-font :height 120 :inherit 'fixed-pitch :slant 'italic)
+    (set-face-attribute 'org-block nil :foreground nil :font axiom/org-mode-code-font :height 120 :inherit 'fixed-pitch)
     (set-face-attribute 'org-code nil   :font axiom/org-mode-code-font :inherit '(shadow fixed-pitch))
     (set-face-attribute 'org-table nil   :font axiom/org-mode-code-font :inherit '(shadow fixed-pitch))
     (set-face-attribute 'org-verbatim nil :font axiom/org-mode-code-font :inherit '(shadow fixed-pitch)))
@@ -1089,7 +1089,8 @@ It is very useful for figuring out how things work in Emacs.
     ;; formatting of multiline strings only. You might want to disable it so that
     ;; emacs can use indentation provided by scala-mode.
     (lsp-metals-server-args '("-J-Dmetals.allow-multiline-string-formatting=off"))
-    :hook (scala-mode . lsp))
+    :hook (scala-mode . lsp)
+    (before-save . lsp-format-buffer))
 #+end_src
 
 ** Tex
