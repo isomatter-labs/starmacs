@@ -573,8 +573,8 @@ explanation.
                     (org-level-8 . 1.05)))
       (set-face-attribute (car face) nil :font axiom/title-font :weight 'regular :height (cdr face)))
 
-    (set-face-attribute 'org-document-title nil :inherit '(shadow axiom/title-font) :weight 'regular :height 1.50)
-    (set-face-attribute 'org-document-info nil :inherit '(shadow axiom/title-font) :weight 'regular :height 1.20)
+    (set-face-attribute 'org-document-title nil :inherit '(shadow axiom/title-font) :weight 'light :height 1.50)
+    (set-face-attribute 'org-document-info nil :inherit '(shadow axiom/title-font) :weight 'light :height 1.20)
 
     (set-face-attribute 'org-block nil :foreground nil :font axiom/org-mode-code-font :height 120 :inherit 'fixed-pitch)
     (set-face-attribute 'org-code nil   :font axiom/org-mode-code-font :inherit '(shadow fixed-pitch))
