@@ -243,20 +243,6 @@ I like to display a column ruler at common styleguide limits
     (doom-themes-org-config)
     (if (window-system)
         (load-theme 'doom-one t))) ; Only load in GUI to reduce issues with comment-coloring
-
-  (defun axiom/toggle-theme ()
-    (interactive)
-    (cond
-     ((eq axiom/current-theme 'dark) (progn
-                                       (load-theme 'doom-one-light t)
-                                       (setq axiom/current-theme 'light)
-                                       (axiom/setup-fonts)))
-     ((eq axiom/current-theme 'light) (progn
-                                        (load-theme 'doom-one t)
-                                        (setq axiom/current-theme 'dark)
-                                        (axiom/setup-fonts)))))
-
-  (global-set-key (kbd "C-M-S-t") 'axiom/toggle-theme)
 #+end_src
 
 *** Markdown
@@ -426,20 +412,23 @@ Set up pixel-scrolling for a nice, modern-feeling experience (currently causing 
   (defvar axiom/variable-pitch-height 160)
   (setq-default line-spacing 0.1)
 
-  (defun axiom/setup-fonts ()
-    (setq axiom/fixed-pitch-font (if (member "JuliaMono" (font-family-list))
+    (defvar axiom/fixed-pitch-font (if (member "JuliaMono" (font-family-list))
                                      "JuliaMono"
                                    "Courier New"))
 
-    (setq axiom/variable-pitch-font (if (member "Crimson Pro" (font-family-list))
+    (defvar axiom/variable-pitch-font (if (member "Crimson Pro" (font-family-list))
                                         "Crimson Pro"
                                       "Times New Roman"))
 
-    (setq axiom/comment-face axiom/fixed-pitch-font)
+    (defvar axiom/comment-face axiom/fixed-pitch-font)
 
-    (setq axiom/org-mode-code-font (if (member "DM Mono" (font-family-list))
+    (defvar axiom/org-mode-code-font (if (member "DM Mono" (font-family-list))
                                        "DM Mono"
                                      axiom/fixed-pitch-font))
+
+   (defvar axiom/title-font (if (member "Magorian" (font-family-list))
+                                       "Magorian"
+                                     "Baskerville"))
 
 
     (set-face-attribute 'default nil :font axiom/fixed-pitch-font :height axiom/fixed-pitch-height)
@@ -449,10 +438,8 @@ Set up pixel-scrolling for a nice, modern-feeling experience (currently causing 
     (set-face-attribute 'font-lock-comment-face nil :slant 'italic :weight 'thin :font axiom/comment-face :inherit '(shadow))
     (set-face-attribute 'mode-line nil
                         :font axiom/fixed-pitch-font
-                        :height 1.1))       ;should be a little larger than regular text
-
-  (axiom/setup-fonts)
-    #+end_src
+                        :height 1.1)       ;should be a little larger than regular text
+     #+end_src
 
 *** Ligatures
 #+begin_src emacs-lisp
@@ -550,6 +537,7 @@ explanation.
 
 #+begin_src emacs-lisp
   (use-package org
+    :demand t
     :straight t
     :hook
     (org-mode . visual-line-mode)
@@ -585,8 +573,8 @@ explanation.
                     (org-level-8 . 1.05)))
       (set-face-attribute (car face) nil :font axiom/title-font :weight 'regular :height (cdr face)))
 
-    (set-face-attribute 'org-document-title nil :inherit '(shadow axiom/title-font) :height 1.50)
-    (set-face-attribute 'org-document-info nil :inherit '(shadow axiom/title-font) :height 1.20)
+    (set-face-attribute 'org-document-title nil :inherit '(shadow axiom/title-font) :weight 'regular :height 1.50)
+    (set-face-attribute 'org-document-info nil :inherit '(shadow axiom/title-font) :weight 'regular :height 1.20)
 
     (set-face-attribute 'org-block nil :foreground nil :font axiom/org-mode-code-font :height 120 :inherit 'fixed-pitch)
     (set-face-attribute 'org-code nil   :font axiom/org-mode-code-font :inherit '(shadow fixed-pitch))
@@ -603,10 +591,6 @@ explanation.
      Third level: 1.1.1 - xxx
      etc.
     "
-    (setq axiom/title-font (if (member "Magorian" (font-family-list))
-                               "Magorian"
-                             "Baskerville"))
-
     (if (= (length numbering) 1)
         (propertize (concat (mapconcat
                              #'number-to-string
@@ -620,7 +604,7 @@ explanation.
                                   :foreground ,(face-foreground 'shadow nil t)))))
 
   (font-lock-add-keywords 'org-mode
-                          '(("^*+ " 0 `(:family "Magorian"
+                          '(("^*+ " 0 `(:family axiom/title-font
                                                 :height 140
                                                 :foreground ,(face-foreground 'shadow nil t)) prepend)
                             ) 'append)
