@@ -897,7 +897,6 @@ It is very useful for figuring out how things work in Emacs.
   (use-package why-this
     :ensure t
     :custom (why-this-idle-delay 0)
-    :hook (org-mode . (lambda () (why-this-mode -1))) ;blaming is kind of annoying in files meant to be documentation
     :bind
     ("C-c b" . why-this-mode)
     ("C-c w" . why-this))
