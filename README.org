@@ -529,7 +529,7 @@ Org Mode is one of the hallmark features of Emacs. It is a rich document editor,
 project planner, task and time tracker, blogging engine, and literate coding
 utility all wrapped up in one package.
 
-**** Basic Config
+*** Basic Config
 This section contains the basic configuration for org-mode plus the
 configuration for Org agendas and capture templates. There's a lot to unpack in
 here so I'd recommend watching the videos for Part 5 and Part 6 for a full
@@ -582,7 +582,7 @@ explanation.
     (set-face-attribute 'org-verbatim nil :font axiom/org-mode-code-font :inherit '(shadow fixed-pitch)))
 #+end_src
 
-**** Custom Numbering
+*** Custom Numbering
 #+begin_src emacs-lisp
   (defun writer-mode--num-format (numbering)
     "Alternative numbering format for org-num.
@@ -621,7 +621,7 @@ explanation.
 
 #+end_src
 
-**** Org-Modern
+*** Org-Modern
 #+begin_src emacs-lisp
   (use-package org-modern
     :ensure t
@@ -630,7 +630,7 @@ explanation.
     (org-agenda-finalize . org-modern-agenda))
 #+end_src
 
-**** Center Org Buffers
+*** Center Org Buffers
 Here, visual-fill-column is used to center org-mode buffers for a more pleasing writing
 experience as it centers the contents of the buffer horizontally to seem more
 like you are editing a document. This is really a matter of personal preference
@@ -648,7 +648,7 @@ so you can remove the block below if you don't like the behavior.
     :hook (org-mode . axiom/org-mode-visual-fill))
 #+end_src
 
-**** Org-Roam
+*** Org-Roam
 #+begin_src emacs-lisp
   (use-package org-roam
     :ensure t
@@ -986,10 +986,11 @@ It is very useful for figuring out how things work in Emacs.
 
 ** LSP-Mode
 #+begin_src emacs-lisp
-  (use-package lsp-mode
-  ;; Optional - enable lsp-mode automatically in scala files
-  :hook (scala-mode . lsp)
-  :config (setq lsp-prefer-flymake nil))
+    (use-package lsp-mode
+      :hook
+      (scala-mode . lsp)
+      (typescript-mode . lsp)
+      :config (setq lsp-prefer-flymake nil))
 #+end_src
 *** LSP-UI
 #+begin_src emacs-lisp
