@@ -331,25 +331,42 @@ Set up pixel-scrolling for a nice, modern-feeling experience (currently causing 
 
 *** Dashboard
 #+begin_src emacs-lisp
-  (defun no-linum ()
-    (display-line-numbers-mode -1))
+   (defun no-linum ()
+     (display-line-numbers-mode -1))
 
-  (use-package dashboard
-    :ensure t
-    :config
-    (setq dashboard-banner-logo-title "Welcome to Emacs, A hackable text editor for the 21st Century!")
-    (setq initial-buffer-choice (lambda () (get-buffer "*dashboard*"))) ; for emacs daemon
-    (setq dashboard-items '((projects . 5)
-                            (recents . 5)
-                            (agenda . 5)))
-    (dashboard-modify-heading-icons '((recents . "file-text")))
-    (setq dashboard-set-navigator t)
-    (setq dashboard-set-file-icons t)
-    (setq dashboard-startup-banner "~/.emacs.d/img/emacs.png") ; set to path to image file to customize
-    (setq dashboard-set-footer nil)
-    (dashboard-setup-startup-hook)
-    (setq dashboard-center-content t)
-    (add-hook 'dashboard-mode-hook 'no-linum)) ; turn off line numbers for dashboard
+  (defun axiom/dashboard ()
+     "Show minimal *welcome* buffer"
+     (with-current-buffer (get-buffer-create "*Welcome*")
+       (setq truncate-lines t)
+       (no-linum)
+       (let* ((buffer-read-only)
+              (image-path "~/.emacs.d/img/emacs.png")
+              (image (create-image image-path))
+              (size (image-size image))
+              (height (cdr size))
+              (width (car size))
+              (top-margin (floor (/ (- (window-height) height) 2)))
+              (left-margin (floor (/ (- (window-width) width) 2)))
+              (title "A hackable text editor for the 21st Century!"))
+         (erase-buffer)
+         (setq mode-line-format nil)
+         (goto-char (point-min))
+         (insert (make-string top-margin ?\n ))
+         (insert (make-string left-margin ?\ ))
+         (insert-image image)
+         (insert "\n\n\n")
+         (insert (make-string (floor (/ (- (window-width) (string-width title)) 2)) ?\ ))
+         (insert title))
+       (setq cursor-type nil)
+       (read-only-mode +1)
+       (switch-to-buffer (current-buffer))
+       (local-set-key (kbd "q") 'kill-this-buffer)))
+
+  (when (< (length command-line-args) 2)
+    (add-hook 'emacs-startup-hook (lambda ()
+                                   (when (display-graphic-p)
+                                     (axiom/dashboard)))))
+
 #+end_src
 
 *** Rainbow Delimiters
