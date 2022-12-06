@@ -242,7 +242,7 @@ I like to display a column ruler at common styleguide limits
     (doom-themes-visual-bell-config)
     (doom-themes-org-config)
     (if (window-system)
-        (load-theme 'doom-one t))) ; Only load in GUI to reduce issues with comment-coloring
+        (load-theme 'doom-nord-aurora t))) ; Only load in GUI to reduce issues with comment-coloring
 #+end_src
 
 *** Markdown
@@ -439,9 +439,9 @@ Set up pixel-scrolling for a nice, modern-feeling experience (currently causing 
 
     (defvar axiom/comment-face axiom/fixed-pitch-font)
 
-    (defvar axiom/org-mode-code-font (if (member "DM Mono" (font-family-list))
-                                       "DM Mono"
-                                     axiom/fixed-pitch-font))
+      (defvar axiom/org-mode-code-font (if (member "Drafting Mono" (font-family-list))
+                                         "Drafting Mono"
+                                       axiom/fixed-pitch-font))
 
    (defvar axiom/title-font (if (member "Magorian" (font-family-list))
                                        "Magorian"
