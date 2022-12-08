@@ -242,7 +242,7 @@ I like to display a column ruler at common styleguide limits
     (doom-themes-visual-bell-config)
     (doom-themes-org-config)
     (if (window-system)
-        (load-theme 'doom-nord-aurora t))) ; Only load in GUI to reduce issues with comment-coloring
+        (load-theme 'doom-one t))) ; Only load in GUI to reduce issues with comment-coloring
 #+end_src
 
 *** Markdown
