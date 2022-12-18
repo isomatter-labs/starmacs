@@ -1002,11 +1002,12 @@ It is very useful for figuring out how things work in Emacs.
 
 ** LSP-Mode
 #+begin_src emacs-lisp
-    (use-package lsp-mode
-      :hook
-      (scala-mode . lsp)
-      (typescript-mode . lsp)
-      :config (setq lsp-prefer-flymake nil))
+  (use-package lsp-mode
+    :hook
+    (scala-mode . lsp)
+    (typescript-mode . lsp)
+    (python-mode . lsp)
+    :config (setq lsp-prefer-flymake nil))
 #+end_src
 *** LSP-UI
 #+begin_src emacs-lisp
