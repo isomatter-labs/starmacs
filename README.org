@@ -550,7 +550,7 @@ utility all wrapped up in one package.
     :straight t
     :hook
     (org-mode . visual-line-mode)
-    (org-mode . variable-pitch-mode)
+   ;(org-mode . variable-pitch-mode)
     (org-mode . (lambda () (indent-tabs-mode -1)))
     (org-mode . org-num-mode)
 
@@ -971,6 +971,7 @@ It is very useful for figuring out how things work in Emacs.
     (scala-mode . lsp)
     (typescript-mode . lsp)
     (python-mode . lsp)
+    (before-save . #'lsp-format-buffer)
     :config (setq lsp-prefer-flymake nil))
 #+end_src
 *** LSP-UI
