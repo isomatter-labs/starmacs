@@ -433,9 +433,7 @@ Set up pixel-scrolling for a nice, modern-feeling experience (currently causing 
                                      "JuliaMono"
                                    "Courier New"))
 
-    (defvar axiom/variable-pitch-font (if (member "Crimson Pro" (font-family-list))
-                                        "Crimson Pro"
-                                      "Times New Roman"))
+    (defvar axiom/variable-pitch-font "Times New Roman")
 
     (defvar axiom/comment-face axiom/fixed-pitch-font)
 
@@ -443,9 +441,7 @@ Set up pixel-scrolling for a nice, modern-feeling experience (currently causing 
                                          "Drafting Mono"
                                        axiom/fixed-pitch-font))
 
-   (defvar axiom/title-font (if (member "Magorian" (font-family-list))
-                                       "Magorian"
-                                     "Baskerville"))
+   (defvar axiom/title-font "Baskerville")
 
 
     (set-face-attribute 'default nil :font axiom/fixed-pitch-font :height axiom/fixed-pitch-height)
@@ -546,11 +542,7 @@ Org Mode is one of the hallmark features of Emacs. It is a rich document editor,
 project planner, task and time tracker, blogging engine, and literate coding
 utility all wrapped up in one package.
 
-*** Basic Config
-This section contains the basic configuration for org-mode plus the
-configuration for Org agendas and capture templates. There's a lot to unpack in
-here so I'd recommend watching the videos for Part 5 and Part 6 for a full
-explanation.
+** Basic Config
 
 #+begin_src emacs-lisp
   (use-package org
@@ -569,16 +561,6 @@ explanation.
      org-pretty-entities t
      org-ellipsis "…"
 
-     ;; Agenda styling
-     org-agenda-tags-column 0
-     org-agenda-block-separator ?─
-     org-agenda-time-grid
-     '((daily today require-timed)
-       (800 1000 1200 1400 1600 1800 2000)
-       " ┄┄┄┄┄ " "┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄")
-     org-agenda-current-time-string
-     "⭠ now ─────────────────────────────────────────────────")
-
 
     (dolist (face '((org-level-1 . 1.30)
                     (org-level-2 . 1.20)
@@ -596,7 +578,7 @@ explanation.
     (set-face-attribute 'org-block nil :foreground nil :font axiom/org-mode-code-font :height 120 :inherit 'fixed-pitch)
     (set-face-attribute 'org-code nil   :font axiom/org-mode-code-font :inherit '(shadow fixed-pitch))
     (set-face-attribute 'org-table nil   :font axiom/org-mode-code-font :inherit '(shadow fixed-pitch))
-    (set-face-attribute 'org-verbatim nil :font axiom/org-mode-code-font :inherit '(shadow fixed-pitch)))
+    (set-face-attribute 'org-verbatim nil :font axiom/org-mode-code-font :inherit '(shadow fixed-pitch))))
 #+end_src
 
 *** Custom Numbering
@@ -647,25 +629,7 @@ explanation.
     (org-agenda-finalize . org-modern-agenda))
 #+end_src
 
-*** Center Org Buffers
-Here, visual-fill-column is used to center org-mode buffers for a more pleasing writing
-experience as it centers the contents of the buffer horizontally to seem more
-like you are editing a document. This is really a matter of personal preference
-so you can remove the block below if you don't like the behavior.
-
-#+begin_src emacs-lisp
-  (defun axiom/org-mode-visual-fill ()
-    (setq visual-fill-column-width 150
-          visual-fill-column-center-text t
-          visual-fill-column-fringes-outside-margins nil)
-    (visual-fill-column-mode 1))
-
-  (use-package visual-fill-column
-    :ensure t
-    :hook (org-mode . axiom/org-mode-visual-fill))
-#+end_src
-
-*** Org-Roam
+** Org-Roam
 #+begin_src emacs-lisp
   (use-package org-roam
     :ensure t
