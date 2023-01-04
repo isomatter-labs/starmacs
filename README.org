@@ -971,7 +971,6 @@ It is very useful for figuring out how things work in Emacs.
     (scala-mode . lsp)
     (typescript-mode . lsp)
     (python-mode . lsp)
-    (before-save . #'lsp-format-buffer)
     :config (setq lsp-prefer-flymake nil))
 #+end_src
 *** LSP-UI
@@ -1001,6 +1000,13 @@ It is very useful for figuring out how things work in Emacs.
   (add-hook 'python-mode-hook
             (lambda ()
               (setq comment-start " # ")))
+#+end_src
+*** Black
+#+begin_src emacs-lisp
+  (use-package python-black
+  :demand t
+  :after python
+  :hook (python-mode . python-black-on-save-mode-enable-dwim))
 #+end_src
 
 ** TypeScript
