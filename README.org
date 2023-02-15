@@ -127,16 +127,17 @@ When text is highlighted, typing should delete the highlighted text and insert w
   (add-hook 'prog-mode-hook (lambda () (setq show-trailing-whitespace t)))
   (add-hook 'before-save-hook 'delete-trailing-whitespace)
   ;; whitespace-space-regexp will only work with selective highlighting, not with space-mark
-                                          ;(setq whitespace-space-regexp "\\( \\{2,\\}\\)")
+					  ;(setq whitespace-space-regexp "\\( \\{2,\\}\\)")
+  (setq-default tab-width 4)
   (setq whitespace-style (quote (face tabs newline tab-mark newline-mark)))
   (custom-set-faces
-   '(whitespace-tab((t (:foreground "#E06C75")))) ; make tabs _very_ noticable
+   '(whitespace-tab((t (:foreground "#525252"))))
    '(whitespace-space((t (:foreground "#525252"))))
    '(whitespace-newline((t (:foreground "#525252")))))
   (setq whitespace-display-mappings
-        '((space-mark 32 [183] [46])
-          (newline-mark 10 [172 10])
-          (tab-mark 9 [187 9] [92 9])))
+	'((space-mark 32 [183] [46])
+	  (newline-mark 10 [172 10])
+	  (tab-mark 9 [187 9] [9655 9] [92 9])))
   (global-whitespace-mode 1)
 #+end_src
 
