@@ -385,34 +385,6 @@ Set up pixel-scrolling for a nice, modern-feeling experience (currently causing 
     (find-font (font-spec :name font-name)))
 #+end_src
 
-*** Installing
-#+begin_src emacs-lisp
-  (defun install-plex ()
-    (when (and (window-system) ( not (string-equal system-type "windows-nt")))
-      (progn
-        (message "Installing IBM Plex -- You might want to grab a cup of something...")
-        (call-process "/bin/bash" nil nil nil "-c" "wget 'https://github.com/IBM/plex/releases/download/v6.0.2/OpenType.zip' -O ~/.emacs.d/fonts/plex.zip")
-        (call-process "/bin/bash" nil nil nil "-c" "unzip ~/.emacs.d/fonts/plex.zip -d ~/.local/share/fonts")
-        (call-process "/bin/bash" nil nil nil "-c" "rm ~/.emacs.d/fonts/plex.zip")
-        (message "Installed IBM Plex"))))
-
-  (defun cache-fonts ()
-    (unless
-        (string-equal system-type "windows-nt")
-      (progn
-        (message "Running fc-cache -f")
-        (call-process "/bin/bash" nil nil nil "-c" "fc-cache -f")
-        (message "Fonts installed"))))
-
-  (unless (window-system)
-    (progn
-      (unless (file-directory-p "~/.local/share/fonts")
-        (make-directory "~/.local/share/fonts" :parents))
-      (unless (member "IBM Plex Mono" (font-family-list))
-        (install-plex))
-      (cache-fonts)))
-#+end_src
-
 *** All the Icons
 #+begin_src emacs-lisp
   (use-package all-the-icons
@@ -971,6 +943,7 @@ It is very useful for figuring out how things work in Emacs.
     (scala-mode . lsp)
     (typescript-mode . lsp)
     (python-mode . lsp)
+    (go-mode . lsp)
     :config (setq lsp-prefer-flymake nil))
 #+end_src
 *** LSP-UI
@@ -994,6 +967,15 @@ It is very useful for figuring out how things work in Emacs.
 #+end_src
 
 * Language Specific IDE-Like Features
+** Go
+#+begin_src emacs-lisp
+  (use-package go-mode
+    :ensure t
+    :config
+    (setq gc-cons-threshold 100000000)
+    (setq read-process-output-max (* 1024 1024)))
+#+end_src
+
 ** Python
 *** PEP8-compliant comments
 #+begin_src emacs-lisp
@@ -1004,9 +986,9 @@ It is very useful for figuring out how things work in Emacs.
 *** Black
 #+begin_src emacs-lisp
   (use-package python-black
-  :demand t
-  :after python
-  :hook (python-mode . python-black-on-save-mode-enable-dwim))
+    :demand t
+    :after python
+    :hook (python-mode . python-black-on-save-mode-enable-dwim))
 #+end_src
 
 ** TypeScript
