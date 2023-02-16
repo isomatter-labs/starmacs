@@ -126,19 +126,19 @@ When text is highlighted, typing should delete the highlighted text and insert w
 #+begin_src emacs-lisp
   (add-hook 'prog-mode-hook (lambda () (setq show-trailing-whitespace t)))
   (add-hook 'before-save-hook 'delete-trailing-whitespace)
-  ;; whitespace-space-regexp will only work with selective highlighting, not with space-mark
-					  ;(setq whitespace-space-regexp "\\( \\{2,\\}\\)")
+
   (setq-default tab-width 4)
   (setq whitespace-style (quote (face tabs newline tab-mark newline-mark)))
+
+  (setq whitespace-display-mappings
+        '((newline-mark 10 [172 10])
+          (tab-mark 9 [187 9] [92 9])))
+  (global-whitespace-mode 't)
+
   (custom-set-faces
    '(whitespace-tab((t (:foreground "#525252"))))
-   '(whitespace-space((t (:foreground "#525252"))))
    '(whitespace-newline((t (:foreground "#525252")))))
-  (setq whitespace-display-mappings
-	'((space-mark 32 [183] [46])
-	  (newline-mark 10 [172 10])
-	  (tab-mark 9 [187 9] [9655 9] [92 9])))
-  (global-whitespace-mode 1)
+
 #+end_src
 
 ** Column Ruler
@@ -931,32 +931,16 @@ It is very useful for figuring out how things work in Emacs.
 #+end_src
 
 * LSP Features
-** DAP-Mode
+** Eglot
 #+begin_src emacs-lisp
-  (use-package dap-mode
-    )
-#+end_src
-
-** LSP-Mode
-#+begin_src emacs-lisp
-  (use-package lsp-mode
+  (use-package eglot
     :hook
-    (scala-mode . lsp)
-    (typescript-mode . lsp)
-    (python-mode . lsp)
-    (go-mode . lsp)
+    (scala-mode . eglot-ensure)
+    (typescript-mode . eglot-ensure)
+    (python-mode . eglot-ensure)
+    (go-mode . eglot-ensure)
     :config (setq lsp-prefer-flymake nil))
 #+end_src
-*** LSP-UI
-#+begin_src emacs-lisp
-  (use-package lsp-ui)
-#+end_src
-
-*** Company-LSP
-#+begin_src emacs-lisp
-  ;; Add company-lsp backend for metals
-  (use-package company-lsp)
-        #+end_src
 
 ** Tree-Sitter
 #+begin_src emacs-lisp
@@ -973,6 +957,7 @@ It is very useful for figuring out how things work in Emacs.
   (use-package go-mode
     :ensure t
     :config
+    (add-hook 'before-save-hook 'gofmt-before-save)
     (setq gc-cons-threshold 100000000)
     (setq read-process-output-max (* 1024 1024)))
 #+end_src
@@ -1006,46 +991,26 @@ It is very useful for figuring out how things work in Emacs.
   (use-package vterm
     :ensure t)
 
+  (use-package julia-repl)
+
+  (use-package eglot-jl)
+
   (use-package julia-mode
-    :ensure t
-    :interpreter ("julia" . julia-mode))
-
-  (use-package julia-snail
-    :ensure t
-    :hook
-    (julia-mode . julia-snail-mode))
-#+end_src
-
-** Scala
-#+begin_src emacs-lisp
-  ;; Enable scala-mode for highlighting, indentation and motion commands
-  (use-package scala-mode
-    :ensure t
-    :mode "\\.s\\(cala\\|bt\\)$"
-    :hook (scala-mode . company-mode)
-    :interpreter
-    ("scala" . scala-mode))
-
-  (use-package sbt-mode
-    :commands sbt-start sbt-command
+    :mode "\\.jl\\'"
+    :interpreter ("julia" . julia-mode)
+    :init (setenv "JULIA_NUM_THREADS" "6")
     :config
-    ;; WORKAROUND: https://github.com/ensime/emacs-sbt-mode/issues/31
-    ;; allows using SPACE when in the minibuffer
-    (substitute-key-definition
-     'minibuffer-complete-word
-     'self-insert-command
-     minibuffer-local-completion-map))
+    (add-hook 'julia-mode-hook 'julia-repl-mode)
+    (add-hook 'julia-mode-hook 'eglot-jl-init)
+    (add-hook 'julia-mode-hook 'eglot-ensure)
+    (add-hook 'julia-mode-hook (lambda () (setq julia-repl-set-terminal-backend 'vterm)))
+    (add-hook 'julia-mode-hook (lambda () (setq julia-repl-set-terminal-backend 'vterm)))
+    (add-hook 'julia-mode-hook (lambda () (setq julia-repl-set-terminal-backend 'vterm))))
 
-
-  (use-package lsp-metals
-    :ensure t
-    :custom
-    ;; Metals claims to support range formatting by default but it supports range
-    ;; formatting of multiline strings only. You might want to disable it so that
-    ;; emacs can use indentation provided by scala-mode.
-    (lsp-metals-server-args '("-J-Dmetals.allow-multiline-string-formatting=off"))
-    :hook (scala-mode . lsp)
-    (before-save . lsp-format-buffer))
+  (setq eglot-jl-julia-command "/usr/local/bin/julia")
+  (setq julia-repl-executable-records
+        '((default "/usr/local/bin/julia")
+          (master "/usr/local/bin/julia")))
 #+end_src
 
 ** Tex
