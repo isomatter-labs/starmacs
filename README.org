@@ -895,6 +895,17 @@ It is very useful for figuring out how things work in Emacs.
 #+end_src
 
 * Auto-Completion
+** Copilot
+#+begin_src emacs-lisp
+  (use-package copilot
+    :straight (:host github :repo "zerolfx/copilot.el" :files ("dist" "*.el"))
+    :hook (prog-mode . copilot-mode)
+    :config
+    (define-key copilot-completion-map (kbd "C-f") 'copilot-accept-completion) ; using forward motion to accept completion like Warp
+    (define-key copilot-completion-map (kbd "<right>") 'copilot-accept-completion)
+    :ensure t)
+#+end_src
+
 ** Company-mode
 #+begin_src emacs-lisp
   (use-package company
