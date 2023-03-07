@@ -28,10 +28,7 @@
  ;; If there is more than one, they won't work right.
  '(blamer-face ((t :foreground "#7a88cf" :background nil :height 140 :italic t)))
  '(treemacs-fringe-indicator-face ((t (:inherit font-lock-doc-face))))
- '(treemacs-git-ignored-face ((t (:inherit (shadow)))))
- '(whitespace-newline ((t (:foreground "#525252"))))
- '(whitespace-space ((t (:foreground "#525252"))))
- '(whitespace-tab ((t (:foreground "#E06C75")))))
+ '(treemacs-git-ignored-face ((t (:inherit (shadow))))))
 (put 'downcase-region 'disabled nil)
 (provide 'init)
 ;;; init.el ends here
