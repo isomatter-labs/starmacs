@@ -1041,3 +1041,9 @@ It is very useful for figuring out how things work in Emacs.
     :ensure auctex)
 
 #+end_src
+
+** Protobufs
+#+begin_src emacs-lisp
+  (use-package protobuf-mode
+	:straight t)
+#+end_src
