@@ -950,6 +950,7 @@ It is very useful for figuring out how things work in Emacs.
     (typescript-mode . eglot-ensure)
     (python-mode . eglot-ensure)
     (go-mode . eglot-ensure)
+    (f90-mode . eglot-ensure)
     :config (setq lsp-prefer-flymake nil))
 #+end_src
 
@@ -1046,4 +1047,9 @@ It is very useful for figuring out how things work in Emacs.
 #+begin_src emacs-lisp
   (use-package protobuf-mode
 	:straight t)
+#+end_src
+
+** Fortran
+#+begin_src emacs-lisp
+  (add-to-list 'eglot-server-programs '(f90-mode . ("fortls" "--notify_init" "--nthreads=4")))
 #+end_src
