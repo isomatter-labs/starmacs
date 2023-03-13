@@ -933,8 +933,6 @@ It is very useful for figuring out how things work in Emacs.
     (add-hook 'julia-mode-hook 'julia-repl-mode)
     (add-hook 'julia-mode-hook 'eglot-jl-init)
     (add-hook 'julia-mode-hook 'eglot-ensure)
-    (add-hook 'julia-mode-hook (lambda () (setq julia-repl-set-terminal-backend 'vterm)))
-    (add-hook 'julia-mode-hook (lambda () (setq julia-repl-set-terminal-backend 'vterm)))
     (add-hook 'julia-mode-hook (lambda () (setq julia-repl-set-terminal-backend 'vterm))))
 
   (setq eglot-jl-julia-command "/usr/local/bin/julia")
