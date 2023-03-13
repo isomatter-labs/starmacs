@@ -324,8 +324,8 @@ Set up pixel-scrolling for a nice, modern-feeling experience (currently causing 
       (defvar axiom/variable-pitch-height 130)
       (setq-default line-spacing 0.1)
 
-        (defvar axiom/fixed-pitch-font (if (member "Lilex" (font-family-list))
-                                         "Lilex"
+        (defvar axiom/fixed-pitch-font (if (member "JuliaMono" (font-family-list))
+                                         "JuliaMono"
                                        "Courier New"))
 
         (defvar axiom/variable-pitch-font "Times New Roman")
