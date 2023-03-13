@@ -4,6 +4,9 @@
 #+STARTUP: overview
 
 
+[[./img/emacs.png]]
+
+
 * What is Axiom?
 Axiom is yet another set of defaults for emacs, with one (and only one) purpose:
 it attempts to get out of your way, and add as little magic as possible.
