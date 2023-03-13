@@ -33,7 +33,7 @@ LSP is only becoming more relevant, and magit is the only thing close to the kin
 that is becoming expected in the modern world of editors.
 
 ** Extras
-Settings for some languages have been pre-configured (primarily Python) this is unabashedly because they are languages I use often, and Axiom is developed primarily for my own use.
+Settings for some languages have been pre-configured (primarily Go and Julia) this is unabashedly because they are languages I use often, and Axiom is developed primarily for my own use.
 
 ** Things You May Prefer
 Axiom is not necessarily for everyone; you may prefer one of the following:
