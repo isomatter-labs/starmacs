@@ -215,7 +215,7 @@ I like to display a column ruler at common styleguide limits
 *** Scrolling
 Set up pixel-scrolling for a nice, modern-feeling experience (currently causing lag on long files)
 #+begin_src emacs-lisp
-  ;(pixel-scroll-mode 1)
+  (pixel-scroll-precision-mode 1)
 #+end_src
 
 *** Cursor
@@ -324,8 +324,8 @@ Set up pixel-scrolling for a nice, modern-feeling experience (currently causing 
       (defvar axiom/variable-pitch-height 130)
       (setq-default line-spacing 0.1)
 
-        (defvar axiom/fixed-pitch-font (if (member "JuliaMono" (font-family-list))
-                                         "JuliaMono"
+        (defvar axiom/fixed-pitch-font (if (member "IBM Plex Mono" (font-family-list))
+                                         "IBM Plex Mono"
                                        "Courier New"))
 
         (defvar axiom/variable-pitch-font "Times New Roman")
@@ -343,7 +343,7 @@ Set up pixel-scrolling for a nice, modern-feeling experience (currently causing 
         (set-face-attribute 'fixed-pitch nil :font axiom/fixed-pitch-font :height axiom/fixed-pitch-height)
 
         (set-face-attribute 'variable-pitch nil :font axiom/variable-pitch-font :height axiom/variable-pitch-height)
-        (set-face-attribute 'font-lock-comment-face nil :slant 'italic :weight 'thin :font axiom/comment-face :inherit '(shadow))
+        (set-face-attribute 'font-lock-comment-face nil :slant 'italic :font axiom/comment-face :inherit '(shadow))
         (set-face-attribute 'mode-line nil
                             :font axiom/fixed-pitch-font
                             :height 1.1)
