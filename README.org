@@ -252,6 +252,14 @@ Set up pixel-scrolling for a nice, modern-feeling experience (currently causing 
       (global-hl-line-mode 1))
 #+end_src
 
+*** Highlight TODOs
+#+begin_src emacs-lisp
+  (use-package hl-todo
+    :ensure t
+    :config
+    (global-hl-todo-mode 1))
+#+end_src
+
 *** Dashboard
 #+begin_src emacs-lisp
    (defun no-linum ()
