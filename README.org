@@ -902,8 +902,7 @@ It is very useful for figuring out how things work in Emacs.
 #+begin_src emacs-lisp
   (use-package tree-sitter
     :ensure t
-    :hook
-    (prog-mode . tree-sitter-hl-mode)
+    :hook (prog-mode . tree-sitter-hl-mode)
     :config
     (global-tree-sitter-mode t))
 
