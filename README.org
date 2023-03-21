@@ -996,3 +996,15 @@ It is very useful for figuring out how things work in Emacs.
 #+begin_src emacs-lisp
   (add-to-list 'eglot-server-programs '(f90-mode . ("fortls" "--notify_init" "--nthreads=4")))
 #+end_src
+
+* Sampling the Future
+** ChatGPT
+#+begin_src emacs-lisp
+  (use-package chatgpt-shell
+    :ensure t
+    :straight (:host github :repo "xenodium/chatgpt-shell" :files ("dist" "*.el"))
+    :config
+    (setq chatgpt-shell-openai-key (replace-regexp-in-string "\n\\'" "" (with-temp-buffer
+                                     (insert-file-contents "~/.emacs.d/chatgpt-api-key.txt")
+                                     (buffer-string)))))
+#+end_src
