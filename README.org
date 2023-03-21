@@ -901,7 +901,6 @@ It is very useful for figuring out how things work in Emacs.
 #+begin_src emacs-lisp
   (use-package tree-sitter
     :ensure t
-    :hook (prog-mode . tree-sitter-hl-mode)
     :config
     (global-tree-sitter-mode t))
 
@@ -913,6 +912,7 @@ It is very useful for figuring out how things work in Emacs.
 #+begin_src emacs-lisp
   (use-package go-mode
     :ensure t
+    :hook (go-mode . tree-sitter-hl-mode)
     :config
     (add-hook 'before-save-hook 'gofmt-before-save)
     (setq gc-cons-threshold 100000000)
