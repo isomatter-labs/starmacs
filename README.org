@@ -336,19 +336,17 @@ Set up pixel-scrolling for a nice, modern-feeling experience (currently causing 
                                      "Iosevka"
                                    "Courier New"))
 
-  (defvar axiom/variable-pitch-font (if (member "Go" (font-family-list))
-                                        "Go"
+  (defvar axiom/variable-pitch-font (if (member "Merriweather" (font-family-list))
+                                        "Merriweather"
                                       "Times New Roman"))
 
   (defvar axiom/comment-face axiom/fixed-pitch-font)
 
-  (defvar axiom/org-mode-code-font (if (member "Go Mono" (font-family-list))
-                                       "Go Mono"
+  (defvar axiom/org-mode-code-font (if (member "Source Code Pro" (font-family-list))
+                                       "Source Code Pro"
                                      axiom/fixed-pitch-font))
 
-  (defvar axiom/title-font (if (member "Go Smallcaps" (font-family-list))
-                               "Go Smallcaps"
-                             "Baskerville"))
+  (defvar axiom/title-font "Helvetica")
 
 
   (set-face-attribute 'default nil :font axiom/fixed-pitch-font :height axiom/fixed-pitch-height)
@@ -463,7 +461,6 @@ utility all wrapped up in one package.
 
     :config
     (setq
-     ;; Org styling, hide markup etc.
      org-hide-emphasis-markers t
      org-pretty-entities t
      org-ellipsis "…")
@@ -479,8 +476,8 @@ utility all wrapped up in one package.
                     (org-level-8 . 1.05)))
       (set-face-attribute (car face) nil :font axiom/title-font :weight 'regular :height (cdr face)))
 
-    (set-face-attribute 'org-document-title nil :inherit '(shadow axiom/title-font) :weight 'light :height 1.50)
-    (set-face-attribute 'org-document-info nil :inherit '(shadow axiom/title-font) :weight 'light :height 1.20)
+    (set-face-attribute 'org-document-title nil :font axiom/title-font :height 1.50)
+    (set-face-attribute 'org-document-info nil :font axiom/title-font :inherit '(shadow) :height 1.20)
 
     (set-face-attribute 'org-block nil :foreground nil :font axiom/org-mode-code-font :height 120 :inherit 'fixed-pitch)
     (set-face-attribute 'org-code nil   :font axiom/org-mode-code-font :inherit '(shadow fixed-pitch))
