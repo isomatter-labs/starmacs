@@ -325,37 +325,47 @@ Set up pixel-scrolling for a nice, modern-feeling experience (currently causing 
                (window-system))
       (all-the-icons-install-fonts t)))
 #+end_src
-
-*** Defaults
+*** Default Fonts
+**** Install Defaults
 #+begin_src emacs-lisp
-    (defvar axiom/fixed-pitch-height 140)
-    (defvar axiom/variable-pitch-height 130)
-    (setq-default line-spacing 0.1)
+  (defun install-default-fonts ()
+    (when (and
+           (window-system)
+           (string-equal system-type "darwin"))
+      (progn
+        (message "Installing Default Fonts")
+        (call-process "/bin/bash" nil nil nil "-c" "cp ~/.emacs.d/fonts/*.ttf ~/Library/Fonts")
+        (message "Installed Default Fonts"))))
+#+end_src
+**** Set Defaults
+#+begin_src emacs-lisp
+  (defvar axiom/fixed-pitch-height 140)
+  (defvar axiom/variable-pitch-height 130)
+  (setq-default line-spacing 0.1)
 
-    (defvar axiom/fixed-pitch-font (if (member "Iosevka" (font-family-list))
-                                       "Iosevka"
-                                     "Courier New"))
+  (defvar axiom/fixed-pitch-font (if (member "Iosevka" (font-family-list))
+                                     "Iosevka"
+                                   "Menlo"))
 
-    (defvar axiom/variable-pitch-font (if (member "Merriweather" (font-family-list))
-                                          "Merriweather"
-                                        "Times New Roman"))
+  (if (not (and (member "Hubot-Sans" font-family-list) (member "Mona-Sans" font-family-list)))
+      (install-default-fonts))
 
-    (defvar axiom/comment-face axiom/fixed-pitch-font)
+  (defvar axiom/variable-pitch-font "Hubot-Sans")
 
-    (defvar axiom/org-mode-code-font (if (member "Source Code Pro" (font-family-list))
-                                         "Source Code Pro"
-                                       axiom/fixed-pitch-font))
+  (defvar axiom/comment-face axiom/fixed-pitch-font)
 
-    (defvar axiom/title-font "Helvetica")
+  (defvar axiom/org-mode-code-font "Menlo")
+
+  (defvar axiom/title-font "Mona-Sans")
 
 
-    (set-face-attribute 'default nil :font axiom/fixed-pitch-font :height axiom/fixed-pitch-height)
-    (set-face-attribute 'fixed-pitch nil :font axiom/fixed-pitch-font :height axiom/fixed-pitch-height)
+  (set-face-attribute 'default nil :font axiom/fixed-pitch-font :height axiom/fixed-pitch-height)
+  (set-face-attribute 'fixed-pitch nil :font axiom/fixed-pitch-font :height axiom/fixed-pitch-height)
 
-    (set-face-attribute 'variable-pitch nil :font axiom/variable-pitch-font :height axiom/variable-pitch-height)
-    (set-face-attribute 'font-lock-comment-face nil :slant 'italic :font axiom/comment-face :inherit '(shadow))
-    (set-face-attribute 'mode-line nil
-                        :font axiom/fixed-pitch-font)
+  (set-face-attribute 'variable-pitch nil :font axiom/variable-pitch-font :height axiom/variable-pitch-height)
+  (set-face-attribute 'font-lock-comment-face nil :slant 'italic :font axiom/comment-face :inherit '(shadow))
+  (set-face-attribute 'mode-line nil
+                      :font axiom/fixed-pitch-font)
      #+end_src
 
 *** Ligatures

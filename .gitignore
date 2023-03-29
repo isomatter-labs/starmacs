@@ -21,3 +21,4 @@ url/
 /.org-id-locations
 /org-roam.db
 /org-persist/
+/.DS_Store
