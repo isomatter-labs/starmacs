@@ -327,15 +327,15 @@ Set up pixel-scrolling for a nice, modern-feeling experience (currently causing 
 #+end_src
 *** Default Fonts
 **** Install Defaults
-#+begin_src emacs-lisp
-  (defun install-default-fonts ()
-    (when (and
-           (window-system)
-           (string-equal system-type "darwin"))
-      (progn
-        (message "Installing Default Fonts")
-        (call-process "/bin/bash" nil nil nil "-c" "cp ~/.emacs.d/fonts/*.ttf ~/Library/Fonts")
-        (message "Installed Default Fonts"))))
+  #+begin_src emacs-lisp
+    (defun install-default-fonts ()
+      (when (and
+             (window-system)
+             (string-equal system-type "darwin"))
+        (progn
+          (message "Installing Default Fonts")
+          (call-process "/bin/bash" nil nil nil "-c" "cp ~/.emacs.d/fonts/*.ttf ~/Library/Fonts")
+          (message "Installed Default Fonts"))))
 #+end_src
 **** Set Defaults
 #+begin_src emacs-lisp
@@ -347,7 +347,7 @@ Set up pixel-scrolling for a nice, modern-feeling experience (currently causing 
                                      "Iosevka"
                                    "Menlo"))
 
-  (if (not (and (member "Hubot-Sans" (font-family-list)) (member "Mona-Sans" (font-family-list))))
+  (if (not (and (member "Hubot-Sans" (font-family-list)) (member "Mona Sans" (font-family-list))))
       (install-default-fonts))
 
   (defvar axiom/variable-pitch-font "Hubot-Sans")
@@ -356,7 +356,7 @@ Set up pixel-scrolling for a nice, modern-feeling experience (currently causing 
 
   (defvar axiom/org-mode-code-font "Menlo")
 
-  (defvar axiom/title-font "Mona-Sans")
+  (defvar axiom/title-font "Mona Sans")
 
 
   (set-face-attribute 'default nil :font axiom/fixed-pitch-font :height axiom/fixed-pitch-height)
