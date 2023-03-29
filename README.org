@@ -347,7 +347,7 @@ Set up pixel-scrolling for a nice, modern-feeling experience (currently causing 
                                      "Iosevka"
                                    "Menlo"))
 
-  (if (not (and (member "Hubot-Sans" font-family-list) (member "Mona-Sans" font-family-list)))
+  (if (not (and (member "Hubot-Sans" (font-family-list)) (member "Mona-Sans" (font-family-list))))
       (install-default-fonts))
 
   (defvar axiom/variable-pitch-font "Hubot-Sans")
