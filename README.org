@@ -884,12 +884,17 @@ It is very useful for figuring out how things work in Emacs.
 ** Eglot
 #+begin_src emacs-lisp
   (use-package eglot
+    :bind
+    (("s-." . eglot-code-actions)
+    ("<f12>" . eglot-find-typeDefinition)
+    ("<f2>" . eglot-rename))
     :hook
     (scala-mode . eglot-ensure)
     (typescript-mode . eglot-ensure)
     (python-mode . eglot-ensure)
     (go-mode . eglot-ensure)
     (f90-mode . eglot-ensure)
+    (zig-mode . eglot-ensure)
     :config (setq lsp-prefer-flymake nil)
     (add-to-list 'eglot-server-programs
       '((go-mode go-ts-mode) .
@@ -1001,6 +1006,12 @@ It is very useful for figuring out how things work in Emacs.
 ** Fortran
 #+begin_src emacs-lisp
   (add-to-list 'eglot-server-programs '(f90-mode . ("fortls" "--notify_init" "--nthreads=4")))
+#+end_src
+
+** Zig
+#+begin_src emacs-lisp
+  (use-package zig-mode
+  :straight t)
 #+end_src
 
 * Sampling the Future
