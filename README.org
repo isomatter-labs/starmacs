@@ -2,8 +2,6 @@
 #+AUTHOR: Matthew Cooper Healy
 #+EMAIL: m.cooper.healy@gmail.com
 #+STARTUP: overview
-
-
 #+CAPTION: A hackable text-editor for the 21st century!
 [[./img/emacs.png]]
 
