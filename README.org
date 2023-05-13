@@ -470,6 +470,7 @@ utility all wrapped up in one package.
 
     :config
     (setq
+     org-startup-with-inline-images t
      org-hide-emphasis-markers t
      org-pretty-entities t
      org-ellipsis "…")
