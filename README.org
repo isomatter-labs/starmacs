@@ -907,6 +907,13 @@ It is very useful for figuring out how things work in Emacs.
                       :compositeLiteralTypes t
                       :constantValues t))))))
 #+end_src
+*** Format Imports on Save
+#+begin_src emacs-lisp
+ (defun my-eglot-organize-imports () (interactive)
+   (eglot-code-actions nil nil "source.organizeImports" t))
+ (add-hook 'before-save-hook 'my-eglot-organize-imports nil t)
+ (add-hook 'before-save-hook 'eglot-format-buffer)
+ #+end_src
 
 ** Tree-Sitter
 #+begin_src emacs-lisp
@@ -921,14 +928,16 @@ It is very useful for figuring out how things work in Emacs.
 * Language Specific IDE-Like Features
 ** Go
 #+begin_src emacs-lisp
-    (use-package go-mode
-      :ensure t
-      :hook
-      (go-mode . tree-sitter-hl-mode)
-      :config
-      (add-hook 'before-save-hook 'gofmt-before-save)
-      (setq gc-cons-threshold 100000000)
-      (setq read-process-output-max (* 1024 1024)))
+  (use-package go-mode
+    :ensure t
+    :hook
+    (go-mode . tree-sitter-hl-mode)
+    (go-mode . (lambda () (ligature-mode -1)))
+    :config
+    (setq gc-cons-threshold 100000000)
+    (add-hook 'before-save-hook 'gofmt-before-save)
+    (setq gofmt-command "goimports")
+    (setq read-process-output-max (* 1024 1024)))
 #+end_src
 
 ** Python
