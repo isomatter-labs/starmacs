@@ -62,7 +62,17 @@ We assume that we will want packages from MELPA, the most popular emacs package 
   (add-to-list 'load-path "~/.emacs.d/modules") ; add local files
 #+end_src
 
-** =straight.el=
+** Straight
+=straight.el= is an Emacs package manager that allows users to easily and
+efficiently install and manage Emacs packages. It provides a simple and
+streamlined interface for managing packages, making it ideal for users who want
+to quickly and easily add functionality to their Emacs setup. With straight.el,
+users can easily install and update packages with just a few commands, and can
+also configure package sources, dependencies, and version locking. This makes it
+an essential tool for anyone who wants to customize their Emacs experience and
+stay up-to-date with the latest packages and features. Whether you're a seasoned
+Emacs user or just getting started, straight.el is a powerful and flexible
+package manager that can help you get the most out of your Emacs setup.
 *** Bootstrap =straight=
 #+begin_src emacs-lisp
   (defvar bootstrap-version)
@@ -351,11 +361,6 @@ Set up pixel-scrolling for a nice, modern-feeling experience (currently causing 
           (install-default-fonts))
 
       (defvar starmacs/variable-pitch-font "Mona Sans")
-
-      (defvar starmacs/comment-face starmacs/fixed-pitch-font)
-
-      (defvar starmacs/org-mode-code-font "SF Mono")
-
       (defvar starmacs/title-font "Hubot-Sans")
 
 
@@ -363,7 +368,6 @@ Set up pixel-scrolling for a nice, modern-feeling experience (currently causing 
       (set-face-attribute 'fixed-pitch nil :font starmacs/fixed-pitch-font :height starmacs/fixed-pitch-height)
 
       (set-face-attribute 'variable-pitch nil :font starmacs/variable-pitch-font :height starmacs/variable-pitch-height)
-      (set-face-attribute 'font-lock-comment-face nil :slant 'italic :font starmacs/comment-face :inherit '(shadow))
       (set-face-attribute 'mode-line nil
                           :font starmacs/fixed-pitch-font)
      #+end_src
@@ -396,6 +400,10 @@ Set up pixel-scrolling for a nice, modern-feeling experience (currently causing 
 #+end_src
 
 ** SQL Highlighting
+This mode allows any SQL queries embedded in strings to be evaluated as if they
+were in a dedicated SQL buffer. All that is required is to add comments at the
+beginning and end of the query of the form =--SQL= and =--SQL-END=, and all of the
+text between them will be treated as a SQL query.
 #+begin_src emacs-lisp
   (add-to-list 'auto-mode-alist '("\\.sqli\\'" . sql-mode))
   (use-package mmm-mode
@@ -411,7 +419,6 @@ Set up pixel-scrolling for a nice, modern-feeling experience (currently causing 
         :front "\\(--SQL\\)"
         :back "\\(--SQL-END\\)")))
     (mmm-add-mode-ext-class 'prog-mode nil 'embedded-sql))
-
 #+end_src
 
 ** Quick Reload
@@ -443,7 +450,6 @@ key bindings in the mode of your current buffer.
 #+end_src
 
 ** Better Window Navigation
-*** With =ace-window=
 #+begin_src emacs-lisp
   (use-package ace-window
     :ensure t
@@ -457,7 +463,6 @@ project planner, task and time tracker, blogging engine, and literate coding
 utility all wrapped up in one package.
 
 ** Basic Config
-
 #+begin_src emacs-lisp
   (use-package org
     :demand t
@@ -466,16 +471,13 @@ utility all wrapped up in one package.
     (org-mode . visual-line-mode)
     (org-mode . variable-pitch-mode)
     (org-mode . (lambda () (indent-tabs-mode -1)))
-    (org-mode . org-num-mode)
+
+    :custom
+    (org-startup-with-inline-images t)
+    (org-hide-emphasis-markers t)
+    (org-pretty-entities t)
 
     :config
-    (setq
-     org-startup-with-inline-images t
-     org-hide-emphasis-markers t
-     org-pretty-entities t
-     org-ellipsis "…")
-
-
     (dolist (face '((org-level-1 . 1.30)
                     (org-level-2 . 1.20)
                     (org-level-3 . 1.10)
@@ -484,66 +486,28 @@ utility all wrapped up in one package.
                     (org-level-6 . 1.05)
                     (org-level-7 . 1.05)
                     (org-level-8 . 1.05)))
-      (set-face-attribute (car face) nil :font starmacs/title-font :weight 'regular :height (cdr face)))
+      (set-face-attribute (car face) nil :font starmacs/title-font :weight 'thin :height (cdr face)))
 
-    (set-face-attribute 'org-document-title nil :font starmacs/title-font :height 1.50)
-    (set-face-attribute 'org-document-info nil :font starmacs/title-font :inherit '(shadow) :height 1.20)
+    (set-face-attribute 'org-document-title nil :font starmacs/title-font :height 1.50 :weight 'regular)
+    (set-face-attribute 'org-document-info nil :font starmacs/title-font :inherit '(shadow) :height 1.20 :weight 'thin)
 
-    (set-face-attribute 'org-block nil :foreground nil :font starmacs/org-mode-code-font :height 120 :inherit 'fixed-pitch)
-    (set-face-attribute 'org-code nil   :font starmacs/org-mode-code-font :inherit '(shadow fixed-pitch))
-    (set-face-attribute 'org-table nil   :font starmacs/org-mode-code-font :inherit '(shadow fixed-pitch))
-    (set-face-attribute 'org-verbatim nil :font starmacs/org-mode-code-font :inherit '(shadow fixed-pitch)))
-#+end_src
-
-*** Custom Numbering
-#+begin_src emacs-lisp
-  (defun writer-mode--num-format (numbering)
-    "Alternative numbering format for org-num.
-     First level: 1 | xxx
-     Second level: 1.1 — xxx
-     Third level: 1.1.1 - xxx
-     etc.
-    "
-    (if (= (length numbering) 1)
-        (propertize (concat (mapconcat
-                             #'number-to-string
-                             numbering ".") " | " )
-                    'face `(:family starmacs/title-font
-                                    :foreground ,(face-foreground 'shadow nil t)))
-      (propertize (concat (mapconcat
-                           #'number-to-string
-                           numbering ".") " — " )
-                  'face `(:family starmacs/title-font
-                                  :foreground ,(face-foreground 'shadow nil t)))))
-
-  (font-lock-add-keywords 'org-mode
-                          '(("^*+ " 0 `(:family starmacs/title-font
-                                                :height 140
-                                                :foreground ,(face-foreground 'shadow nil t)) prepend)
-                            ) 'append)
-
-  (setq org-num-skip-unnumbered t)
-  (setq org-num-skip-footnotes t)
-  (setq org-num-max-level 3)
-  (setq org-num-face nil)
-
-
-  (setq org-modern-hide-stars nil)
-  (setq org-modern-star nil)
-  (setq org-num-format-function 'writer-mode--num-format)
-
-#+end_src
-
-*** Org-Modern
-#+begin_src emacs-lisp
-  (use-package org-modern
-    :ensure t
-    :hook
-    (org-mode . org-modern-mode)
-    (org-agenda-finalize . org-modern-agenda))
+    (set-face-attribute 'org-block nil :foreground nil :font starmacs/fixed-pitch-font :height 120 :inherit 'fixed-pitch)
+    (set-face-attribute 'org-code nil   :font starmacs/fixed-pitch-font :inherit '(shadow fixed-pitch))
+    (set-face-attribute 'org-table nil   :font starmacs/fixed-pitch-font :inherit '(shadow fixed-pitch))
+    (set-face-attribute 'org-verbatim nil :font starmacs/fixed-pitch-font :inherit '(shadow fixed-pitch)))
 #+end_src
 
 ** Org-Roam
+Org-roam is an Emacs package that enables users to create a network of linked
+notes and documents in plain text, providing a powerful tool for organizing
+knowledge and personal information management. With org-roam, users can easily
+create, link, and navigate between notes, making it ideal for researchers,
+writers, and anyone looking for a simple and effective way to manage their
+digital life. Whether you're looking to organize your thoughts, plan a project,
+or keep track of your research, org-roam makes it easy to stay organized and
+focused. With its intuitive interface and robust features, org-roam is a
+must-have tool for anyone looking to streamline their workflow and simplify
+their digital life.
 #+begin_src emacs-lisp
   (use-package org-roam
     :ensure t
@@ -577,7 +541,7 @@ utility all wrapped up in one package.
     ("C-c p" . projectile-command-map)
     :init
     (when (file-directory-p "~/Development")
-      (setq projectile-project-search-path '("~/Development" "~/Development/coppercrm")))
+      (setq projectile-project-search-path '("~/Development")))
     (setq projectile-switch-project-action #'projectile-dired)
     :config
     (projectile-global-mode))
@@ -588,6 +552,14 @@ utility all wrapped up in one package.
 #+end_src
 
 * Searching and Fuzzy-Finding
+Vertico, Consult, Orderless, and Helpful are four packages for Emacs that are
+designed to enhance the user's experience and productivity. Vertico is a
+flexible completion system that allows users to quickly navigate and select from
+a list of options. Consult provides a powerful search tool that makes it easy to
+find files, buffers, and other resources within Emacs. Orderless is a
+customizable matching system that allows users to search for text using a
+variety of patterns and options. Finally, Helpful is a documentation viewer that
+provides contextual help and advice on Emacs commands and functions. 
 ** Vertico
 #+begin_src emacs-lisp
   (use-package vertico
@@ -756,13 +728,10 @@ It is very useful for figuring out how things work in Emacs.
 #+begin_src emacs-lisp
   (use-package helpful
     :ensure t
-    :custom
-    (counsel-describe-function-function #'helpful-callable)
-    (counsel-describe-variable-function #'helpful-variable)
     :bind
-    ([remap describe-function] . counsel-describe-function)
+    ([remap describe-function] . helpful-function)
     ([remap describe-command]  . helpful-command)
-    ([remap describe-variable] . counsel-describe-variable)
+    ([remap describe-variable] . helpful-variable)
     ([remap describe-key]      . helpful-key))
 #+end_src
 
@@ -857,7 +826,7 @@ It is very useful for figuring out how things work in Emacs.
                 ("C-n" . 'company-select-next-or-abort)
                 ("C-p" . 'company-select-previous-or-abort))
     :custom
-    (company-idle-delay 0)
+    (company-idle-delay nil) ; don't try to complete until asked
     (company-minimum-prefix-length 1)
     (company-tooltip-align-annotations t)
     (lsp-completion-provider :capf) ; used for eglot integration
@@ -874,11 +843,6 @@ It is very useful for figuring out how things work in Emacs.
 * Tab to Complete
 #+begin_src emacs-lisp
 (setq tab-always-indent 'complete)
-#+end_src
-
-* Open Emacs GUI above terminal
-#+begin_src emacs-lisp
-  (x-focus-frame nil)
 #+end_src
 
 * LSP Features
@@ -1031,8 +995,7 @@ It is very useful for figuring out how things work in Emacs.
   :straight t)
 #+end_src
 
-* Sampling the Future
-** ChatGPT
+* ChatGPT
 #+begin_src emacs-lisp
   (use-package chatgpt-shell
     :ensure t
