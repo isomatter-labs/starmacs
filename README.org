@@ -1,4 +1,4 @@
-#+TITLE: Axiom -- An Emacs Config With as Little as Possible
+#+TITLE: Starmacs -- An Emacs Config With as Little as Possible
 #+AUTHOR: Matthew Cooper Healy
 #+EMAIL: m.cooper.healy@gmail.com
 #+STARTUP: overview
@@ -8,16 +8,16 @@
 [[./img/emacs.png]]
 
 
-* What is Axiom?
-Axiom is yet another set of defaults for emacs, with one (and only one) purpose:
+* What is Starmacs?
+Starmacs is yet another set of defaults for emacs, with one (and only one) purpose:
 it attempts to get out of your way, and add as little magic as possible.
 
-Axiom is not a full distribution, like Doom or Spacemacs,
+Starmacs is not a full distribution, like Doom or Spacemacs,
 but is more akin to Prelude, although much more amateur.
 
 ** Design Decisions
 *** One Big File
-Axiom's config lives in a single file: =README.org=.
+Starmacs's config lives in a single file: =README.org=.
 This is entirely in an effort to make things easier to grok for new users.
 This way, there is only one file to be perused, and users need not be bothered to learn how packages work.
 
@@ -25,10 +25,10 @@ The use of an org file rather than an elisp file is to improve discoverability.
 Users can simply expand and collapse sections to painlessly explore the configuration.
 
 ** Included Packages
-Axiom intends to be a set of sane defaults for emacs, and nothing more.
+Starmacs intends to be a set of sane defaults for emacs, and nothing more.
 As such, dependency on packages is minimized as much as is practical.
 
-Ideally, Axiom is mostly an aesthetic overhaul,
+Ideally, Starmacs is mostly an aesthetic overhaul,
 with the only major functional changes being the inclusion of magit and eglot.
 
 This is intended to allow a new emacs user to learn emacs (and not a custom layer sitting on it)
@@ -37,10 +37,10 @@ LSP is only becoming more relevant, and magit is the only thing close to the kin
 that is becoming expected in the modern world of editors.
 
 ** Extras
-Settings for some languages have been pre-configured (primarily Go and Julia) this is unabashedly because they are languages I use often, and Axiom is developed primarily for my own use.
+Settings for some languages have been pre-configured (primarily Go and Julia) this is unabashedly because they are languages I use often, and Starmacs is developed primarily for my own use.
 
 ** Things You May Prefer
-Axiom is not necessarily for everyone; you may prefer one of the following:
+Starmacs is not necessarily for everyone; you may prefer one of the following:
 
 [[https://spacemacs.org][Spacemacs]]
 [[https://github.com/hlissner/doom-emacs][Doom Emacs]]
@@ -155,7 +155,7 @@ I like to display a column ruler at common styleguide limits
 ** Look
 *** Theme
 #+begin_src emacs-lisp
-  (defvar axiom/current-theme 'dark)
+  (defvar starmacs/current-theme 'dark)
 
   (use-package doom-themes
     :ensure t
@@ -265,7 +265,7 @@ Set up pixel-scrolling for a nice, modern-feeling experience (currently causing 
    (defun no-linum ()
      (display-line-numbers-mode -1))
 
-  (defun axiom/dashboard ()
+  (defun starmacs/dashboard ()
      "Show minimal *welcome* buffer"
      (with-current-buffer (get-buffer-create "*Welcome*")
        (setq truncate-lines t)
@@ -296,7 +296,7 @@ Set up pixel-scrolling for a nice, modern-feeling experience (currently causing 
   (when (< (length command-line-args) 2)
     (add-hook 'emacs-startup-hook (lambda ()
                                    (when (display-graphic-p)
-                                     (axiom/dashboard)))))
+                                     (starmacs/dashboard)))))
 
 #+end_src
 
@@ -312,7 +312,7 @@ Set up pixel-scrolling for a nice, modern-feeling experience (currently causing 
 ** Fonts
 *** =font-installed-p=
 #+begin_src emacs-lisp
-  (defun axiom/font-installed-p (font-name)
+  (defun starmacs/font-installed-p (font-name)
     (find-font (font-spec :name font-name)))
 #+end_src
 
@@ -321,7 +321,7 @@ Set up pixel-scrolling for a nice, modern-feeling experience (currently causing 
   (use-package all-the-icons
     :ensure t
     :config
-    (when (and (not (axiom/font-installed-p "all-the-icons"))
+    (when (and (not (starmacs/font-installed-p "all-the-icons"))
                (window-system))
       (all-the-icons-install-fonts t)))
 #+end_src
@@ -339,33 +339,33 @@ Set up pixel-scrolling for a nice, modern-feeling experience (currently causing 
 #+end_src
 **** Set Defaults
 #+begin_src emacs-lisp
-      (defvar axiom/fixed-pitch-height 130)
-      (defvar axiom/variable-pitch-height 130)
+      (defvar starmacs/fixed-pitch-height 130)
+      (defvar starmacs/variable-pitch-height 130)
       (setq-default line-spacing 0.2)
 
-      (defvar axiom/fixed-pitch-font (if (member "Berkeley Mono" (font-family-list))
+      (defvar starmacs/fixed-pitch-font (if (member "Berkeley Mono" (font-family-list))
                                          "Berkeley Mono"
                                        "SF Mono"))
 
       (if (not (and (member "Hubot-Sans" (font-family-list)) (member "Mona Sans" (font-family-list))))
           (install-default-fonts))
 
-      (defvar axiom/variable-pitch-font "Mona Sans")
+      (defvar starmacs/variable-pitch-font "Mona Sans")
 
-      (defvar axiom/comment-face axiom/fixed-pitch-font)
+      (defvar starmacs/comment-face starmacs/fixed-pitch-font)
 
-      (defvar axiom/org-mode-code-font "SF Mono")
+      (defvar starmacs/org-mode-code-font "SF Mono")
 
-      (defvar axiom/title-font "Hubot-Sans")
+      (defvar starmacs/title-font "Hubot-Sans")
 
 
-      (set-face-attribute 'default nil :font axiom/fixed-pitch-font :height axiom/fixed-pitch-height)
-      (set-face-attribute 'fixed-pitch nil :font axiom/fixed-pitch-font :height axiom/fixed-pitch-height)
+      (set-face-attribute 'default nil :font starmacs/fixed-pitch-font :height starmacs/fixed-pitch-height)
+      (set-face-attribute 'fixed-pitch nil :font starmacs/fixed-pitch-font :height starmacs/fixed-pitch-height)
 
-      (set-face-attribute 'variable-pitch nil :font axiom/variable-pitch-font :height axiom/variable-pitch-height)
-      (set-face-attribute 'font-lock-comment-face nil :slant 'italic :font axiom/comment-face :inherit '(shadow))
+      (set-face-attribute 'variable-pitch nil :font starmacs/variable-pitch-font :height starmacs/variable-pitch-height)
+      (set-face-attribute 'font-lock-comment-face nil :slant 'italic :font starmacs/comment-face :inherit '(shadow))
       (set-face-attribute 'mode-line nil
-                          :font axiom/fixed-pitch-font)
+                          :font starmacs/fixed-pitch-font)
      #+end_src
 
 *** Ligatures
@@ -484,15 +484,15 @@ utility all wrapped up in one package.
                     (org-level-6 . 1.05)
                     (org-level-7 . 1.05)
                     (org-level-8 . 1.05)))
-      (set-face-attribute (car face) nil :font axiom/title-font :weight 'regular :height (cdr face)))
+      (set-face-attribute (car face) nil :font starmacs/title-font :weight 'regular :height (cdr face)))
 
-    (set-face-attribute 'org-document-title nil :font axiom/title-font :height 1.50)
-    (set-face-attribute 'org-document-info nil :font axiom/title-font :inherit '(shadow) :height 1.20)
+    (set-face-attribute 'org-document-title nil :font starmacs/title-font :height 1.50)
+    (set-face-attribute 'org-document-info nil :font starmacs/title-font :inherit '(shadow) :height 1.20)
 
-    (set-face-attribute 'org-block nil :foreground nil :font axiom/org-mode-code-font :height 120 :inherit 'fixed-pitch)
-    (set-face-attribute 'org-code nil   :font axiom/org-mode-code-font :inherit '(shadow fixed-pitch))
-    (set-face-attribute 'org-table nil   :font axiom/org-mode-code-font :inherit '(shadow fixed-pitch))
-    (set-face-attribute 'org-verbatim nil :font axiom/org-mode-code-font :inherit '(shadow fixed-pitch)))
+    (set-face-attribute 'org-block nil :foreground nil :font starmacs/org-mode-code-font :height 120 :inherit 'fixed-pitch)
+    (set-face-attribute 'org-code nil   :font starmacs/org-mode-code-font :inherit '(shadow fixed-pitch))
+    (set-face-attribute 'org-table nil   :font starmacs/org-mode-code-font :inherit '(shadow fixed-pitch))
+    (set-face-attribute 'org-verbatim nil :font starmacs/org-mode-code-font :inherit '(shadow fixed-pitch)))
 #+end_src
 
 *** Custom Numbering
@@ -508,16 +508,16 @@ utility all wrapped up in one package.
         (propertize (concat (mapconcat
                              #'number-to-string
                              numbering ".") " | " )
-                    'face `(:family axiom/title-font
+                    'face `(:family starmacs/title-font
                                     :foreground ,(face-foreground 'shadow nil t)))
       (propertize (concat (mapconcat
                            #'number-to-string
                            numbering ".") " — " )
-                  'face `(:family axiom/title-font
+                  'face `(:family starmacs/title-font
                                   :foreground ,(face-foreground 'shadow nil t)))))
 
   (font-lock-add-keywords 'org-mode
-                          '(("^*+ " 0 `(:family axiom/title-font
+                          '(("^*+ " 0 `(:family starmacs/title-font
                                                 :height 140
                                                 :foreground ,(face-foreground 'shadow nil t)) prepend)
                             ) 'append)
@@ -804,10 +804,10 @@ It is very useful for figuring out how things work in Emacs.
     :custom (flycheck-check-syntax-automatically '(save mode-enabled))
     :init (global-flycheck-mode))
 
-  (defvar-local axiom--mode-line-flycheck "")
+  (defvar-local starmacs--mode-line-flycheck "")
 
-  (defun axiom/mode-line-update-flycheck (&rest _)
-    (setq axiom--mode-line-flycheck
+  (defun starmacs/mode-line-update-flycheck (&rest _)
+    (setq starmacs--mode-line-flycheck
           (if (bound-and-true-p flycheck-mode)
               (concat
                "  "
@@ -830,8 +830,8 @@ It is very useful for figuring out how things work in Emacs.
                  (`suspicious (propertize "?" 'help-echo "Flycheck: suspicious"))))
             "")))
 
-  (add-hook 'flycheck-status-changed-functions #'axiom/mode-line-update-flycheck)
-  (add-hook 'flycheck-mode-hook #'axiom/mode-line-update-flycheck)
+  (add-hook 'flycheck-status-changed-functions #'starmacs/mode-line-update-flycheck)
+  (add-hook 'flycheck-mode-hook #'starmacs/mode-line-update-flycheck)
 #+end_src
 
 * Auto-Completion
