@@ -153,26 +153,6 @@ I like to display a column ruler at common styleguide limits
 #+end_src
 
 ** Look
-** Mini-Frame
-=mini-frame= is a package that moves the minibuffer to the center-top
-of the buffer, much like the command pallette of Atom or Visual Studio Code.
-Since this is a more eye-catching location, it decreases the likelihood that,
-for example, a search will be initiated, then edits made in the main buffer,
-without ever exiting the search. This can cause very jarring jumps back and
-forth through the buffer when finally rectified, so it is better to know when
-one is making the error, when one can solve it with a single keystroke.
-#+begin_src emacs-lisp
-  (use-package mini-frame
-    :hook
-    (prog-mode . mini-frame-mode)
-    :config
-    (custom-set-variables
-     '(mini-frame-show-parameters
-       '((top . 10)
-         (width . 0.5)
-         (left . 0.5)))))
-#+end_src
-
 *** Theme
 #+begin_src emacs-lisp
   (defvar axiom/current-theme 'dark)
@@ -934,6 +914,12 @@ It is very useful for figuring out how things work in Emacs.
  (add-hook 'before-save-hook 'my-eglot-organize-imports nil t)
  (add-hook 'before-save-hook 'eglot-format-buffer)
  #+end_src
+*** Eldoc
+#+begin_src emacs-lisp
+  (use-package eldoc-box
+    :hook
+    (eglot-managed-mode . eldoc-box-hover-mode))
+#+end_src
 
 ** Tree-Sitter
 #+begin_src emacs-lisp
