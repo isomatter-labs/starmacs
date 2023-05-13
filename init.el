@@ -1,4 +1,13 @@
+;;; init.el --- Emacs configuration
 
+;;; Commentary:
+;; This is the initial loader for the code found in README.org
+;; It sets up org mode and babel, as well as some custom variables
+;; and faces.  These variables and faces were added automatically by
+;; packages, and are not meant to be directly edited.
+;; It then loads the code in README.org
+
+;;; Code:
 ;; Added by Package.el.  This must come before configurations of
 ;; installed packages.  Don't delete this line.  If you don't want it,
 ;; just comment it out by adding a semicolon to the start of the line.
@@ -15,8 +24,6 @@
  ;; If there is more than one, they won't work right.
  '(org-agenda-files nil)
  '(org-modern-block-fringe t)
- '(package-selected-packages
-   '(why-this which-key visual-fill-column typescript-mode treemacs-projectile treemacs-magit tree-sitter-langs solaire-mode sbt-mode rainbow-delimiters quelpa-use-package py-autopep8 prettier-js org-bullets mmm-mode magithub lsp-ui lsp-metals lsp-julia lsp-ivy julia-snail ivy-rich helpful general forge flycheck doom-themes doom-modeline discover diff-hl dashboard counsel-projectile company-box command-log-mode auto-package-update all-the-icons))
  '(warning-suppress-types
    '(((defvaralias losing-value org-tab-first-hook))
      (use-package)
