@@ -857,6 +857,8 @@ It is very useful for figuring out how things work in Emacs.
     (go-mode . eglot-ensure)
     (f90-mode . eglot-ensure)
     (zig-mode . eglot-ensure)
+    (before-save . my-eglot-organize-imports)
+    (before-save . eglot-format-buffer)
     :config (setq lsp-prefer-flymake nil)
     (add-to-list 'eglot-server-programs
       '((go-mode go-ts-mode) .
@@ -876,6 +878,7 @@ It is very useful for figuring out how things work in Emacs.
  (add-hook 'before-save-hook 'my-eglot-organize-imports nil t)
  (add-hook 'before-save-hook 'eglot-format-buffer)
  #+end_src
+ 
 *** Eldoc
 #+begin_src emacs-lisp
   (use-package eldoc-box
@@ -903,8 +906,6 @@ It is very useful for figuring out how things work in Emacs.
     (go-mode . (lambda () (ligature-mode -1)))
     :config
     (setq gc-cons-threshold 100000000)
-    (add-hook 'before-save-hook 'gofmt-before-save)
-    (setq gofmt-command "goimports")
     (setq read-process-output-max (* 1024 1024)))
 #+end_src
 
