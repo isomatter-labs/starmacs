@@ -186,10 +186,28 @@ I like to display a column ruler at common styleguide limits
 
 *** Modeline
 #+begin_src emacs-lisp
-  (use-package doom-modeline
-    :ensure t
-    :hook (after-init . doom-modeline-mode)
-    :custom (doom-modeline-height 40))
+      (use-package base-line
+        :ensure t
+        :straight (:host github :repo "noonels/base-line")
+        :hook
+        (after-init . base-line-mode))
+#+end_src
+
+**** Making the Mode Line Larger and more distinct
+#+begin_src emacs-lisp
+  (set-face-attribute 'mode-line nil
+                      :background "#353644"
+                      :foreground "white"
+                      :box '(:line-width 8 :color "#353644")
+                      :overline nil
+                      :underline nil)
+
+  (set-face-attribute 'mode-line-inactive nil
+                      :background "#565063"
+                      :foreground "white"
+                      :box '(:line-width 8 :color "#565063")
+                      :overline nil
+                      :underline nil)
 #+end_src
 
 *** Quality of Life
@@ -557,7 +575,7 @@ a list of options. Consult provides a powerful search tool that makes it easy to
 find files, buffers, and other resources within Emacs. Orderless is a
 customizable matching system that allows users to search for text using a
 variety of patterns and options. Finally, Helpful is a documentation viewer that
-provides contextual help and advice on Emacs commands and functions. 
+provides contextual help and advice on Emacs commands and functions.
 ** Vertico
 #+begin_src emacs-lisp
   (use-package vertico
@@ -878,7 +896,7 @@ It is very useful for figuring out how things work in Emacs.
  (add-hook 'before-save-hook 'my-eglot-organize-imports nil t)
  (add-hook 'before-save-hook 'eglot-format-buffer)
  #+end_src
- 
+
 *** Eldoc
 #+begin_src emacs-lisp
   (use-package eldoc-box
