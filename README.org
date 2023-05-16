@@ -186,28 +186,10 @@ I like to display a column ruler at common styleguide limits
 
 *** Modeline
 #+begin_src emacs-lisp
-      (use-package base-line
-        :ensure t
-        :straight (:host github :repo "noonels/base-line")
-        :hook
-        (after-init . base-line-mode))
-#+end_src
-
-**** Making the Mode Line Larger and more distinct
-#+begin_src emacs-lisp
-  (set-face-attribute 'mode-line nil
-                      :background "#353644"
-                      :foreground "white"
-                      :box '(:line-width 8 :color "#353644")
-                      :overline nil
-                      :underline nil)
-
-  (set-face-attribute 'mode-line-inactive nil
-                      :background "#565063"
-                      :foreground "white"
-                      :box '(:line-width 8 :color "#565063")
-                      :overline nil
-                      :underline nil)
+  (use-package doom-modeline
+    :ensure t
+    :hook (after-init . doom-modeline-mode)
+    :custom (doom-modeline-height 40))
 #+end_src
 
 *** Quality of Life
