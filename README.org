@@ -195,16 +195,16 @@ I like to display a column ruler at common styleguide limits
 **** Adjust Modeline Size
 #+begin_src emacs-lisp
   (set-face-attribute 'mode-line nil
-                      :background "#353644"
-                      :foreground "white"
-                      :box '(:line-width 8 :color "#353644")
+                      :background "#363c47"
+                      :foreground "#faf4e9"
+                      :box '(:line-width 8 :color "#363c47")
                       :overline nil
                       :underline nil)
 
   (set-face-attribute 'mode-line-inactive nil
-                      :background "#565063"
-                      :foreground "white"
-                      :box '(:line-width 8 :color "#565063")
+                      :background "#23272e"
+                      :foreground "#586274"
+                      :box '(:line-width 8 :color "#23272e")
                       :overline nil
                       :underline nil)
 #+end_src
