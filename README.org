@@ -2,6 +2,7 @@
 #+AUTHOR: Matthew Cooper Healy
 #+EMAIL: m.cooper.healy@gmail.com
 #+STARTUP: overview
+
 #+CAPTION: A hackable text-editor for the 21st century!
 [[./img/emacs.png]]
 
@@ -186,10 +187,26 @@ I like to display a column ruler at common styleguide limits
 
 *** Modeline
 #+begin_src emacs-lisp
-  (use-package doom-modeline
+  (use-package mood-line
     :ensure t
-    :hook (after-init . doom-modeline-mode)
-    :custom (doom-modeline-height 40))
+    :hook (after-init . mood-line-mode))
+#+end_src
+
+**** Adjust Modeline Size
+#+begin_src emacs-lisp
+  (set-face-attribute 'mode-line nil
+                      :background "#353644"
+                      :foreground "white"
+                      :box '(:line-width 8 :color "#353644")
+                      :overline nil
+                      :underline nil)
+
+  (set-face-attribute 'mode-line-inactive nil
+                      :background "#565063"
+                      :foreground "white"
+                      :box '(:line-width 8 :color "#565063")
+                      :overline nil
+                      :underline nil)
 #+end_src
 
 *** Quality of Life
@@ -550,8 +567,9 @@ key bindings in the mode of your current buffer.
   (use-package meow
     :ensure t
     :config
-    (meow-setup)
-    (meow-global-mode))
+    ;(meow-setup)
+    ;(meow-global-mode))
+    )
 #+end_src
 
 * Org Mode
