@@ -14,7 +14,51 @@
 ;; You may delete these explanatory comments.
 (package-initialize)
 
-(require 'org)
+;;; Package Management
+;; We assume that we will want packages from MELPA, the most popular emacs package registry, as well as ELPA, the official GNU repository, and MELPA Stable (which is exactly what it sounds like).
+(require 'package)
+(setq package-archives
+      '(("MELPA Stable" . "https://stable.melpa.org/packages/")
+        ("GNU ELPA"     . "https://elpa.gnu.org/packages/")
+        ("MELPA"        . "https://melpa.org/packages/"))
+      package-archive-priorities
+      '(("GNU ELPA"     . 10)
+        ("MELPA"        . 0)))
+
+(add-to-list 'load-path "~/.emacs.d/modules") ; add local files
+
+;;; Straight
+;; =straight.el= is an Emacs package manager that allows users to easily and
+;; efficiently install and manage Emacs packages. It provides a simple and
+;; streamlined interface for managing packages, making it ideal for users who want
+;; to quickly and easily add functionality to their Emacs setup. With straight.el,
+;; users can easily install and update packages with just a few commands, and can
+;; also configure package sources, dependencies, and version locking. This makes it
+;; an essential tool for anyone who wants to customize their Emacs experience and
+;; stay up-to-date with the latest packages and features. Whether you're a seasoned
+;; Emacs user or just getting started, straight.el is a powerful and flexible
+;; package manager that can help you get the most out of your Emacs setup.
+(defvar bootstrap-version)
+(let ((bootstrap-file
+       (expand-file-name "straight/repos/straight.el/bootstrap.el" user-emacs-directory))
+      (bootstrap-version 5))
+  (unless (file-exists-p bootstrap-file)
+    (with-current-buffer
+        (url-retrieve-synchronously
+         "https://raw.githubusercontent.com/raxod502/straight.el/develop/install.el"
+         'silent 'inhibit-cookies)
+      (goto-char (point-max))
+      (eval-print-last-sexp)))
+  (load bootstrap-file nil 'nomessage))
+
+;; Integrate with =use-package=
+(straight-use-package 'use-package)
+(setq straight-use-package-by-default t)
+
+;; load org so that babel will work, custom org configuration is in README.org
+(use-package org
+  :ensure t)
+
 (org-babel-load-file
  (expand-file-name "README.org" user-emacs-directory))
 (custom-set-variables
