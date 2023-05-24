@@ -140,9 +140,10 @@ Autothemer is a requirement for =anisochromatic-theme=, and must be loaded in fi
 
 *** Modeline
 #+begin_src emacs-lisp
-  (use-package mood-line
+  (use-package base-line
+    :straight (:host github :repo "isomatter-labs/base-line" :files ("dist" "*.el"))
     :ensure t
-    :hook (after-init . mood-line-mode))
+    :hook (after-init . base-line-mode))
 #+end_src
 
 **** Adjust Modeline Size
@@ -262,6 +263,7 @@ Set up pixel-scrolling for a nice, modern-feeling experience (currently causing 
      (display-line-numbers-mode -1))
 
   (defun starmacs/dashboard ()
+    (interactive)
      "Show minimal *welcome* buffer"
      (with-current-buffer (get-buffer-create "*Welcome*")
        (setq truncate-lines t)
