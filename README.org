@@ -147,54 +147,65 @@ Autothemer is a requirement for =anisochromatic-theme=, and must be loaded in fi
 
 **** Adjust Modeline Size
 #+begin_src emacs-lisp
-  (set-face-attribute 'mode-line nil
-                      :background "#363c47"
-                      :foreground "#faf4e9"
-                      :box '(:line-width 8 :color "#363c47")
-                      :overline nil
-                      :underline nil)
+  (defvar starmacs/default-modeline-active-bg "#363c47")
+  (defvar starmacs/default-modeline-inactive-bg "#23273e")
 
-  (set-face-attribute 'mode-line-inactive nil
-                      :background "#23272e"
-                      :foreground "#586274"
-                      :box '(:line-width 8 :color "#23272e")
-                      :overline nil
-                      :underline nil)
+  (defun starmacs/set-modeline-box-bg (new-bg)
+    (set-face-attribute 'mode-line nil
+                        :background new-bg
+                        :foreground "#faf4e9"
+                        :box `(:line-width 8 :color ,new-bg)
+                        :overline nil
+                        :underline nil))
+
+  (defun starmacs/set-modeline-inactive-box-bg (new-bg)
+    (set-face-attribute 'mode-line-inactive nil
+                        :background new-bg
+                        :foreground "#586274"
+                        :box `(:line-width 8 :color ,new-bg)
+                        :overline nil
+                        :underline nil))
+
+  (starmacs/set-modeline-box-bg starmacs/default-modeline-active-bg)
+  (starmacs/set-modeline-inactive-box-bg starmacs/default-modeline-inactive-bg)
+
 #+end_src
 
 *** Quality of Life
 #+begin_src emacs-lisp
-  (setq inhibit-startup-message t)
+          (setq inhibit-startup-message t)
 
-  (scroll-bar-mode -1)        ; Disable visible scrollbar
-  (tool-bar-mode -1)          ; Disable the toolbar
-  (tooltip-mode -1)           ; Disable tooltips
-  (set-fringe-mode 10)        ; Give some breathing room
+          (scroll-bar-mode -1)        ; Disable visible scrollbar
+          (tool-bar-mode -1)          ; Disable the toolbar
+          (tooltip-mode -1)           ; Disable tooltips
+          (set-fringe-mode 10)        ; Give some breathing room
 
-  ;(menu-bar-mode -1)          ; Disable the menu bar
+          ;(menu-bar-mode -1)          ; Disable the menu bar
 
-  (toggle-frame-maximized)    ; Always start maximized
+          (toggle-frame-maximized)    ; Always start maximized
 
-  ;; Set up the visible bell
-  (setq visible-bell t)
-  (setq ring-bell-function
-      (lambda ()
-        (let ((orig-bg (face-background 'mode-line)))
-          (set-face-background 'mode-line "#ef8e49")
-          (run-with-idle-timer 0.1 nil
-                               (lambda (bg) (set-face-background 'mode-line bg))
-                               orig-bg))))
+          ;; Set up the visible bell
+          (setq visible-bell t)
+          (setq ring-bell-function
+              (lambda ()
+                (let ((orig-bg (face-background 'mode-line)))
+                  (set-face-background 'mode-line "#ef8e49")
+                  (starmacs/set-modeline-box-bg "#ef8e49")
+                  (run-with-idle-timer 0.1 nil
+                                       (lambda (bg) (progn (set-face-background 'mode-line bg)
+                                                           (starmacs/set-modeline-box-bg bg)))
+                                       orig-bg))))
 
-  (column-number-mode)
-  (global-display-line-numbers-mode t)
+          (column-number-mode)
+          (global-display-line-numbers-mode t)
 
-  ;; Disable line numbers for some modes
-  (dolist (mode '(org-mode-hook
-                  term-mode-hook
-                  shell-mode-hook
-                  treemacs-mode-hook
-                  eshell-mode-hook))
-    (add-hook mode (lambda () (display-line-numbers-mode 0))))
+          ;; Disable line numbers for some modes
+          (dolist (mode '(org-mode-hook
+                          term-mode-hook
+                          shell-mode-hook
+                          treemacs-mode-hook
+                          eshell-mode-hook))
+            (add-hook mode (lambda () (display-line-numbers-mode 0))))
 #+end_src
 
 *** Scrolling
