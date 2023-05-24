@@ -114,18 +114,20 @@ I like to display a column ruler at common styleguide limits
 
 ** Look
 *** Theme
+**** Autothemer
+Autothemer is a requirement for =anisochromatic-theme=, and must be loaded in first.
 #+begin_src emacs-lisp
-  (defvar starmacs/current-theme 'dark)
+  (use-package autothemer
+    :ensure t)
+#+end_src
 
-  (use-package doom-themes
+**** Anisochromatic
+#+begin_src emacs-lisp
+  (use-package anisochromatic-theme
+    :straight (:host github :repo "isomatter-labs/anisochromatic-emacs" :files ("dist" "*.el"))
     :ensure t
     :config
-    (setq doom-themes-enable-bold t
-          doom-themes-enable-italic t)
-    (doom-themes-visual-bell-config)
-    (doom-themes-org-config)
-    (if (window-system)
-        (load-theme 'doom-one t))) ; Only load in GUI to reduce issues with comment-coloring
+    (load-theme 'anisochromatic t))
 #+end_src
 
 *** Markdown
@@ -175,6 +177,13 @@ I like to display a column ruler at common styleguide limits
 
   ;; Set up the visible bell
   (setq visible-bell t)
+  (setq ring-bell-function
+      (lambda ()
+        (let ((orig-bg (face-background 'mode-line)))
+          (set-face-background 'mode-line "#ef8e49")
+          (run-with-idle-timer 0.1 nil
+                               (lambda (bg) (set-face-background 'mode-line bg))
+                               orig-bg))))
 
   (column-number-mode)
   (global-display-line-numbers-mode t)

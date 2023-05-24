@@ -66,12 +66,98 @@
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
+ '(connection-local-criteria-alist
+   '(((:application eshell)
+	  eshell-connection-default-profile)
+	 ((:application tramp :machine "localhost")
+	  tramp-connection-local-darwin-ps-profile)
+	 ((:application tramp :machine "starlight.lan")
+	  tramp-connection-local-darwin-ps-profile)
+	 ((:application tramp)
+	  tramp-connection-local-default-system-profile tramp-connection-local-default-shell-profile)))
+ '(connection-local-profile-alist
+   '((eshell-connection-default-profile
+	  (eshell-path-env-list))
+	 (tramp-connection-local-darwin-ps-profile
+	  (tramp-process-attributes-ps-args "-acxww" "-o" "pid,uid,user,gid,comm=abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ" "-o" "state=abcde" "-o" "ppid,pgid,sess,tty,tpgid,minflt,majflt,time,pri,nice,vsz,rss,etime,pcpu,pmem,args")
+	  (tramp-process-attributes-ps-format
+	   (pid . number)
+	   (euid . number)
+	   (user . string)
+	   (egid . number)
+	   (comm . 52)
+	   (state . 5)
+	   (ppid . number)
+	   (pgrp . number)
+	   (sess . number)
+	   (ttname . string)
+	   (tpgid . number)
+	   (minflt . number)
+	   (majflt . number)
+	   (time . tramp-ps-time)
+	   (pri . number)
+	   (nice . number)
+	   (vsize . number)
+	   (rss . number)
+	   (etime . tramp-ps-time)
+	   (pcpu . number)
+	   (pmem . number)
+	   (args)))
+	 (tramp-connection-local-busybox-ps-profile
+	  (tramp-process-attributes-ps-args "-o" "pid,user,group,comm=abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ" "-o" "stat=abcde" "-o" "ppid,pgid,tty,time,nice,etime,args")
+	  (tramp-process-attributes-ps-format
+	   (pid . number)
+	   (user . string)
+	   (group . string)
+	   (comm . 52)
+	   (state . 5)
+	   (ppid . number)
+	   (pgrp . number)
+	   (ttname . string)
+	   (time . tramp-ps-time)
+	   (nice . number)
+	   (etime . tramp-ps-time)
+	   (args)))
+	 (tramp-connection-local-bsd-ps-profile
+	  (tramp-process-attributes-ps-args "-acxww" "-o" "pid,euid,user,egid,egroup,comm=abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ" "-o" "state,ppid,pgid,sid,tty,tpgid,minflt,majflt,time,pri,nice,vsz,rss,etimes,pcpu,pmem,args")
+	  (tramp-process-attributes-ps-format
+	   (pid . number)
+	   (euid . number)
+	   (user . string)
+	   (egid . number)
+	   (group . string)
+	   (comm . 52)
+	   (state . string)
+	   (ppid . number)
+	   (pgrp . number)
+	   (sess . number)
+	   (ttname . string)
+	   (tpgid . number)
+	   (minflt . number)
+	   (majflt . number)
+	   (time . tramp-ps-time)
+	   (pri . number)
+	   (nice . number)
+	   (vsize . number)
+	   (rss . number)
+	   (etime . number)
+	   (pcpu . number)
+	   (pmem . number)
+	   (args)))
+	 (tramp-connection-local-default-shell-profile
+	  (shell-file-name . "/bin/sh")
+	  (shell-command-switch . "-c"))
+	 (tramp-connection-local-default-system-profile
+	  (path-separator . ":")
+	  (null-device . "/dev/null"))))
+ '(custom-safe-themes
+   '("4f7b78f1db71645999a8d632fe1d5cf863750a75b2153d429e59051827e439f2" "f40d0dc5fd64fef08959e2f5a35050baeb98faef572c233b7dcc3f89f0feed69" "574167ab321bb3041545e414a466cb30c48ec41d4ec27593c58be78d837575cc" "02f57ef0a20b7f61adce51445b68b2a7e832648ce2e7efb19d217b6454c1b644" "0e83cec64ea5e9d63769fd8644936d367f624f83d7cd5310c949f74b8975d305" default))
  '(org-agenda-files nil)
  '(org-modern-block-fringe t)
  '(warning-suppress-types
    '(((defvaralias losing-value org-tab-first-hook))
-     (use-package)
-     (use-package))))
+	 (use-package)
+	 (use-package))))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
@@ -79,7 +165,9 @@
  ;; If there is more than one, they won't work right.
  '(blamer-face ((t :foreground "#7a88cf" :background nil :height 140 :italic t)))
  '(treemacs-fringe-indicator-face ((t (:inherit font-lock-doc-face))))
- '(treemacs-git-ignored-face ((t (:inherit (shadow))))))
+ '(treemacs-git-ignored-face ((t (:inherit (shadow)))))
+ '(whitespace-newline ((t (:foreground "#525252"))))
+ '(whitespace-tab ((t (:foreground "#525252")))))
 (put 'downcase-region 'disabled nil)
 (provide 'init)
 ;;; init.el ends here
