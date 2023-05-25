@@ -149,7 +149,7 @@ Autothemer is a requirement for =anisochromatic-theme=, and must be loaded in fi
 **** Adjust Modeline Size
 #+begin_src emacs-lisp
   (defvar starmacs/default-modeline-active-bg "#363c47")
-  (defvar starmacs/default-modeline-inactive-bg "#23273e")
+  (defvar starmacs/default-modeline-inactive-bg "#23272e")
 
   (defun starmacs/set-modeline-box-bg (new-bg)
     (set-face-attribute 'mode-line nil
