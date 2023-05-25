@@ -274,7 +274,7 @@ Set up pixel-scrolling for a nice, modern-feeling experience (currently causing 
               (size (image-size image))
               (height (cdr size))
               (width (car size))
-              (top-margin (floor (/ (- (window-height) height) 2)))
+              (top-margin (floor (/ (- (window-height) height 3) 2)))
               (left-margin (floor (/ (- (window-width) width) 2)))
               (title "A hackable text editor for the 21st Century!"))
          (erase-buffer)
@@ -993,7 +993,6 @@ It is very useful for figuring out how things work in Emacs.
     :ensure t
     :hook
     (go-mode . tree-sitter-hl-mode)
-    (go-mode . (lambda () (ligature-mode -1)))
     :config
     (setq gc-cons-threshold 100000000)
     (setq read-process-output-max (* 1024 1024)))
