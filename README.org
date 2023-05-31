@@ -1062,8 +1062,15 @@ inspect variables, and so much more. If you use Common Lisp or are interested
 in learning it, sly is definitely a package to consider.
 
 #+begin_src emacs-lisp
-    (use-package sly
-      :ensure t)
+  (use-package sly
+    :ensure t)
+
+  ;; paredit allows for some now keybinding that make working with parens suck less
+  (use-package paredit
+    :init
+    (progn
+      (add-hook 'emacs-lisp-mode-hook 'paredit-mode)
+      (add-hook 'common-lisp-mode-hook 'paredit-mode)))
 #+end_src
 
 * LSP Features
