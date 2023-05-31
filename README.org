@@ -45,6 +45,17 @@ Starmacs is not necessarily for everyone; you may prefer one of the following:
 [[https://github.com/hlissner/doom-emacs][Doom Emacs]]
 [[https://github.com/bbatsov/prelude][Prelude]]
 
+* User Code
+In order to allow you to use a better editing environment when adding your /own/
+code to Starmacs, the =usr= directory is added to the load-path. This means that
+any file you add in =~.emacs.d/usr/= will we automatically evaluated as you
+launch Emacs. This way, Emacs Lisp code can be edited in a dedicated buffer,
+rather than in a source block in an org document
+#+begin_src emacs-lisp
+  (let ((default-directory  "~/.emacs.d/usr/"))
+    (normal-top-level-add-subdirs-to-load-path))
+#+end_src
+
 * Quality of Life Improvements
 ** Keep Buffers Up to Date with Files
 When files on disk change, open buffers should be automatically updated to reflect those changes.
@@ -447,6 +458,15 @@ key bindings in the mode of your current buffer.
 
 * Meow
 ** Meow Keymap
+Meow keybindings are a set of Emacs keybindings popularized by  =meow=.
+Meow aims to improve Emacs usability by reducing the need to use modifier keys
+(such as control and shift) when executing Emacs commands. Instead, meow uses
+single letter keys mapped to command sequences, similar to Vim's modal editing.
+For example, users can scroll up by pressing =j= or execute a buffer save by
+pressing =s=. Meow also provides a range of movement commands, allowing users
+to jump to specific lines or characters in the buffer quickly. Meow keybindings
+can simplify Emacs usage for users who prefer a more modal interface.
+
 #+begin_src emacs-lisp
   (defun meow-setup ()
     (setq meow-cheatsheet-layout meow-cheatsheet-layout-qwerty)
@@ -536,13 +556,18 @@ key bindings in the mode of your current buffer.
 #+end_src
 
 ** Enable Meow
+Starmacs assumes that you do not want to use the meow keybindings.
+If you would like to enable meow,
+simply bind the variable =*starmacs/enable-meow*= to =t=.
+
 #+begin_src emacs-lisp
   (use-package meow
     :ensure t
     :config
-    ;(meow-setup)
-    ;(meow-global-mode))
-    )
+    (when (and (boundp '*starmacs/enable-meow*)
+               ,*starmacs/enable-meow*)
+      (meow-setup)
+      (meow-global-mode)))
 #+end_src
 
 * Org Mode
@@ -616,27 +641,23 @@ their digital life.
 #+end_src
 
 * Project-Management
-** Projectile
-#+begin_src emacs-lisp
-  (use-package projectile
-    :ensure t
-    :diminish projectile-mode
-    :config (projectile-mode)
-    :custom
-    (projectile-enable-caching t)
-    (projectile-indexing-method 'alien)
-    :bind-keymap
-    ("C-c p" . projectile-command-map)
-    :init
-    (when (file-directory-p "~/Development")
-      (setq projectile-project-search-path '("~/Development")))
-    (setq projectile-switch-project-action #'projectile-dired)
-    :config
-    (projectile-global-mode))
+** Project
+=project.el= is an Emacs library that provides a unified way to manage and
+navigate projects in an efficient manner.
 
-  (use-package counsel-projectile
-    :ensure t
-    :config (counsel-projectile-mode))
+It allows users to define and work on groups of files as projects, providing
+navigation commands to move between project-related files, search for files in
+the project, and perform batch operations such as renaming or deleting files.
+=project.el= also integrates with version control systems, automatically
+detecting and associating projects with their respective repositories.
+Overall, project.el simplifies project navigation and organization, improving
+productivity for Emacs users who work with multiple projects.
+
+=project.el= has been built-in to Emacs 29+.
+
+#+begin_src emacs-lisp
+  (use-package project
+    :ensure t)
 #+end_src
 
 * Searching and Fuzzy-Finding
@@ -824,16 +845,31 @@ It is very useful for figuring out how things work in Emacs.
 
 * Git/Github
 ** Magit
+Magit is a Git user interface for Emacs.
+It provides a complete Git toolset within Emacs and allows users to interact
+with Git repositories directly from their text editor, without needing to
+switch to a separate Git client. Magit features include status information,
+branch visualization, diff viewing, commit creation, file staging, and more.
+It is highly customizable, scriptable, and integrates seamlessly with
+Emacs workflows.
+
+Magit can be a great time-saver for developers working with Git repositories.
+
 #+begin_src emacs-lisp
   (use-package magit
     :ensure t)
 
+  ;; forge allows magit to connect to Github
   (use-package forge
     :ensure t
     :after magit)
 #+end_src
 
 ** Highlight Git diffs in the gutter
+The left-hand fringe of Emacs is known as the /gutter/.
+Using =git-gutter=, symbols can be added in this fringe to visualize what changes
+have been made to the current buffer since the last =git= commit.
+
 #+begin_src emacs-lisp
   (use-package git-gutter
     :ensure t
@@ -842,7 +878,7 @@ It is very useful for figuring out how things work in Emacs.
 #+end_src
 
 ** Why This?
-=why-this= shows blam information for the currently selected line (or region) along the right side of the current line
+=why-this= shows blame information for the currently selected line (or region) along the right side of the current line
 #+begin_src emacs-lisp
   (use-package why-this
     :ensure t
@@ -854,6 +890,14 @@ It is very useful for figuring out how things work in Emacs.
 
 * Syntax Checking
 ** Flycheck
+Flycheck is an on-the-fly syntax checking and linting tool for Emacs.
+It automatically highlights errors and warnings in source code in real-time,
+helping to identify typos, syntax errors, and other mistakes quickly.
+Flycheck supports multiple programming languages and integrates with a variety
+of additional tools such as syntax checkers, linters, and spell checkers.
+Its modular architecture enables users to extend its functionality with
+additional checkers and customizations.
+
 #+begin_src emacs-lisp
   (use-package flycheck
     :ensure t
@@ -892,7 +936,27 @@ It is very useful for figuring out how things work in Emacs.
 
 * Auto-Completion
 ** Copilot
+Github Copilot is an artificial intelligence (AI) code autocompletion system
+that can suggest code snippets to developers as they write code. It uses
+advanced deep learning models trained on vast amounts of existing code to
+generate suggestions in real-time. Github Copilot aims to reduce the time
+needed to write code by automating some repetitive tasks and suggesting
+efficient code structures.
+
+=C-f=, as well as the right arrow key, are bound to complete suggestions made
+by copilot. This is to distinguish them from completions given from
+=company-mode=, and therefore LSP, which are completed with =<Tab>=.
+
+This config assumes you do not have copilot access, or that you have not
+logged in on this machine. In order to enable copilot, bind the variable
+=*starmacs/copilot-enabled*= to =t=.
+
 #+begin_src emacs-lisp
+  (defun starmacs/copilot-mode-hook ()
+    (when (and (boundp '*starmacs/copilot-enabled*)
+               ,*starmacs/copilot-enabled*)
+      copilot-mode-hook))
+
   (use-package copilot
     :straight (:host github :repo "zerolfx/copilot.el" :files ("dist" "*.el"))
     :hook (prog-mode . copilot-mode)
@@ -931,9 +995,22 @@ It is very useful for figuring out how things work in Emacs.
 #+begin_src emacs-lisp
 (setq tab-always-indent 'complete)
 #+end_src
+* Lisp Editing
+#+begin_src emacs-lisp
+    (use-package sly
+      :ensure t)
+#+end_src
 
 * LSP Features
+LSP stands for Language Server Protocol. It is a protocol that enables the
+development of tools to provide language-specific intelligent features such as
+auto-completion, go to definition, find all references, hover information, and
+other language-related features in text editors and integrated development
+environments (IDEs) using separate language servers.
+
 ** Eglot
+Emacs 29+ comes with =eglot=, an LSP system, built-in.
+
 #+begin_src emacs-lisp
   (use-package eglot
     :bind
@@ -949,17 +1026,7 @@ It is very useful for figuring out how things work in Emacs.
     (zig-mode . eglot-ensure)
     (before-save . my-eglot-organize-imports)
     (before-save . eglot-format-buffer)
-    :config (setq lsp-prefer-flymake nil)
-    (add-to-list 'eglot-server-programs
-      '((go-mode go-ts-mode) .
-          ("gopls" :initializationOptions
-             (:hints (:parameterNames t
-                      :rangeVariableTypes t
-                      :functionTypeParameters t
-                      :assignVariableTypes t
-                      :compositeLiteralFields t
-                      :compositeLiteralTypes t
-                      :constantValues t))))))
+    :config (setq lsp-prefer-flymake nil))
 #+end_src
 *** Format Imports on Save
 #+begin_src emacs-lisp
@@ -968,7 +1035,7 @@ It is very useful for figuring out how things work in Emacs.
  (add-hook 'before-save-hook 'my-eglot-organize-imports nil t)
  (add-hook 'before-save-hook 'eglot-format-buffer)
  #+end_src
-
+ 
 *** Eldoc
 #+begin_src emacs-lisp
   (use-package eldoc-box
@@ -977,6 +1044,13 @@ It is very useful for figuring out how things work in Emacs.
 #+end_src
 
 ** Tree-Sitter
+Tree-sitter is a parsing system and library designed for use in text editors.
+It can parse source code or other textual content and provide a detailed
+representation of the syntax tree, which can be used to perform powerful code
+analysis. It is particularly useful for support of advanced features such as
+syntax highlighting, code folding, and code navigation. Tree-sitter is fast,
+efficient and supports multiple programming languages.
+
 #+begin_src emacs-lisp
   (use-package tree-sitter
     :ensure t
@@ -986,109 +1060,11 @@ It is very useful for figuring out how things work in Emacs.
   (use-package tree-sitter-langs :ensure t)
 #+end_src
 
-* Language Specific IDE-Like Features
-** Go
-#+begin_src emacs-lisp
-  (use-package go-mode
-    :ensure t
-    :hook
-    (go-mode . tree-sitter-hl-mode)
-    :config
-    (setq gc-cons-threshold 100000000)
-    (setq read-process-output-max (* 1024 1024)))
-#+end_src
-
-** Python
-*** PEP8-compliant comments
-#+begin_src emacs-lisp
-  (add-hook 'python-mode-hook
-            (lambda ()
-              (setq comment-start " # ")))
-#+end_src
-*** Black
-#+begin_src emacs-lisp
-  (use-package python-black
-    :demand t
-    :after python
-    :hook (python-mode . python-black-on-save-mode-enable-dwim))
-#+end_src
-
-** TypeScript
-#+begin_src emacs-lisp
-  (use-package typescript-mode
-    :ensure t
-    :mode "\\.ts\\'"
-    :config
-    (setq typescript-indent-level 2))
-#+end_src
-
-** Julia
-#+begin_src emacs-lisp
-  (use-package vterm
-    :ensure t)
-
-  (use-package julia-repl)
-
-  (use-package eglot-jl)
-
-  (use-package julia-mode
-    :mode "\\.jl\\'"
-    :interpreter ("julia" . julia-mode)
-    :init (setenv "JULIA_NUM_THREADS" "6")
-    :config
-    (add-hook 'julia-mode-hook 'julia-repl-mode)
-    (add-hook 'julia-mode-hook 'eglot-jl-init)
-    (add-hook 'julia-mode-hook 'eglot-ensure)
-    (add-hook 'julia-mode-hook (lambda () (setq julia-repl-set-terminal-backend 'vterm))))
-
-  (setq eglot-jl-julia-command "/usr/local/bin/julia")
-  (setq julia-repl-executable-records
-        '((default "/usr/local/bin/julia")
-          (master "/usr/local/bin/julia")))
-#+end_src
-
-** Tex
-#+begin_src emacs-lisp
-  (use-package tex
-    :defer t
-    :straight auctex
-    :ensure auctex
-    :config
-    (setq TeX-auto-save t)
-    (setq-default TeX-engine 'xetex)
-    (setq-default TeX-PDF-mode t))
-
-  (use-package preview-latex
-    :defer t
-    :straight auctex
-    :ensure auctex)
-
-#+end_src
-
-** Protobufs
-#+begin_src emacs-lisp
-  (use-package protobuf-mode
-	:straight t)
-#+end_src
-
-** Fortran
-#+begin_src emacs-lisp
-  (add-to-list 'eglot-server-programs '(f90-mode . ("fortls" "--notify_init" "--nthreads=4")))
-#+end_src
-
-** Zig
-#+begin_src emacs-lisp
-  (use-package zig-mode
-  :straight t)
-#+end_src
-
-** Common Lisp
-#+begin_src emacs-lisp
-    (use-package sly
-      :ensure t)
-#+end_src
-
 * ChatGPT
+Due to its usefulness for unsticking oneself while programming, a ChatGPT
+client has been bundled in. To use it, simply put your OpenAI API key in the file
+=~/.emacs.d/chatgpt-api-key.txt=, and it will be automatically read when
+a new shell is opened with =M-x chatgpt-shell=
 #+begin_src emacs-lisp
   (use-package chatgpt-shell
     :ensure t
