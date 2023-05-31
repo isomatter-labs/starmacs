@@ -46,11 +46,11 @@ Starmacs is not necessarily for everyone; you may prefer one of the following:
 [[https://github.com/bbatsov/prelude][Prelude]]
 
 * User Code
-In order to allow you to use a better editing environment when adding your /own/
+In order to allow the user to use a better editing environment when adding your /own/
 code to Starmacs, the =usr= directory is added to the load-path. This means that
-any file you add in =~.emacs.d/usr/= will we automatically evaluated as you
-launch Emacs. This way, Emacs Lisp code can be edited in a dedicated buffer,
-rather than in a source block in an org document
+any file added in =~.emacs.d/usr/= will we automatically evaluated when
+Emacs is launched.. This way, Emacs Lisp code can be edited in a dedicated
+buffer, rather than in a source block in an org document
 #+begin_src emacs-lisp
   (let ((default-directory  "~/.emacs.d/usr/"))
     (normal-top-level-add-subdirs-to-load-path))
@@ -64,7 +64,8 @@ When files on disk change, open buffers should be automatically updated to refle
 #+end_src
 
 ** Do Not Create Extra Files
-Don't create =backup~= or =#autosave#= files
+Don't create =backup~= or =#autosave#= files.
+
 #+begin_src emacs-lisp
   (setq make-backup-files nil)
   (setq auto-save-default nil)
@@ -79,12 +80,14 @@ Don't create =backup~= or =#autosave#= files
 
 ** Replace Selection
 When text is highlighted, typing should delete the highlighted text and insert what is typed.
+
 #+begin_src emacs-lisp
   (delete-selection-mode 1)
 #+end_src
 
 ** Usage Guides
 =discover.el= mostly just helps with =dired= mode, but it's worth including for new users.
+
 #+begin_src emacs-lisp
   (use-package discover
     :ensure t
@@ -93,11 +96,17 @@ When text is highlighted, typing should delete the highlighted text and insert w
 #+end_src
 
 ** Mouse in Terminal
+If Emacs is run in the terminal, the mouse should continue to work.
+
 #+begin_src emacs-lisp
   (xterm-mouse-mode 1)
 #+end_src
 
 ** Whitespace
+Trailing whitespace should be highlighted, and deleted on save.
+In addition, tabs and newlines should be displayed in a subtle way,
+allowing for users to more easily check the formatting used.
+
 #+begin_src emacs-lisp
   (add-hook 'prog-mode-hook (lambda () (setq show-trailing-whitespace t)))
   (add-hook 'before-save-hook 'delete-trailing-whitespace)
@@ -116,23 +125,31 @@ When text is highlighted, typing should delete the highlighted text and insert w
 
 #+end_src
 
-** Column Ruler
-I like to display a column ruler at common styleguide limits
-(famously, 80 characters, but also often 100 and 120 characters).
-#+begin_src emacs-lisp
-  ;; (add-hook 'prog-mode-hook #'display-fill-column-indicator-mode)
-#+end_src
-
 ** Look
 *** Theme
 **** Autothemer
 Autothemer is a requirement for =anisochromatic-theme=, and must be loaded in first.
+
 #+begin_src emacs-lisp
   (use-package autothemer
     :ensure t)
 #+end_src
 
 **** Anisochromatic
+[[https://github.com/isomatter-labs/anisochromatic][Anisochromatic]] is a theme created by /Isomatter::Labs/ (the creators of Starmacs),
+and is a color theme meant to be both pleasing to the eye, a little retro, and comfortable.
+
+It also intentionally uses the same (or very similar) color assignments
+as the default Github color theme. This is done to reduce mental friction when
+alternating between one's editor and code in the browser.
+
+While the color attributions are intentionally copied, the colors themselves
+are original, and were carefully chosen to create a pleasing palette.
+
+A notable exception to the color attirbutions are strings, which Github lumps
+with other constants as /blue/, but which most color schemes tend to assign /green/.
+In order to assure the least friction reasonable, /Anisochromatic/ opted for teal.
+
 #+begin_src emacs-lisp
   (use-package anisochromatic-theme
     :straight (:host github :repo "isomatter-labs/anisochromatic-emacs" :files ("dist" "*.el"))
@@ -142,6 +159,10 @@ Autothemer is a requirement for =anisochromatic-theme=, and must be loaded in fi
 #+end_src
 
 *** Markdown
+While most Emacs users prefer to use =org-mode= for rich text documents
+(such as this one), one will nevertheless encounter Markdown frequently,
+so Markdown should also be rendered nicely.
+
 #+begin_src emacs-lisp
   (use-package markdown-mode
     :ensure t
@@ -150,6 +171,9 @@ Autothemer is a requirement for =anisochromatic-theme=, and must be loaded in fi
 #+end_src
 
 *** Modeline
+[[https://github.com/isomatter-labs/base-line][base-line]] is an Emacs modeline maintained by Isomatter::Labs that is /heavily/
+based on [[https://github.com/jessiehildebrandt/mood-line][mood-line]] by Jessie Hildebrandt.
+
 #+begin_src emacs-lisp
   (use-package base-line
     :straight (:host github :repo "isomatter-labs/base-line" :files ("dist" "*.el"))
@@ -185,53 +209,70 @@ Autothemer is a requirement for =anisochromatic-theme=, and must be loaded in fi
 
 *** Quality of Life
 #+begin_src emacs-lisp
-          (setq inhibit-startup-message t)
+  (setq inhibit-startup-message t)
 
-          (scroll-bar-mode -1)        ; Disable visible scrollbar
-          (tool-bar-mode -1)          ; Disable the toolbar
-          (tooltip-mode -1)           ; Disable tooltips
-          (set-fringe-mode 10)        ; Give some breathing room
+  (scroll-bar-mode -1)        ; Disable visible scrollbar
+  (tool-bar-mode -1)          ; Disable the toolbar
+  (tooltip-mode -1)           ; Disable tooltips
+  (set-fringe-mode 10)        ; Give some breathing room
 
-          ;(menu-bar-mode -1)          ; Disable the menu bar
 
-          (toggle-frame-maximized)    ; Always start maximized
+  (toggle-frame-maximized)    ; Always start maximized
+  #+end_src
 
-          ;; Set up the visible bell
-          (setq visible-bell t)
-          (setq ring-bell-function
-              (lambda ()
-                (let ((orig-bg (face-background 'mode-line)))
-                  (set-face-background 'mode-line "#ef8e49")
-                  (starmacs/set-modeline-box-bg "#ef8e49")
-                  (run-with-idle-timer 0.1 nil
-                                       (lambda (bg) (progn (set-face-background 'mode-line bg)
-                                                           (starmacs/set-modeline-box-bg bg)))
-                                       orig-bg))))
+*** Visible Bell
+Instead of ringing an obnoxious bell, simply flash the modeline.
 
-          (column-number-mode)
-          (global-display-line-numbers-mode t)
+#+begin_src emacs-lisp
+  (setq visible-bell t)
+  (setq ring-bell-function
+        (lambda ()
+          (let ((orig-bg (face-background 'mode-line)))
+            (set-face-background 'mode-line "#ef8e49")
+            (starmacs/set-modeline-box-bg "#ef8e49")
+            (run-with-idle-timer 0.1 nil
+                                 (lambda (bg) (progn (set-face-background 'mode-line bg)
+                                                     (starmacs/set-modeline-box-bg bg)))
+                                 orig-bg))))
+#+end_src
 
-          ;; Disable line numbers for some modes
-          (dolist (mode '(org-mode-hook
-                          term-mode-hook
-                          shell-mode-hook
-                          treemacs-mode-hook
-                          eshell-mode-hook))
-            (add-hook mode (lambda () (display-line-numbers-mode 0))))
+*** Line Numbers
+Display line numbers everywhere, except for things like terminals, where it doesn't make much sense.
+
+#+begin_src emacs-lisp
+
+  (column-number-mode)
+  (global-display-line-numbers-mode t)
+
+  ;; Disable line numbers for some modes
+  (dolist (mode '(org-mode-hook
+                  term-mode-hook
+                  shell-mode-hook
+                  eshell-mode-hook))
+    (add-hook mode (lambda () (display-line-numbers-mode 0))))
 #+end_src
 
 *** Scrolling
-Set up pixel-scrolling for a nice, modern-feeling experience (currently causing lag on long files)
+Set up pixel-scrolling for a nice, modern-feeling experience
+
 #+begin_src emacs-lisp
   (pixel-scroll-precision-mode 1)
 #+end_src
 
 *** Cursor
+Default the cursor to a blinking bar, which is more familiar than the default box.
+
 #+begin_src emacs-lisp
-  (setq-default cursor-type '(bar . 1))
+  (setq-default cursor-type '(bar . 2))
 #+end_src
 
 *** Truncate, Don't Wrap
+By default, do not wrap lines around the window,
+but instead truncate them at the edge.
+
+Use diamonds to indicate when these truncations happen, rather than the default
+right-arrows.
+
 #+begin_src emacs-lisp
   (set-default 'truncate-lines t)
   (define-fringe-bitmap 'right-arrow
@@ -255,12 +296,17 @@ Set up pixel-scrolling for a nice, modern-feeling experience (currently causing 
 #+end_src
 
 *** Focus Line
+Highlight the line the cursor is currently on, to make it easier to quickly locate the cursor.
+
 #+begin_src emacs-lisp
   (if (window-system)
       (global-hl-line-mode 1))
 #+end_src
 
 *** Highlight TODOs
+Highlight the words "TODO" and "FIXME"  in comments,
+allowing them to be more easily found.
+
 #+begin_src emacs-lisp
   (use-package hl-todo
     :ensure t
@@ -268,12 +314,14 @@ Set up pixel-scrolling for a nice, modern-feeling experience (currently causing 
     (global-hl-todo-mode 1))
 #+end_src
 
-*** Dashboard
+*** Welcome screen
+Present users with a friendly and fun welcome screen on initial startup.
+
 #+begin_src emacs-lisp
    (defun no-linum ()
      (display-line-numbers-mode -1))
 
-  (defun starmacs/dashboard ()
+  (defun starmacs/welcome ()
     (interactive)
      "Show minimal *welcome* buffer"
      (with-current-buffer (get-buffer-create "*Welcome*")
@@ -305,11 +353,13 @@ Set up pixel-scrolling for a nice, modern-feeling experience (currently causing 
   (when (< (length command-line-args) 2)
     (add-hook 'emacs-startup-hook (lambda ()
                                    (when (display-graphic-p)
-                                     (starmacs/dashboard)))))
+                                     (starmacs/welcome)))))
 
 #+end_src
 
 *** Rainbow Delimiters
+Color parentheses based on their nesting, so allow quick and easy matching,
+as well as keeping track of the current scope
 #+begin_src emacs-lisp
   (use-package rainbow-delimiters
     :ensure t
@@ -319,23 +369,13 @@ Set up pixel-scrolling for a nice, modern-feeling experience (currently causing 
 #+end_src
 
 ** Fonts
-*** =font-installed-p=
-#+begin_src emacs-lisp
-  (defun starmacs/font-installed-p (font-name)
-    (find-font (font-spec :name font-name)))
-#+end_src
-
-*** All the Icons
-#+begin_src emacs-lisp
-  (use-package all-the-icons
-    :ensure t
-    :config
-    (when (and (not (starmacs/font-installed-p "all-the-icons"))
-               (window-system))
-      (all-the-icons-install-fonts t)))
-#+end_src
 *** Default Fonts
 **** Install Defaults
+Ensure that the fonts packaged with Starmacs are installed correctly.
+Currently, this assumes that the user is using macOS.
+
+This will be later expanded to support all *nix, and perhaps Windows.
+
   #+begin_src emacs-lisp
     (defun install-default-fonts ()
       (when (and
@@ -372,6 +412,9 @@ Set up pixel-scrolling for a nice, modern-feeling experience (currently causing 
      #+end_src
 
 *** Ligatures
+Allow the use of ligatures in code, prettying up the noisy symbol-salad
+that most programming languages consist of.
+
 #+begin_src emacs-lisp
   (use-package ligature
     :config
@@ -421,6 +464,10 @@ text between them will be treated as a SQL query.
 #+end_src
 
 ** Quick Reload
+This binds both =<f5>= and Cmd-R to a function that will reload the current
+buffer from it's file. This comes in handy more often than would be thought,
+for example when forcing LSP to re-evaluate a buffer.
+
 #+begin_src emacs-lisp
   (defun revert-buffer-no-confirm ()
     "Revert the current buffer without asking permission"
@@ -432,7 +479,7 @@ text between them will be treated as a SQL query.
 #+end_src
 
 ** Which Key
-which-key is a useful UI panel that appears when you start pressing any key
+=which-key= is a useful UI panel that appears when you start pressing any key
 binding in Emacs to offer you all possible completions for the prefix.
 For example, if you press =C-c= (hold control and press the letter c), a panel
 will appear at the bottom of the frame displaying all of the bindings under that
@@ -449,11 +496,26 @@ key bindings in the mode of your current buffer.
 #+end_src
 
 ** Better Window Navigation
+When more than two windows are visible in the frame,
+=C-x o= will add a red number to each pane, allowing the user to select which
+pane they mean to move to.
+
+This prevents the endless pane-cycling many users are familiar with.
+
 #+begin_src emacs-lisp
   (use-package ace-window
     :ensure t
     :config
     (global-set-key (kbd "C-x o") 'ace-window))
+#+end_src
+
+** SQLite
+Although Emacs has built-in SQLite support since Emacs 29.1, it is manually
+installed here to prevent annoying warnings.
+
+#+begin_src emacs-lisp
+  (use-package sqlite3
+    :ensure t)
 #+end_src
 
 * Meow
