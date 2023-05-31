@@ -1047,6 +1047,20 @@ logged in on this machine. In order to enable copilot, bind the variable
 (setq tab-always-indent 'complete)
 #+end_src
 * Lisp Editing
+While Emacs Lisp is the language Emacs is configured in,
+as well as what this code is in, it's very likely that users will eventually
+encounter another Lisp.
+
+Common Lisp is the most common variant users can expect to see inthe wild,
+and /Sly/ is the best solution out there for working on it.
+
+Sly is a Common Lisp IDE for Emacs that provides a variety of features for
+interactive programming, development, and debugging. It is an alternative to
+the more popular package Slime, but is designed to be more lightweight and
+modern. With sly, you can connect to a running Lisp process, evaluate code,
+inspect variables, and so much more. If you use Common Lisp or are interested
+in learning it, sly is definitely a package to consider.
+
 #+begin_src emacs-lisp
     (use-package sly
       :ensure t)
