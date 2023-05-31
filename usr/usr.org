@@ -1,4 +1,0 @@
-* User code
-In this directory, add your own =*.el= files containing code you'd like to add
-to /your/ personal Emacs, rather than trying to modify the large org file.
-

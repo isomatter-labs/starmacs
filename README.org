@@ -172,28 +172,20 @@ based on [[https://github.com/jessiehildebrandt/mood-line][mood-line]] by Jessie
 
 **** Adjust Modeline Size
 #+begin_src emacs-lisp
-  (defvar starmacs/default-modeline-active-bg "#363c47")
-  (defvar starmacs/default-modeline-inactive-bg "#23272e")
+    (defun starmacs/set-modeline-box-bg (face new-bg)
+      (set-face-attribute face nil
+                          :background new-bg
+                          :box `(:line-width 8 :color ,new-bg)
+                          :overline nil
+                          :underline nil))
 
-  (defun starmacs/set-modeline-box-bg (new-bg)
-    (set-face-attribute 'mode-line nil
-                        :background new-bg
-                        :foreground "#faf4e9"
-                        :box `(:line-width 8 :color ,new-bg)
-                        :overline nil
-                        :underline nil))
+  (defun starmacs/fix-modeline ()
+    (interactive)
+    (starmacs/set-modeline-box-bg 'mode-line-active (face-background 'mode-line-active))
+    (starmacs/set-modeline-box-bg 'mode-line (face-background 'mode-line))
+    (starmacs/set-modeline-box-bg 'mode-line-inactive (face-background 'mode-line-inactive)))
 
-  (defun starmacs/set-modeline-inactive-box-bg (new-bg)
-    (set-face-attribute 'mode-line-inactive nil
-                        :background new-bg
-                        :foreground "#586274"
-                        :box `(:line-width 8 :color ,new-bg)
-                        :overline nil
-                        :underline nil))
-
-  (starmacs/set-modeline-box-bg starmacs/default-modeline-active-bg)
-  (starmacs/set-modeline-inactive-box-bg starmacs/default-modeline-inactive-bg)
-
+  (starmacs/fix-modeline)
 #+end_src
 
 *** Quality of Life
@@ -216,12 +208,12 @@ Instead of ringing an obnoxious bell, simply flash the modeline.
   (setq visible-bell t)
   (setq ring-bell-function
         (lambda ()
-          (let ((orig-bg (face-background 'mode-line)))
-            (set-face-background 'mode-line "#ef8e49")
-            (starmacs/set-modeline-box-bg "#ef8e49")
+          (let ((orig-bg (face-background 'mode-line-active)))
+            (set-face-background 'mode-line-active "#ef8e49")
+            (starmacs/set-modeline-box-bg 'mode-line-active "#ef8e49")
             (run-with-idle-timer 0.1 nil
-                                 (lambda (bg) (progn (set-face-background 'mode-line bg)
-                                                     (starmacs/set-modeline-box-bg bg)))
+                                 (lambda (bg) (progn (set-face-background 'mode-line-active bg)
+                                                     (starmacs/set-modeline-box-bg 'mode-line-active bg)))
                                  orig-bg))))
 #+end_src
 
