@@ -45,17 +45,6 @@ Starmacs is not necessarily for everyone; you may prefer one of the following:
 [[https://github.com/hlissner/doom-emacs][Doom Emacs]]
 [[https://github.com/bbatsov/prelude][Prelude]]
 
-* User Code
-In order to allow the user to use a better editing environment when adding your /own/
-code to Starmacs, the =usr= directory is added to the load-path. This means that
-any file added in =~.emacs.d/usr/= will we automatically evaluated when
-Emacs is launched.. This way, Emacs Lisp code can be edited in a dedicated
-buffer, rather than in a source block in an org document
-#+begin_src emacs-lisp
-  (let ((default-directory  "~/.emacs.d/usr/"))
-    (normal-top-level-add-subdirs-to-load-path))
-#+end_src
-
 * Quality of Life Improvements
 ** Keep Buffers Up to Date with Files
 When files on disk change, open buffers should be automatically updated to reflect those changes.
@@ -1136,3 +1125,28 @@ a new shell is opened with =M-x chatgpt-shell=
                                      (insert-file-contents "~/.emacs.d/chatgpt-api-key.txt")
                                      (buffer-string)))))
 #+end_src
+
+* User Code
+In order to allow the user to use a better editing environment when adding your /own/
+code to Starmacs, the =usr= directory is added to the load-path. This means that
+any file added in =~.emacs.d/usr/= will we automatically evaluated when
+Emacs is launched.. This way, Emacs Lisp code can be edited in a dedicated
+buffer, rather than in a source block in an org document
+#+begin_src emacs-lisp
+  (let ((default-directory  "~/.emacs.d/usr/"))
+    (normal-top-level-add-subdirs-to-load-path))
+
+  (defun starmacs/load-user-code (dir)
+  "`load' all elisp libraries in directory DIR which are not already loaded."
+  (interactive "D")
+  (let ((libraries-loaded (mapcar #'file-name-sans-extension
+                                  (delq nil (mapcar #'car load-history)))))
+    (dolist (file (directory-files dir t ".+\\.elc?$"))
+      (let ((library (file-name-sans-extension file)))
+        (unless (member library libraries-loaded)
+          (load library nil t)
+          (push library libraries-loaded))))))
+
+  (starmacs/load-user-code "~/.emacs.d/usr/")
+#+end_src
+
