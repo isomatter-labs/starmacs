@@ -1134,7 +1134,11 @@ efficient and supports multiple programming languages.
      (typescript "https://github.com/tree-sitter/tree-sitter-typescript" "master" "typescript/src")
      (yaml "https://github.com/ikatyang/tree-sitter-yaml")))
 
-  (mapc #'treesit-install-language-grammar (mapcar #'car treesit-language-source-alist))
+  (defun starmacs/install-grammers ()
+    "Download and compile all of the grammers in treesit-language"
+  	(interactive)
+    (mapc #'treesit-install-language-grammar (mapcar #'car treesit-language-source-alist)))
+
   (global-tree-sitter-mode t)
 #+end_src
 
