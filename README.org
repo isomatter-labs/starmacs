@@ -1082,10 +1082,11 @@ Emacs 29+ comes with =eglot=, an LSP system, built-in.
     ("<f12>" . eglot-find-typeDefinition)
     ("<f2>" . eglot-rename))
     :hook
-    (scala-mode . eglot-ensure)
     (typescript-mode . eglot-ensure)
-    (python-mode . eglot-ensure)
-    (go-mode . eglot-ensure)
+    (typescript-ts-mode . eglot-ensure)
+    (tsx-ts-mode . eglot-ensure)
+    (python-ts-mode . eglot-ensure)
+    (go-ts-mode . eglot-ensure)
     (f90-mode . eglot-ensure)
     (zig-mode . eglot-ensure)
     (before-save . my-eglot-organize-imports)
@@ -1138,8 +1139,6 @@ efficient and supports multiple programming languages.
     "Download and compile all of the grammers in treesit-language"
   	(interactive)
     (mapc #'treesit-install-language-grammar (mapcar #'car treesit-language-source-alist)))
-
-  (global-tree-sitter-mode t)
 #+end_src
 
 * ChatGPT
