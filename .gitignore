@@ -25,7 +25,8 @@ url/
 /eln-cache/
 /img/.DS_Store
 /games/
-/usr/*
 *.sqlite
 /tree-sitter/
-/usr/
+tramp
+eshell
+usr
