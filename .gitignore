@@ -26,3 +26,6 @@ url/
 /img/.DS_Store
 /games/
 /usr/*
+*.sqlite
+/tree-sitter/
+/usr/
