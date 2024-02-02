@@ -627,6 +627,7 @@ utility all wrapped up in one package.
     (org-mode . visual-line-mode)
     (org-mode . variable-pitch-mode)
     (org-mode . (lambda () (indent-tabs-mode -1)))
+    (org-mode . (lambda () (set-face-attribute 'org-block nil :foreground nil :font starmacs/fixed-pitch-font :height 120 :inherit 'fixed-pitch)))
 
     :custom
     (org-startup-with-inline-images t)
@@ -1118,27 +1119,36 @@ efficient and supports multiple programming languages.
 
 #+begin_src emacs-lisp
   (require 'treesit)
+  (setq treesit-font-lock-level 4)
   (setq treesit-language-source-alist
-   '((bash "https://github.com/tree-sitter/tree-sitter-bash")
-     (cmake "https://github.com/uyha/tree-sitter-cmake")
-     (css "https://github.com/tree-sitter/tree-sitter-css")
-     (elisp "https://github.com/Wilfred/tree-sitter-elisp")
-     (go "https://github.com/tree-sitter/tree-sitter-go")
-     (html "https://github.com/tree-sitter/tree-sitter-html")
-     (javascript "https://github.com/tree-sitter/tree-sitter-javascript" "master" "src")
-     (json "https://github.com/tree-sitter/tree-sitter-json")
-     (make "https://github.com/alemuller/tree-sitter-make")
-     (markdown "https://github.com/ikatyang/tree-sitter-markdown")
-     (python "https://github.com/tree-sitter/tree-sitter-python")
-     (toml "https://github.com/tree-sitter/tree-sitter-toml")
-     (tsx "https://github.com/tree-sitter/tree-sitter-typescript" "master" "tsx/src")
-     (typescript "https://github.com/tree-sitter/tree-sitter-typescript" "master" "typescript/src")
-     (yaml "https://github.com/ikatyang/tree-sitter-yaml")))
+  	  '((bash "https://github.com/tree-sitter/tree-sitter-bash")
+  		(cmake "https://github.com/uyha/tree-sitter-cmake")
+  		(css "https://github.com/tree-sitter/tree-sitter-css")
+  		(elisp "https://github.com/Wilfred/tree-sitter-elisp")
+  		(go "https://github.com/tree-sitter/tree-sitter-go")
+  		(html "https://github.com/tree-sitter/tree-sitter-html")
+  		(javascript "https://github.com/tree-sitter/tree-sitter-javascript" "master" "src")
+  		(json "https://github.com/tree-sitter/tree-sitter-json")
+  		(make "https://github.com/alemuller/tree-sitter-make")
+  		(markdown "https://github.com/ikatyang/tree-sitter-markdown")
+  		(python "https://github.com/tree-sitter/tree-sitter-python")
+  		(toml "https://github.com/tree-sitter/tree-sitter-toml")
+  		(tsx "https://github.com/tree-sitter/tree-sitter-typescript" "master" "tsx/src")
+  		(typescript "https://github.com/tree-sitter/tree-sitter-typescript" "master" "typescript/src")
+  		(yaml "https://github.com/ikatyang/tree-sitter-yaml")))
 
   (defun starmacs/install-grammers ()
     "Download and compile all of the grammers in treesit-language"
-  	(interactive)
+    (interactive)
     (mapc #'treesit-install-language-grammar (mapcar #'car treesit-language-source-alist)))
+
+  (if (not (file-exists-p (expand-file-name "tree-sitter" user-emacs-directory)))
+  	(starmacs/install-grammers))
+
+  ;; (use-package treesit-auto
+  ;;   :config
+  ;;   (treesit-auto-add-to-auto-mode-alist 'all)
+  ;;   (global-treesit-auto-mode))
 #+end_src
 
 * ChatGPT
