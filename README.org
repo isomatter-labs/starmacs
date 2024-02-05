@@ -1090,17 +1090,8 @@ Emacs 29+ comes with =eglot=, an LSP system, built-in.
     (go-ts-mode . eglot-ensure)
     (f90-mode . eglot-ensure)
     (zig-mode . eglot-ensure)
-    (before-save . my-eglot-organize-imports)
-    (before-save . eglot-format-buffer)
     :config (setq lsp-prefer-flymake nil))
 #+end_src
-*** Format Imports on Save
-#+begin_src emacs-lisp
- (defun my-eglot-organize-imports () (interactive)
-   (eglot-code-actions nil nil "source.organizeImports" t))
- (add-hook 'before-save-hook 'my-eglot-organize-imports nil t)
- (add-hook 'before-save-hook 'eglot-format-buffer)
- #+end_src
  
 *** Eldoc
 #+begin_src emacs-lisp
