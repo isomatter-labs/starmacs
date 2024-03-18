@@ -45,6 +45,27 @@ Starmacs is not necessarily for everyone; you may prefer one of the following:
 [[https://github.com/hlissner/doom-emacs][Doom Emacs]]
 [[https://github.com/bbatsov/prelude][Prelude]]
 
+* Installation
+** Dependencies
+The =magit= package installed by Starmacs expects you to have =sqlite= installed on your system.
+Installation will vary based on your system, but it is generally available as a package for most package managers.
+
+** Cloning the Repository
+Simply clone this repository into your =~/.emacs.d= directory.
+The next time you start emacs, it will automatically install all of the packages and set up the configuration.
+As is mentioned later in this document, any custom configuration should be added to the =~/usr= directory.
+This prevents the need to merge changes when the repository is updated.
+Feel free to update this file directly if you wish, but be aware that pulling updates will become a headache.
+
+Alternately, after cloning this repository, you can simply delete the =.git= directory and start a new repository.
+That way, Starmacs can simply serve as a starting point for your own configuration, rather than a living distribution.
+
+Either way is fine, and the choice is yours!
+
+*** Note: =sqlite-api=
+When you first start up Starmacs, there will be a prompt to build the =sqlite-api=.
+After entering 'yes', the installation will proceed as normal.
+
 * Quality of Life Improvements
 ** Keep Buffers Up to Date with Files
 When files on disk change, open buffers should be automatically updated to reflect those changes.
@@ -72,16 +93,6 @@ When text is highlighted, typing should delete the highlighted text and insert w
 
 #+begin_src emacs-lisp
   (delete-selection-mode 1)
-#+end_src
-
-** Usage Guides
-=discover.el= mostly just helps with =dired= mode, but it's worth including for new users.
-
-#+begin_src emacs-lisp
-  (use-package discover
-    :ensure t
-    :config
-    (global-discover-mode 1))
 #+end_src
 
 ** Mouse in Terminal
@@ -305,6 +316,7 @@ Present users with a friendly and fun welcome screen on initial startup.
   (defun starmacs/welcome ()
     (interactive)
      "Show minimal *welcome* buffer"
+     (delete-other-windows)
      (with-current-buffer (get-buffer-create "*Welcome*")
        (setq truncate-lines t)
        (no-linum)
@@ -335,7 +347,6 @@ Present users with a friendly and fun welcome screen on initial startup.
     (add-hook 'emacs-startup-hook (lambda ()
                                    (when (display-graphic-p)
                                      (starmacs/welcome)))))
-
 #+end_src
 
 *** Rainbow Delimiters
@@ -351,6 +362,16 @@ as well as keeping track of the current scope
 
 ** Fonts
 *** Default Fonts
+Starmacs comes with a set of default fonts, which are are listed and attributed below:
+
+- [[https://github.com/be5invis/Iosevka][Iosevka]]: A monospaced font with a distinct look, and a wide range of weights.
+- [[https://github.com/github/mona-sans][Mona Sans]]: A strong and versitile typeface inspired by industrial-era grotesques made by GitHub.
+- [[https://github.com/github/hubot-sans][Hubot-Sans]]: The typeface is designed with more geometric accents to lend a technical and idiosyncratic feel—perfect for headers and pull-quotes. Also made by GitHub.
+
+All three licenses are distributed under the SIL Open Font License, and are available for free.
+
+If you have fonts that you prefer, the easiest way to override these defaults is to duplicate this config (with your preferred fonts) inside the =/usr= directory.
+
 **** Install Defaults
 Ensure that the fonts packaged with Starmacs are installed correctly.
 Currently, this assumes that the user is using macOS.
@@ -359,29 +380,25 @@ This will be later expanded to support all *nix, and perhaps Windows.
 
   #+begin_src emacs-lisp
     (defun install-default-fonts ()
-      (when (and
-             (window-system)
-             (string-equal system-type "darwin"))
+      (when (window-system)
         (progn
           (message "Installing Default Fonts")
-          (call-process "/bin/bash" nil nil nil "-c" "cp ~/.emacs.d/fonts/*.ttf ~/Library/Fonts")
+          (shell-command (expand-file-name "install-fonts.sh"))
           (message "Installed Default Fonts"))))
 #+end_src
+
 **** Set Defaults
 #+begin_src emacs-lisp
-      (defvar starmacs/fixed-pitch-height 130)
+      (defvar starmacs/fixed-pitch-height 150)
       (defvar starmacs/variable-pitch-height 130)
       (setq-default line-spacing 0.2)
 
-      (defvar starmacs/fixed-pitch-font (if (member "Berkeley Mono" (font-family-list))
-                                         "Berkeley Mono"
-                                       "SF Mono"))
-
-      (if (not (and (member "Hubot-Sans" (font-family-list)) (member "Mona Sans" (font-family-list))))
+      (if (not (and (member "Iosevka" (font-family-list))(member "Hubot-Sans" (font-family-list)) (member "Mona Sans" (font-family-list))))
           (install-default-fonts))
 
       (defvar starmacs/variable-pitch-font "Mona Sans")
       (defvar starmacs/title-font "Hubot-Sans")
+      (defvar starmacs/fixed-pitch-font "Iosevka")
 
 
       (set-face-attribute 'default nil :font starmacs/fixed-pitch-font :height starmacs/fixed-pitch-height)
@@ -1007,6 +1024,8 @@ logged in on this machine. In order to enable copilot, bind the variable
     :config
     (define-key copilot-completion-map (kbd "C-f") 'copilot-accept-completion) ; using forward motion to accept completion like Warp
     (define-key copilot-completion-map (kbd "<right>") 'copilot-accept-completion)
+    (unless (copilot-installed-version)
+  	  (copilot-install-server))
     :ensure t)
 #+end_src
 
@@ -1092,7 +1111,7 @@ Emacs 29+ comes with =eglot=, an LSP system, built-in.
     (zig-mode . eglot-ensure)
     :config (setq lsp-prefer-flymake nil))
 #+end_src
- 
+
 *** Eldoc
 #+begin_src emacs-lisp
   (use-package eldoc-box
@@ -1148,23 +1167,29 @@ client has been bundled in. To use it, simply put your OpenAI API key in the fil
 =~/.emacs.d/chatgpt-api-key.txt=, and it will be automatically read when
 a new shell is opened with =M-x chatgpt-shell=
 #+begin_src emacs-lisp
+  (setq starmacs/chatgpt-api-key (expand-file-name "chatgpt-api-key.txt"))
+
   (use-package chatgpt-shell
     :ensure t
     :straight (:host github :repo "xenodium/chatgpt-shell" :files ("dist" "*.el"))
     :config
+    (unless
+  	  (file-exists-p starmacs/chatgpt-api-key)
+  	(make-empty-file starmacs/chatgpt-api-key))
+
     (setq chatgpt-shell-openai-key (replace-regexp-in-string "\n\\'" "" (with-temp-buffer
-                                     (insert-file-contents "~/.emacs.d/chatgpt-api-key.txt")
-                                     (buffer-string)))))
+  																		(insert-file-contents (expand-file-name "chatgpt-api-key.txt"))
+  																		(buffer-string)))))
 #+end_src
 
 * User Code
 In order to allow the user to use a better editing environment when adding your /own/
 code to Starmacs, the =usr= directory is added to the load-path. This means that
-any file added in =~.emacs.d/usr/= will we automatically evaluated when
+any file added in =./usr/= will we automatically evaluated when
 Emacs is launched.. This way, Emacs Lisp code can be edited in a dedicated
 buffer, rather than in a source block in an org document
 #+begin_src emacs-lisp
-  (let ((default-directory  "~/.emacs.d/usr/"))
+  (let ((default-directory  user-emacs-directory))
     (normal-top-level-add-subdirs-to-load-path))
 
   (defun starmacs/load-user-code (dir)
@@ -1178,6 +1203,16 @@ buffer, rather than in a source block in an org document
           (load library nil t)
           (push library libraries-loaded))))))
 
-  (starmacs/load-user-code "~/.emacs.d/usr/")
+  (when (file-exists-p (expand-file-name "./usr"))
+    (starmacs/load-user-code (expand-file-name "./usr")))
 #+end_src
 
+* Initial Startup
+If you're starting up for the first time, a bunch of warnings and windows and such are created.
+Let's get rid of those and show you the dashboard
+
+#+begin_src emacs-lisp
+  (when starmacs/initial-install
+    (starmacs/welcome)
+    (move-beginning-of-line nil))
+#+end_src
