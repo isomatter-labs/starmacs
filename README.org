@@ -1213,5 +1213,6 @@ Let's get rid of those and show you the dashboard
 
 #+begin_src emacs-lisp
   (when starmacs/initial-install
-    (starmacs/welcome))
+    (starmacs/welcome)
+    (move-beginning-of-line nil))
 #+end_src
