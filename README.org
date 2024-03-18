@@ -316,6 +316,7 @@ Present users with a friendly and fun welcome screen on initial startup.
   (defun starmacs/welcome ()
     (interactive)
      "Show minimal *welcome* buffer"
+     (delete-other-windows)
      (with-current-buffer (get-buffer-create "*Welcome*")
        (setq truncate-lines t)
        (no-linum)
@@ -1211,5 +1212,6 @@ If you're starting up for the first time, a bunch of warnings and windows and su
 Let's get rid of those and show you the dashboard
 
 #+begin_src emacs-lisp
-  (starmacs/welcome)
+  (when starmacs/initial-install
+    (starmacs/welcome))
 #+end_src
