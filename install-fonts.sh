@@ -2,7 +2,7 @@
 
 font_src_dir="$(pwd)/fonts"
 
-find_command="find \"$font_src_dir\" \( -name '*.[o,t]tf' -or -name '*.pcf.gz' \) -type f -print0"
+find_command="find \"$font_src_dir\" \( -name '*.[o,t]t[f,c]' -or -name '*.pcf.gz' \) -type f -print0"
 
 if [[ `uname` == 'Darwin' ]]; then
   # MacOS
