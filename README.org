@@ -45,6 +45,27 @@ Starmacs is not necessarily for everyone; you may prefer one of the following:
 [[https://github.com/hlissner/doom-emacs][Doom Emacs]]
 [[https://github.com/bbatsov/prelude][Prelude]]
 
+* Installation
+** Dependencies
+The =magit= package installed by Starmacs expects you to have =sqlite= installed on your system.
+Installation will vary based on your system, but it is generally available as a package for most package managers.
+
+** Cloning the Repository
+Simply clone this repository into your =~/.emacs.d= directory.
+The next time you start emacs, it will automatically install all of the packages and set up the configuration.
+As is mentioned later in this document, any custom configuration should be added to the =~/usr= directory.
+This prevents the need to merge changes when the repository is updated.
+Feel free to update this file directly if you wish, but be aware that pulling updates will become a headache.
+
+Alternately, after cloning this repository, you can simply delete the =.git= directory and start a new repository.
+That way, Starmacs can simply serve as a starting point for your own configuration, rather than a living distribution.
+
+Either way is fine, and the choice is yours!
+
+*** Note: =sqlite-api=
+When you first start up Starmacs, there will be a prompt to build the =sqlite-api=.
+After entering 'yes', the installation will proceed as normal.
+
 * Quality of Life Improvements
 ** Keep Buffers Up to Date with Files
 When files on disk change, open buffers should be automatically updated to reflect those changes.
@@ -325,7 +346,6 @@ Present users with a friendly and fun welcome screen on initial startup.
     (add-hook 'emacs-startup-hook (lambda ()
                                    (when (display-graphic-p)
                                      (starmacs/welcome)))))
-
 #+end_src
 
 *** Rainbow Delimiters
@@ -359,12 +379,10 @@ This will be later expanded to support all *nix, and perhaps Windows.
 
   #+begin_src emacs-lisp
     (defun install-default-fonts ()
-      (when (and
-             (window-system)
-             (string-equal system-type "darwin"))
+      (when (window-system)
         (progn
           (message "Installing Default Fonts")
-          (call-process "/bin/bash" nil nil nil "-c" "cp ~/.emacs.d/fonts/*.ttf ~/Library/Fonts")
+          (shell-command (expand-file-name "install-fonts.sh"))
           (message "Installed Default Fonts"))))
 #+end_src
 
@@ -1186,4 +1204,12 @@ buffer, rather than in a source block in an org document
 
   (when (file-exists-p (expand-file-name "./usr"))
     (starmacs/load-user-code (expand-file-name "./usr")))
+#+end_src
+
+* Initial Startup
+If you're starting up for the first time, a bunch of warnings and windows and such are created.
+Let's get rid of those and show you the dashboard
+
+#+begin_src emacs-lisp
+  (starmacs/welcome)
 #+end_src
